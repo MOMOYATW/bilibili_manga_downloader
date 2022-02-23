@@ -1,10 +1,74 @@
 import sys
 from downloader_base_ui import Ui_MainWindow
 from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QThread, Signal
 from core import *
 from settings_ui import SettingWindow
 import re
+from time import sleep
+
+
+class DownloadThread(QThread):
+    progress_changed = Signal(int)
+
+    def __init__(self, window) -> None:
+        super(DownloadThread, self).__init__()
+        self.window = window
+        self.stop = False
+        self.progress_changed.connect(self.window.ui.progressBar.setValue)
+
+    def run(self) -> None:
+        progress_value = 0
+        self.progress_changed.emit(progress_value)
+        download_sets = []
+        for i in range(self.window.ui.listWidget.count()):
+            item = self.window.ui.listWidget.item(i)
+            widget = self.window.ui.listWidget.itemWidget(item)
+            if widget.isChecked():
+                download_sets.append(self.window.episode_list[i])
+        for i, download in enumerate(download_sets):
+            base_value = i / len(download_sets) * 100
+            delta_value = 1 / len(download_sets) * 100
+            save_folder = os.path.join(self.window.base_folder, self.window.ui.manga_title.text(),
+                                       '{} - {}'.format(download['short_title'], download['title']))
+            folder = os.path.exists(save_folder)
+            if not folder:
+                os.makedirs(save_folder)
+            try:
+                length, images_list = get_images_list(
+                    download['id'], self.window.cookie)
+            except Exception as e:
+                msg_box = QMessageBox(
+                    QMessageBox.Critical, '错误', '抛出异常：' + str(e) + '\n请检查网络或代理配置')
+                msg_box.exec_()
+                continue
+
+            if length == -1:
+                msg_box = QMessageBox(
+                    QMessageBox.Critical, '错误', images_list)
+                msg_box.exec_()
+
+            for i, image in enumerate(images_list):
+                progress_value = base_value + \
+                    delta_value * ((i + 1) / len(images_list))
+                self.progress_changed.emit(progress_value)
+                if self.stop:
+                    break
+                try:
+                    res = download_episode_image(save_folder, image['path'], i)
+                except Exception as e:
+                    msg_box = QMessageBox(
+                        QMessageBox.Critical, '错误', '抛出异常：' + str(e) + '\n请检查网络或代理配置')
+                    msg_box.exec_()
+                    continue
+                if res:
+                    sleep(self.window.interval_seconds)  # control speed
+
+            if self.stop:
+                self.stop = False
+                return
+
+        self.progress_changed.emit(100)
 
 
 class MainWindow(QMainWindow):
@@ -27,6 +91,8 @@ class MainWindow(QMainWindow):
         self.ui.btn_selectall.clicked.connect(self.select_all)
         self.ui.btn_cancelall.clicked.connect(self.cancel_all)
 
+        self.is_downloading = False
+
         file = os.path.exists('./settings.json')
         if file:
             with open('./settings.json', 'r', encoding='utf-8') as f:
@@ -44,9 +110,9 @@ class MainWindow(QMainWindow):
         cookie_sc = SimpleCookie(self.cookie_text)
         self.cookie = {v.key: v.value for k, v in cookie_sc.items()}
         if self.cookie == {}:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.0.0 - 尚未设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 尚未设置cookie')
         else:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.0.0 - 已设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 已设置cookie')
 
     def showMax(self):
         if self.isMaximized() == True:
@@ -275,23 +341,25 @@ class MainWindow(QMainWindow):
             self.ui.listWidget.setItemWidget(item, checkbox)
 
     def start_download(self):
-        pass
-        # self.ui.btn_getinfo.setEnabled(False)
-        # self.ui.btn_startdownload.setEnabled(False)
-        # self.ui.progressBar.setValue(0)
-        # download_sets = []
-        # for i in range(self.ui.listWidget.count()):
-        #     item = self.ui.listWidget.item(i)
-        #     widget = self.ui.listWidget.itemWidget(item)
-        #     if widget.isChecked():
-        #         download_sets.append(self.episode_list[i])
-        # for i, download in enumerate(download_sets):
-        #     get_manga_images(
-        #         self.base_folder, self.interval_seconds, self.ui.manga_title.text(), download['id'], download['short_title'], download['title'], self.cookie)
-        #     self.ui.progressBar.setValue((i + 1) / len(download_sets) * 100)
-        #     QApplication.processEvents()
-        # self.ui.btn_getinfo.setEnabled(True)
-        # self.ui.btn_startdownload.setEnabled(True)
+        if not self.is_downloading:
+            self.thread = DownloadThread(self)
+            self.thread.finished.connect(self.download_finished)
+            self.thread.started.connect(self.download_started)
+            self.thread.start()
+        else:
+            self.thread.stop = True
+            self.ui.btn_startdownload.setEnabled(False)
+
+    def download_started(self):
+        self.is_downloading = True
+        self.ui.btn_getinfo.setEnabled(False)
+        self.ui.btn_startdownload.setText('停止下载')
+
+    def download_finished(self):
+        self.is_downloading = False
+        self.ui.btn_getinfo.setEnabled(True)
+        self.ui.btn_startdownload.setText('开始下载')
+        self.ui.btn_startdownload.setEnabled(True)
 
     def select_all(self):
         for i in range(self.ui.listWidget.count()):
@@ -311,9 +379,9 @@ class MainWindow(QMainWindow):
         cookie_sc = SimpleCookie(self.cookie_text)
         self.cookie = {v.key: v.value for k, v in cookie_sc.items()}
         if self.cookie == {}:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.0.0 - 尚未设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 尚未设置cookie')
         else:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.0.0 - 已设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 已设置cookie')
         self.base_folder = self.setting_ui.ui.path_input.text()
         self.interval_seconds = self.setting_ui.ui.spinBox.value()
         self.setting_ui.close()
@@ -329,6 +397,16 @@ class MainWindow(QMainWindow):
         self.setting_ui.show()
 
     def save_and_close(self):
+        if self.is_downloading:
+            msg_box = QMessageBox(
+                QMessageBox.Warning, '注意', '下载仍在进行，确定要退出吗？', QMessageBox.Yes | QMessageBox.No)
+            ret = msg_box.exec()
+
+            if ret == QMessageBox.No:
+                return
+            self.thread.stop = True
+            self.thread.finished.connect(self.close)
+            return
         save = {"cookie_text": self.cookie_text,
                 "base_folder": self.base_folder, "interval_seconds": self.interval_seconds}
         print(str(save))
