@@ -1,9 +1,8 @@
 import sys
-from settings import Ui_Form
-from PySide6.QtWidgets import QApplication, QWidget, QCheckBox, QListWidgetItem
 from PySide6.QtCore import Qt
-from manga_spider import *
-import re
+from settings_base_ui import Ui_Form
+from PySide6.QtWidgets import QApplication, QWidget
+from terminal_downloader import *
 
 
 class SettingWindow(QWidget):
@@ -16,13 +15,7 @@ class SettingWindow(QWidget):
         self.ui.btn_min.clicked.connect(self.showMinimized)
         self.setMouseTracking(True)
         self.isPressed = False
-        self.isDrag = False
         self.padding = 3
-        self.direction = None
-
-        self.cookie = None
-        self.base_folder = './'
-        self.interval_seconds = 1
 
     def mousePressEvent(self, QMouseEvent):
         """

@@ -1,9 +1,9 @@
 import sys
-from spider_ui import Ui_MainWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem
+from downloader_base_ui import Ui_MainWindow
+from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox
 from PySide6.QtCore import Qt
-from manga_spider import *
-from setting_ui import SettingWindow
+from core import *
+from settings_ui import SettingWindow
 import re
 
 
@@ -230,17 +230,32 @@ class MainWindow(QMainWindow):
             self.startMovePosition = MovePos
 
     def get_manga_info(self):
+        """
+        Get manga informations
+        """
         website = self.ui.website_input.text()
         pattern = r'mc[0-9]*'
         manga_id = re.findall(pattern, website)
         if len(manga_id) == 0:
+            msg_box = QMessageBox(QMessageBox.Warning, '注意', '输入的网址无效')
+            msg_box.exec_()
             return
         else:
             manga_id = manga_id[0]
         manga_id = int(manga_id[2:])
         print(manga_id)
-        episode_num, manga_detail = get_manga_detail(manga_id, self.cookie)
-        print(manga_detail)
+        try:
+            episode_num, manga_detail = get_manga_detail(manga_id, self.cookie)
+        except Exception as e:
+            msg_box = QMessageBox(QMessageBox.Critical,
+                                  '错误', '触发异常:' + str(e) + '\n请检查网络或代理配置')
+            msg_box.exec_()
+            return
+        if episode_num == -1:
+            msg_box = QMessageBox(QMessageBox.Critical,
+                                  '错误', str(manga_detail))
+            msg_box.exec_()
+            return
         self.ui.manga_title.setText(manga_detail['title'])
         self.ui.manga_author.setText(str(manga_detail['author_name']))
         self.ui.manga_description.setText(manga_detail['classic_lines'])
@@ -260,22 +275,23 @@ class MainWindow(QMainWindow):
             self.ui.listWidget.setItemWidget(item, checkbox)
 
     def start_download(self):
-        self.ui.btn_getinfo.setEnabled(False)
-        self.ui.btn_startdownload.setEnabled(False)
-        self.ui.progressBar.setValue(0)
-        download_sets = []
-        for i in range(self.ui.listWidget.count()):
-            item = self.ui.listWidget.item(i)
-            widget = self.ui.listWidget.itemWidget(item)
-            if widget.isChecked():
-                download_sets.append(self.episode_list[i])
-        for i, download in enumerate(download_sets):
-            get_manga_images(
-                self.base_folder, self.interval_seconds, self.ui.manga_title.text(), download['id'], download['short_title'], download['title'], self.cookie)
-            self.ui.progressBar.setValue((i + 1) / len(download_sets) * 100)
-            QApplication.processEvents()
-        self.ui.btn_getinfo.setEnabled(True)
-        self.ui.btn_startdownload.setEnabled(True)
+        pass
+        # self.ui.btn_getinfo.setEnabled(False)
+        # self.ui.btn_startdownload.setEnabled(False)
+        # self.ui.progressBar.setValue(0)
+        # download_sets = []
+        # for i in range(self.ui.listWidget.count()):
+        #     item = self.ui.listWidget.item(i)
+        #     widget = self.ui.listWidget.itemWidget(item)
+        #     if widget.isChecked():
+        #         download_sets.append(self.episode_list[i])
+        # for i, download in enumerate(download_sets):
+        #     get_manga_images(
+        #         self.base_folder, self.interval_seconds, self.ui.manga_title.text(), download['id'], download['short_title'], download['title'], self.cookie)
+        #     self.ui.progressBar.setValue((i + 1) / len(download_sets) * 100)
+        #     QApplication.processEvents()
+        # self.ui.btn_getinfo.setEnabled(True)
+        # self.ui.btn_startdownload.setEnabled(True)
 
     def select_all(self):
         for i in range(self.ui.listWidget.count()):
