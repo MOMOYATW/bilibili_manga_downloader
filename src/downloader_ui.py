@@ -26,12 +26,14 @@ class DownloadThread(QThread):
             item = self.window.ui.listWidget.item(i)
             widget = self.window.ui.listWidget.itemWidget(item)
             if widget.isChecked():
-                download_sets.append(self.window.episode_list[i])
+                download_sets.append([self.window.episode_list[i], i])
         for i, download in enumerate(download_sets):
+            episode_id = download[1]
+            download = download[0]
             base_value = i / len(download_sets) * 100
             delta_value = 1 / len(download_sets) * 100
             self.update_checkbox.emit(
-                i, 0, 0, '{} - {}'.format(download['short_title'], download['title']))
+                episode_id, 0, 0, '{} - {}'.format(download['short_title'], download['title']))
             save_folder = os.path.join(self.window.base_folder, self.window.ui.manga_title.text(),
                                        '{} - {}'.format(download['short_title'], download['title']))
             folder = os.path.exists(save_folder)
@@ -51,7 +53,7 @@ class DownloadThread(QThread):
                 continue
 
             for index, image in enumerate(images_list):
-                self.update_checkbox.emit(i, index, len(
+                self.update_checkbox.emit(episode_id, index, len(
                     images_list), '{} - {}'.format(download['short_title'], download['title']))
                 progress_value = base_value + \
                     delta_value * ((index + 1) / len(images_list))
@@ -73,7 +75,7 @@ class DownloadThread(QThread):
                 self.stop = False
                 return
             self.update_checkbox.emit(
-                i, -1, -1, '{} - {}'.format(download['short_title'], download['title']))
+                episode_id, -1, -1, '{} - {}'.format(download['short_title'], download['title']))
         self.progress_changed.emit(100)
 
 
