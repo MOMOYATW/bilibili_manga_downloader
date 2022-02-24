@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import requests
 from http.cookies import SimpleCookie
@@ -111,3 +112,45 @@ def parse_cookie_text(cookie_text):
     cookie_sc = SimpleCookie(cookie_text)
     cookie = {v.key: v.value for k, v in cookie_sc.items()}
     return cookie
+
+
+def read_config_file(attributes_dict):
+    """
+    Read configurations in file 'settings.json', if file do not exist then return default settings.
+
+    Parameters:
+      attributes_dict    - attributes need to read out, with default value
+
+    Returns:
+      Attributes value ordered in list, or default value when not exist
+    """
+    value_list = []
+    file = os.path.exists('./settings.json')
+    if file:
+        with open('./settings.json', 'r', encoding='utf-8') as f:
+            json_data = json.load(f)
+        for attribute in attributes_dict.keys():
+            if attribute in attributes_dict:
+                value_list.append(json_data[attribute])
+            else:
+                value_list.append(attributes_dict[attribute])
+        return value_list
+    return attributes_dict.values
+
+
+def parse_website(website):
+    """
+    Parse website to get manga id
+
+    Parameters:
+      website - bilibili manga website, eg. https://manga.bilibili.com/detail/mc28560?from=manga_homepage
+
+    Returns:
+      manga id, if parsed failed returns -1
+    """
+    manga_id = re.findall(r'mc[0-9]*', website)
+    if len(manga_id) == 0:
+        return -1
+    else:
+        manga_id = manga_id[0]
+    return int(manga_id[2:])

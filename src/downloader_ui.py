@@ -1,7 +1,5 @@
-import re
 import sys
 from core import *
-from time import sleep
 from settings_ui import SettingWindow
 from downloader_base_ui import Ui_MainWindow
 from PySide6.QtCore import Qt, QThread, Signal
@@ -10,14 +8,15 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetI
 
 class DownloadThread(QThread):
     progress_changed = Signal(int)
-    message = Signal(QMessageBox.Icon, str, str)
+    pop_message = Signal(QMessageBox.Icon, str, str)
+    sleep_thread = Signal()
+    update_checkbox = Signal(int, int, int, str)
 
     def __init__(self, window) -> None:
         super(DownloadThread, self).__init__()
+
         self.window = window
         self.stop = False
-        self.progress_changed.connect(self.window.ui.progressBar.setValue)
-        self.message.connect(self.window.pop_msg_box)
 
     def run(self) -> None:
         progress_value = 0
@@ -31,6 +30,8 @@ class DownloadThread(QThread):
         for i, download in enumerate(download_sets):
             base_value = i / len(download_sets) * 100
             delta_value = 1 / len(download_sets) * 100
+            self.update_checkbox.emit(
+                i, 0, 0, '{} - {}'.format(download['short_title'], download['title']))
             save_folder = os.path.join(self.window.base_folder, self.window.ui.manga_title.text(),
                                        '{} - {}'.format(download['short_title'], download['title']))
             folder = os.path.exists(save_folder)
@@ -40,34 +41,39 @@ class DownloadThread(QThread):
                 length, images_list = get_images_list(
                     download['id'], self.window.cookie)
             except Exception as e:
-                self.message.emit(QMessageBox.Critical, '错误',
-                                  '在获取 {} - {} 的图片列表时抛出异常：\n'.format(download['short_title'], download['title']) + str(e) + '\n请检查网络或代理配置')
+                self.pop_message.emit(QMessageBox.Critical, '错误',
+                                      '在获取 {} - {} 的图片列表时抛出异常：\n'.format(download['short_title'], download['title']) + str(e) + '\n请检查网络或代理配置')
                 continue
 
             if length == -1:
-                self.message.emit(QMessageBox.Critical, '错误', '在获取 {} - {} 的图片列表时出现错误：\n'.format(
+                self.pop_message.emit(QMessageBox.Critical, '错误', '在获取 {} - {} 的图片列表时出现错误：\n'.format(
                     download['short_title'], download['title']) + images_list)
                 continue
 
-            for i, image in enumerate(images_list):
+            for index, image in enumerate(images_list):
+                self.update_checkbox.emit(i, index, len(
+                    images_list), '{} - {}'.format(download['short_title'], download['title']))
                 progress_value = base_value + \
-                    delta_value * ((i + 1) / len(images_list))
+                    delta_value * ((index + 1) / len(images_list))
                 self.progress_changed.emit(progress_value)
                 if self.stop:
                     break
                 try:
-                    res = download_episode_image(save_folder, image['path'], i)
+                    res = download_episode_image(
+                        save_folder, image['path'], index)
                 except Exception as e:
-                    self.message.emit(QMessageBox.Critical,
-                                      '错误', '在下载 {} - {} 的第{}张图片时抛出异常：\n'.format(download['short_title'], download['title'], i) + str(e) + '\n请检查网络或代理配置')
+                    self.pop_message.emit(QMessageBox.Critical,
+                                          '错误', '在下载 {} - {} 的第{}张图片时抛出异常：\n'.format(download['short_title'], download['title'], index) + str(e) + '\n请检查网络或代理配置')
                     continue
                 if res:
-                    sleep(self.window.interval_seconds)  # control speed
+                    # control speed
+                    QThread.msleep(self.window.interval_seconds)
 
             if self.stop:
                 self.stop = False
                 return
-
+            self.update_checkbox.emit(
+                i, -1, -1, '{} - {}'.format(download['short_title'], download['title']))
         self.progress_changed.emit(100)
 
 
@@ -75,46 +81,84 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
-        self.title = '哔哩哔哩漫画下载器 V1.1.2'
         self.ui.setupUi(self)
+        self.title = '哔哩哔哩漫画下载器 V1.2.0'
         self.setWindowFlags(Qt.FramelessWindowHint)
-        self.ui.btn_close.clicked.connect(self.save_and_close)
-        self.ui.btn_min.clicked.connect(self.showMinimized)
-        self.ui.btn_max.clicked.connect(self.showMax)
-        self.setMouseTracking(True)
-        self.isPressed = False
-        self.isDrag = False
-        self.padding = 3
-        self.direction = None
-        self.ui.progressBar.setValue(0)
-        self.ui.btn_getinfo.clicked.connect(self.get_manga_info)
-        self.ui.btn_startdownload.clicked.connect(self.start_download)
-        self.ui.btn_selectall.clicked.connect(self.select_all)
-        self.ui.btn_cancelall.clicked.connect(self.cancel_all)
 
+        self.setMouseTracking(True)
+        self.padding = 3
+        self.isDrag = False
+        self.direction = None
+        self.isPressed = False
         self.is_downloading = False
 
-        file = os.path.exists('./settings.json')
-        if file:
-            with open('./settings.json', 'r', encoding='utf-8') as f:
-                json_data = json.load(f)
-            self.cookie_text = json_data['cookie_text']
-            self.base_folder = json_data['base_folder']
-            self.interval_seconds = json_data['interval_seconds']
-        else:
-            self.cookie_text = ""
-            self.base_folder = './'
-            self.interval_seconds = 1
+        self.ui.progressBar.setValue(0)
 
-        self.ui.btn_moresettings.clicked.connect(self.show_settings)
+        self.ui.btn_min.clicked.connect(self.showMinimized)
+        self.ui.btn_close.clicked.connect(self.saveAndClose)
+        self.ui.btn_max.clicked.connect(self.showMaximizeOrNormalize)
 
+        self.ui.btn_selectall.clicked.connect(self.selectAll)
+        self.ui.btn_cancelall.clicked.connect(self.cancelAll)
+        self.ui.btn_getinfo.clicked.connect(self.getMangaInfo)
+        self.ui.btn_startdownload.clicked.connect(self.startDownload)
+        self.ui.btn_moresettings.clicked.connect(self.showSettings)
+
+        # read out settings and parse cookie
+        self.cookie_text, self.base_folder, self.interval_seconds = read_config_file(
+            {"cookie_text": "", "base_folder": "./", "interval_seconds": 1000})
         self.cookie = parse_cookie_text(self.cookie_text)
         if self.cookie == {}:
             self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
             self.ui.label.setText(self.title + ' - 已设置cookie')
 
-    def showMax(self):
+    def selectAll(self):
+        """
+        Select all unlocked episodes
+        """
+        for i in range(self.ui.listWidget.count()):
+            item = self.ui.listWidget.item(i)
+            widget = self.ui.listWidget.itemWidget(item)
+            if not self.episode_list[i]['is_locked']:
+                widget.setChecked(True)
+
+    def cancelAll(self):
+        """
+        Cancel all episodes
+        """
+        for i in range(self.ui.listWidget.count()):
+            item = self.ui.listWidget.item(i)
+            widget = self.ui.listWidget.itemWidget(item)
+            widget.setChecked(False)
+
+    def saveAndClose(self):
+        """
+        Save user settings before close winodw,
+        also check if is downloading then give a message box to warning
+        """
+        if self.is_downloading:
+            msg_box = QMessageBox(
+                QMessageBox.Warning, '注意', '下载仍在进行，确定要退出吗？', QMessageBox.Yes | QMessageBox.No)
+            ret = msg_box.exec()
+
+            if ret == QMessageBox.No:
+                return
+            self.thread.stop = True
+            self.thread.finished.connect(self.close)
+            return
+
+        save = {"cookie_text": self.cookie_text,
+                "base_folder": self.base_folder, "interval_seconds": self.interval_seconds}
+        with open('./settings.json', 'w') as f:
+            json_str = json.dumps(save, indent=4, ensure_ascii=False)
+            f.write(json_str)
+        self.close()
+
+    def showMaximizeOrNormalize(self):
+        """
+        Maximize or normalize the winodw
+        """
         if self.isMaximized() == True:
             self.showNormal()
             self.move(self.restorePos)
@@ -123,6 +167,17 @@ class MainWindow(QMainWindow):
             self.restoreSize = self.size()
             self.restorePos = self.pos()
             self.showMaximized()
+
+    def showSettings(self):
+        """
+        Show Settings Window
+        """
+        self.setting_ui = SettingWindow()
+        self.setting_ui.ui.cookie_input.setText(self.cookie_text)
+        self.setting_ui.ui.path_input.setText(self.base_folder)
+        self.setting_ui.ui.spinBox.setValue(self.interval_seconds)
+        self.setting_ui.ui.btn_close.clicked.connect(self.fetchSettings)
+        self.setting_ui.show()
 
     def mousePressEvent(self, QMouseEvent):
         """
@@ -143,7 +198,7 @@ class MainWindow(QMainWindow):
         double click to maximum and minimum the window
         """
         if QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.ui.title_bar.height():
-            self.showMax()
+            self.showMaximizeOrNormalize()
 
     def mouseReleaseEvent(self, QMouseEvent):
         """
@@ -295,38 +350,37 @@ class MainWindow(QMainWindow):
             self.move(MovePos - self.startMousePosition)
             self.startMovePosition = MovePos
 
-    def get_manga_info(self):
+    def getMangaInfo(self):
         """
         Get manga informations
         """
+        # parse website input
         website = self.ui.website_input.text()
-        pattern = r'mc[0-9]*'
-        manga_id = re.findall(pattern, website)
-        if len(manga_id) == 0:
-            msg_box = QMessageBox(QMessageBox.Warning, '注意', '输入的网址无效')
-            msg_box.exec_()
+        manga_id = parse_website(website)
+        if manga_id == -1:
+            self.popMsgBox(QMessageBox.Warning, '注意', '输入的网址无效')
             return
-        else:
-            manga_id = manga_id[0]
-        manga_id = int(manga_id[2:])
-        print(manga_id)
+        # get manga detail informations
         try:
             episode_num, manga_detail = get_manga_detail(manga_id, self.cookie)
         except Exception as e:
-            msg_box = QMessageBox(QMessageBox.Critical,
-                                  '错误', '获取漫画信息时触发异常:\n' + str(e) + '\n请检查网络或代理配置')
-            msg_box.exec_()
+            self.popMsgBox(QMessageBox.Critical,
+                           '错误', '获取漫画信息时触发异常:\n' + str(e) + '\n请检查网络或代理配置')
             return
         if episode_num == -1:
-            msg_box = QMessageBox(QMessageBox.Critical,
-                                  '错误', '获取漫画信息时出现错误:\n' + str(manga_detail))
-            msg_box.exec_()
+            self.popMsgBox(QMessageBox.Critical,
+                           '错误', '获取漫画信息时出现错误:\n' + str(manga_detail))
             return
+        # set ui
         self.ui.manga_title.setText(manga_detail['title'])
         self.ui.manga_author.setText(str(manga_detail['author_name']))
         self.ui.manga_description.setText(manga_detail['classic_lines'])
-        self.episode_list = manga_detail['ep_list']
         self.ui.listWidget.clear()
+
+        # save episode list and show in ui
+        manga_detail['ep_list'].reverse()
+        self.episode_list = manga_detail['ep_list']
+        print(self.episode_list)
         for episode in self.episode_list:
             if episode['title'].strip() == "":
                 episode['title'] = episode['short_title']
@@ -342,41 +396,44 @@ class MainWindow(QMainWindow):
             self.ui.listWidget.addItem(item)
             self.ui.listWidget.setItemWidget(item, checkbox)
 
-    def start_download(self):
+    def startDownload(self):
+        """
+        Create a new thread to download,
+        advoid not responding.
+        """
         if not self.is_downloading:
             self.thread = DownloadThread(self)
-            self.thread.finished.connect(self.download_finished)
-            self.thread.started.connect(self.download_started)
+            self.thread.finished.connect(self.downloadFinished)
+            self.thread.started.connect(self.downloadStarted)
+            self.thread.progress_changed.connect(self.ui.progressBar.setValue)
+            self.thread.pop_message.connect(self.popMsgBox)
+            self.thread.update_checkbox.connect(self.setCheckBox)
             self.thread.start()
         else:
             self.thread.stop = True
             self.ui.btn_startdownload.setEnabled(False)
 
-    def download_started(self):
+    def downloadStarted(self):
+        """
+        Execute when download is started
+        """
         self.is_downloading = True
         self.ui.btn_getinfo.setEnabled(False)
         self.ui.btn_startdownload.setText('停止下载')
 
-    def download_finished(self):
+    def downloadFinished(self):
+        """
+        Excute when download is finished
+        """
         self.is_downloading = False
         self.ui.btn_getinfo.setEnabled(True)
         self.ui.btn_startdownload.setText('开始下载')
         self.ui.btn_startdownload.setEnabled(True)
 
-    def select_all(self):
-        for i in range(self.ui.listWidget.count()):
-            item = self.ui.listWidget.item(i)
-            widget = self.ui.listWidget.itemWidget(item)
-            if not self.episode_list[i]['is_locked']:
-                widget.setChecked(True)
-
-    def cancel_all(self):
-        for i in range(self.ui.listWidget.count()):
-            item = self.ui.listWidget.item(i)
-            widget = self.ui.listWidget.itemWidget(item)
-            widget.setChecked(False)
-
-    def get_settings(self):
+    def fetchSettings(self):
+        """
+        From subwindow get informations and close it
+        """
         self.cookie_text = self.setting_ui.ui.cookie_input.text()
         self.cookie = parse_cookie_text(self.cookie_text)
         if self.cookie == {}:
@@ -386,39 +443,27 @@ class MainWindow(QMainWindow):
         self.base_folder = self.setting_ui.ui.path_input.text()
         self.interval_seconds = self.setting_ui.ui.spinBox.value()
         self.setting_ui.close()
-        print(self.cookie, self.base_folder, self.interval_seconds)
 
-    def show_settings(self):
-        self.setting_ui = SettingWindow()
-        self.setting_ui.ui.cookie_input.setText(self.cookie_text)
-        self.setting_ui.ui.path_input.setText(self.base_folder)
-        self.setting_ui.ui.spinBox.setValue(self.interval_seconds)
-
-        self.setting_ui.ui.btn_close.clicked.connect(self.get_settings)
-        self.setting_ui.show()
-
-    def save_and_close(self):
-        if self.is_downloading:
-            msg_box = QMessageBox(
-                QMessageBox.Warning, '注意', '下载仍在进行，确定要退出吗？', QMessageBox.Yes | QMessageBox.No)
-            ret = msg_box.exec()
-
-            if ret == QMessageBox.No:
-                return
-            self.thread.stop = True
-            self.thread.finished.connect(self.close)
-            return
-        save = {"cookie_text": self.cookie_text,
-                "base_folder": self.base_folder, "interval_seconds": self.interval_seconds}
-        print(str(save))
-        with open('./settings.json', 'w') as f:
-            json_str = json.dumps(save, indent=4, ensure_ascii=False)
-            f.write(json_str)
-        self.close()
-
-    def pop_msg_box(self, type, title, content):
+    def popMsgBox(self, type, title, content):
+        """
+        Pop out a message box, maybe change messagebox ui in future
+        """
         msg_box = QMessageBox(type, title, content)
         msg_box.exec()
+
+    def setCheckBox(self, episode_id, image_id, images_num, title):
+        """
+        Set CheckBox value to show process
+        """
+        item = self.ui.listWidget.item(episode_id)
+        widget = self.ui.listWidget.itemWidget(item)
+        if image_id == 0 and images_num == 0:
+            widget.setText(title + ' - 正在获取图片列表')
+        elif image_id == -1 and images_num == -1:
+            widget.setText(title + ' - 下载完成')
+        else:
+            widget.setText(
+                title + ' - 正在下载中({}/{})'.format(image_id, images_num))
 
 
 if __name__ == '__main__':

@@ -563,10 +563,13 @@ QSpinBox::up-button{
 }</string>
            </property>
            <property name="suffix">
-            <string>秒</string>
+            <string>毫秒</string>
            </property>
            <property name="prefix">
             <string/>
+           </property>
+           <property name="maximum">
+            <number>5000</number>
            </property>
           </widget>
          </item>

@@ -1,23 +1,24 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'settings.ui'
+# Form generated from reading UI file 'settings.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.2.3
+# Created by: Qt User Interface Compiler version 6.2.3
 ##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
+# WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
+                            QMetaObject, QObject, QPoint, QRect,
+                            QSize, QTime, QUrl, Qt)
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                           QFont, QFontDatabase, QGradient, QIcon,
+                           QImage, QKeySequence, QLinearGradient, QPainter,
+                           QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QLineEdit, QPushButton, QSizePolicy, QSpinBox,
-    QVBoxLayout, QWidget)
+                               QLineEdit, QPushButton, QSizePolicy, QSpinBox,
+                               QVBoxLayout, QWidget)
+
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -70,7 +71,6 @@ class Ui_Form(object):
 
         self.horizontalLayout_6.addWidget(self.icon_label)
 
-
         self.horizontalLayout_3.addWidget(self.icon_box)
 
         self.title_label_box = QFrame(self.title_box)
@@ -78,7 +78,8 @@ class Ui_Form(object):
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.title_label_box.sizePolicy().hasHeightForWidth())
+        sizePolicy.setHeightForWidth(
+            self.title_label_box.sizePolicy().hasHeightForWidth())
         self.title_label_box.setSizePolicy(sizePolicy)
         self.title_label_box.setMouseTracking(True)
         self.title_label_box.setFrameShape(QFrame.StyledPanel)
@@ -94,9 +95,7 @@ class Ui_Form(object):
 
         self.horizontalLayout_7.addWidget(self.label)
 
-
         self.horizontalLayout_3.addWidget(self.title_label_box)
-
 
         self.horizontalLayout.addWidget(self.title_box)
 
@@ -115,11 +114,12 @@ class Ui_Form(object):
         sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.btn_min.sizePolicy().hasHeightForWidth())
+        sizePolicy1.setHeightForWidth(
+            self.btn_min.sizePolicy().hasHeightForWidth())
         self.btn_min.setSizePolicy(sizePolicy1)
         self.btn_min.setMouseTracking(True)
         self.btn_min.setStyleSheet(u"QPushButton{border:none}\n"
-"QPushButton:hover{background-color:#363a45}")
+                                   "QPushButton:hover{background-color:#363a45}")
         icon1 = QIcon()
         icon1.addFile(u"imgs/minimize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_min.setIcon(icon1)
@@ -129,20 +129,19 @@ class Ui_Form(object):
 
         self.btn_close = QPushButton(self.title_btns_box)
         self.btn_close.setObjectName(u"btn_close")
-        sizePolicy1.setHeightForWidth(self.btn_close.sizePolicy().hasHeightForWidth())
+        sizePolicy1.setHeightForWidth(
+            self.btn_close.sizePolicy().hasHeightForWidth())
         self.btn_close.setSizePolicy(sizePolicy1)
         self.btn_close.setMouseTracking(True)
         self.btn_close.setStyleSheet(u"QPushButton{border:none}\n"
-"QPushButton:hover{background-color:#d41325}")
+                                     "QPushButton:hover{background-color:#d41325}")
         icon2 = QIcon()
         icon2.addFile(u"imgs/close.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_close.setIcon(icon2)
 
         self.horizontalLayout_2.addWidget(self.btn_close)
 
-
         self.horizontalLayout.addWidget(self.title_btns_box)
-
 
         self.verticalLayout.addWidget(self.title_bar)
 
@@ -174,17 +173,16 @@ class Ui_Form(object):
         self.cookie_input.setMaximumSize(QSize(16777215, 32))
         self.cookie_input.setMouseTracking(True)
         self.cookie_input.setStyleSheet(u"QLineEdit{\n"
-"	border:1px solid #383f4d;\n"
-"	background-color:#242936;\n"
-"	color:#cccac2\n"
-"}\n"
-"\n"
-"QLineEdit:focus{\n"
-"	border:1px solid #c4a25f;\n"
-"}")
+                                        "	border:1px solid #383f4d;\n"
+                                        "	background-color:#242936;\n"
+                                        "	color:#cccac2\n"
+                                        "}\n"
+                                        "\n"
+                                        "QLineEdit:focus{\n"
+                                        "	border:1px solid #c4a25f;\n"
+                                        "}")
 
         self.horizontalLayout_4.addWidget(self.cookie_input)
-
 
         self.verticalLayout_2.addWidget(self.cookie_set)
 
@@ -209,33 +207,33 @@ class Ui_Form(object):
         self.path_input.setMaximumSize(QSize(16777215, 32))
         self.path_input.setMouseTracking(True)
         self.path_input.setStyleSheet(u"QLineEdit{\n"
-"	border:1px solid #383f4d;\n"
-"	background-color:#242936;\n"
-"	color:#cccac2\n"
-"}\n"
-"\n"
-"QLineEdit:focus{\n"
-"	border:1px solid #c4a25f;\n"
-"}")
+                                      "	border:1px solid #383f4d;\n"
+                                      "	background-color:#242936;\n"
+                                      "	color:#cccac2\n"
+                                      "}\n"
+                                      "\n"
+                                      "QLineEdit:focus{\n"
+                                      "	border:1px solid #c4a25f;\n"
+                                      "}")
 
         self.horizontalLayout_9.addWidget(self.path_input)
 
         self.btn_select = QPushButton(self.path_set)
         self.btn_select.setObjectName(u"btn_select")
-        sizePolicy1.setHeightForWidth(self.btn_select.sizePolicy().hasHeightForWidth())
+        sizePolicy1.setHeightForWidth(
+            self.btn_select.sizePolicy().hasHeightForWidth())
         self.btn_select.setSizePolicy(sizePolicy1)
         self.btn_select.setMinimumSize(QSize(32, 32))
         self.btn_select.setMaximumSize(QSize(32, 32))
         self.btn_select.setMouseTracking(True)
         self.btn_select.setStyleSheet(u"QPushButton{\n"
-"background-color:#ffcc66;\n"
-"color:#805500;\n"
-"border-style:outset;\n"
-"}")
+                                      "background-color:#ffcc66;\n"
+                                      "color:#805500;\n"
+                                      "border-style:outset;\n"
+                                      "}")
         self.btn_select.setFlat(False)
 
         self.horizontalLayout_9.addWidget(self.btn_select)
-
 
         self.verticalLayout_2.addWidget(self.path_set)
 
@@ -259,32 +257,32 @@ class Ui_Form(object):
         sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.spinBox.sizePolicy().hasHeightForWidth())
+        sizePolicy2.setHeightForWidth(
+            self.spinBox.sizePolicy().hasHeightForWidth())
         self.spinBox.setSizePolicy(sizePolicy2)
         self.spinBox.setMinimumSize(QSize(0, 32))
         self.spinBox.setStyleSheet(u"QSpinBox{\n"
-"	border:1px solid #383f4d;\n"
-"	background-color:#242936;\n"
-"	color:#cccac2\n"
-"}\n"
-"\n"
-"QSpinBox:focus{\n"
-"	border:1px solid #c4a25f;\n"
-"}\n"
-"\n"
-"QSpinBox::down-button{\n"
-"    border-style:outset;\n"
-"}\n"
-"\n"
-"QSpinBox::up-button{\n"
-"    border-style:outset;\n"
-"}")
+                                   "	border:1px solid #383f4d;\n"
+                                   "	background-color:#242936;\n"
+                                   "	color:#cccac2\n"
+                                   "}\n"
+                                   "\n"
+                                   "QSpinBox:focus{\n"
+                                   "	border:1px solid #c4a25f;\n"
+                                   "}\n"
+                                   "\n"
+                                   "QSpinBox::down-button{\n"
+                                   "    border-style:outset;\n"
+                                   "}\n"
+                                   "\n"
+                                   "QSpinBox::up-button{\n"
+                                   "    border-style:outset;\n"
+                                   "}")
+        self.spinBox.setMaximum(5000)
 
         self.horizontalLayout_8.addWidget(self.spinBox)
 
-
         self.verticalLayout_2.addWidget(self.interval_set)
-
 
         self.verticalLayout.addWidget(self.content_bar)
 
@@ -305,9 +303,7 @@ class Ui_Form(object):
 
         self.horizontalLayout_5.addWidget(self.copyright)
 
-
         self.verticalLayout.addWidget(self.status_bar)
-
 
         self.retranslateUi(Form)
 
@@ -315,37 +311,44 @@ class Ui_Form(object):
     # setupUi
 
     def retranslateUi(self, Form):
-        Form.setWindowTitle(QCoreApplication.translate("Form", u"Settings", None))
+        Form.setWindowTitle(QCoreApplication.translate(
+            "Form", u"Settings", None))
         self.icon_label.setText("")
-        self.label.setText(QCoreApplication.translate("Form", u"\u66f4\u591a\u8bbe\u7f6e - \u5173\u95ed\u7a97\u53e3\u4f7f\u8bbe\u7f6e\u751f\u6548", None))
+        self.label.setText(QCoreApplication.translate(
+            "Form", u"\u66f4\u591a\u8bbe\u7f6e - \u5173\u95ed\u7a97\u53e3\u4f7f\u8bbe\u7f6e\u751f\u6548", None))
         self.btn_min.setText("")
         self.btn_close.setText("")
-        self.cookie_label.setText(QCoreApplication.translate("Form", u"cookie", None))
-#if QT_CONFIG(statustip)
+        self.cookie_label.setText(
+            QCoreApplication.translate("Form", u"cookie", None))
+# if QT_CONFIG(statustip)
         self.cookie_input.setStatusTip("")
 #endif // QT_CONFIG(statustip)
-#if QT_CONFIG(whatsthis)
+# if QT_CONFIG(whatsthis)
         self.cookie_input.setWhatsThis("")
 #endif // QT_CONFIG(whatsthis)
-#if QT_CONFIG(accessibility)
+# if QT_CONFIG(accessibility)
         self.cookie_input.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
         self.cookie_input.setPlaceholderText("")
-        self.path_label.setText(QCoreApplication.translate("Form", u"\u4e0b\u8f7d\u8def\u5f84", None))
-#if QT_CONFIG(statustip)
+        self.path_label.setText(QCoreApplication.translate(
+            "Form", u"\u4e0b\u8f7d\u8def\u5f84", None))
+# if QT_CONFIG(statustip)
         self.path_input.setStatusTip("")
 #endif // QT_CONFIG(statustip)
-#if QT_CONFIG(whatsthis)
+# if QT_CONFIG(whatsthis)
         self.path_input.setWhatsThis("")
 #endif // QT_CONFIG(whatsthis)
-#if QT_CONFIG(accessibility)
+# if QT_CONFIG(accessibility)
         self.path_input.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
         self.path_input.setPlaceholderText("")
-        self.btn_select.setText(QCoreApplication.translate("Form", u"...", None))
-        self.interval_label.setText(QCoreApplication.translate("Form", u"\u95f4\u9694\u65f6\u957f", None))
-        self.spinBox.setSuffix(QCoreApplication.translate("Form", u"\u79d2", None))
+        self.btn_select.setText(
+            QCoreApplication.translate("Form", u"...", None))
+        self.interval_label.setText(QCoreApplication.translate(
+            "Form", u"\u95f4\u9694\u65f6\u957f", None))
+        self.spinBox.setSuffix(QCoreApplication.translate(
+            "Form", u"\u6beb\u79d2", None))
         self.spinBox.setPrefix("")
-        self.copyright.setText(QCoreApplication.translate("Form", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
+        self.copyright.setText(QCoreApplication.translate(
+            "Form", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
     # retranslateUi
-

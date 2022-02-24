@@ -1,8 +1,8 @@
 import sys
 from PySide6.QtCore import Qt
+from terminal_downloader import *
 from settings_base_ui import Ui_Form
 from PySide6.QtWidgets import QApplication, QWidget
-from terminal_downloader import *
 
 
 class SettingWindow(QWidget):
