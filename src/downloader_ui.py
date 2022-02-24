@@ -1,11 +1,11 @@
-import sys
-from downloader_base_ui import Ui_MainWindow
-from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox
-from PySide6.QtCore import Qt, QThread, Signal
-from core import *
-from settings_ui import SettingWindow
 import re
+import sys
+from core import *
 from time import sleep
+from settings_ui import SettingWindow
+from downloader_base_ui import Ui_MainWindow
+from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox
 
 
 class DownloadThread(QThread):
@@ -75,6 +75,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
+        self.title = '哔哩哔哩漫画下载器 V1.1.2'
         self.ui.setupUi(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.ui.btn_close.clicked.connect(self.save_and_close)
@@ -107,12 +108,11 @@ class MainWindow(QMainWindow):
 
         self.ui.btn_moresettings.clicked.connect(self.show_settings)
 
-        cookie_sc = SimpleCookie(self.cookie_text)
-        self.cookie = {v.key: v.value for k, v in cookie_sc.items()}
+        self.cookie = parse_cookie_text(self.cookie_text)
         if self.cookie == {}:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 尚未设置cookie')
+            self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 已设置cookie')
+            self.ui.label.setText(self.title + ' - 已设置cookie')
 
     def showMax(self):
         if self.isMaximized() == True:
@@ -328,6 +328,8 @@ class MainWindow(QMainWindow):
         self.episode_list = manga_detail['ep_list']
         self.ui.listWidget.clear()
         for episode in self.episode_list:
+            if episode['title'].strip() == "":
+                episode['title'] = episode['short_title']
             item = QListWidgetItem()
             checkbox = QCheckBox(
                 '{} - {}'.format(episode['short_title'], episode['title']))
@@ -376,12 +378,11 @@ class MainWindow(QMainWindow):
 
     def get_settings(self):
         self.cookie_text = self.setting_ui.ui.cookie_input.text()
-        cookie_sc = SimpleCookie(self.cookie_text)
-        self.cookie = {v.key: v.value for k, v in cookie_sc.items()}
+        self.cookie = parse_cookie_text(self.cookie_text)
         if self.cookie == {}:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 尚未设置cookie')
+            self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 已设置cookie')
+            self.ui.label.setText(self.title + ' - 已设置cookie')
         self.base_folder = self.setting_ui.ui.path_input.text()
         self.interval_seconds = self.setting_ui.ui.spinBox.value()
         self.setting_ui.close()

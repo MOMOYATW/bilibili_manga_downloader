@@ -29,6 +29,8 @@ if __name__ == '__main__':
 
     episode_list, comic_title = manga_detail["ep_list"], manga_detail["title"]
     for episode in episode_list:
+        if episode['title'].strip() == "":
+            episode['title'] == episode['short_title']
         if episode["is_locked"]:
             print(
                 '{} - {} is locked.'.format(episode['short_title'], episode['title']))
