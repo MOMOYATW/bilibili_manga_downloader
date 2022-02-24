@@ -10,12 +10,14 @@ from time import sleep
 
 class DownloadThread(QThread):
     progress_changed = Signal(int)
+    message = Signal(QMessageBox.Icon, str, str)
 
     def __init__(self, window) -> None:
         super(DownloadThread, self).__init__()
         self.window = window
         self.stop = False
         self.progress_changed.connect(self.window.ui.progressBar.setValue)
+        self.message.connect(self.window.pop_msg_box)
 
     def run(self) -> None:
         progress_value = 0
@@ -38,15 +40,14 @@ class DownloadThread(QThread):
                 length, images_list = get_images_list(
                     download['id'], self.window.cookie)
             except Exception as e:
-                msg_box = QMessageBox(
-                    QMessageBox.Critical, '错误', '抛出异常：' + str(e) + '\n请检查网络或代理配置')
-                msg_box.exec_()
+                self.message.emit(QMessageBox.Critical, '错误',
+                                  '在获取 {} - {} 的图片列表时抛出异常：\n'.format(download['short_title'], download['title']) + str(e) + '\n请检查网络或代理配置')
                 continue
 
             if length == -1:
-                msg_box = QMessageBox(
-                    QMessageBox.Critical, '错误', images_list)
-                msg_box.exec_()
+                self.message.emit(QMessageBox.Critical, '错误', '在获取 {} - {} 的图片列表时出现错误：\n'.format(
+                    download['short_title'], download['title']) + images_list)
+                continue
 
             for i, image in enumerate(images_list):
                 progress_value = base_value + \
@@ -57,9 +58,8 @@ class DownloadThread(QThread):
                 try:
                     res = download_episode_image(save_folder, image['path'], i)
                 except Exception as e:
-                    msg_box = QMessageBox(
-                        QMessageBox.Critical, '错误', '抛出异常：' + str(e) + '\n请检查网络或代理配置')
-                    msg_box.exec_()
+                    self.message.emit(QMessageBox.Critical,
+                                      '错误', '在下载 {} - {} 的第{}张图片时抛出异常：\n'.format(download['short_title'], download['title'], i) + str(e) + '\n请检查网络或代理配置')
                     continue
                 if res:
                     sleep(self.window.interval_seconds)  # control speed
@@ -110,9 +110,9 @@ class MainWindow(QMainWindow):
         cookie_sc = SimpleCookie(self.cookie_text)
         self.cookie = {v.key: v.value for k, v in cookie_sc.items()}
         if self.cookie == {}:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 尚未设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 尚未设置cookie')
         else:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 已设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 已设置cookie')
 
     def showMax(self):
         if self.isMaximized() == True:
@@ -314,12 +314,12 @@ class MainWindow(QMainWindow):
             episode_num, manga_detail = get_manga_detail(manga_id, self.cookie)
         except Exception as e:
             msg_box = QMessageBox(QMessageBox.Critical,
-                                  '错误', '触发异常:' + str(e) + '\n请检查网络或代理配置')
+                                  '错误', '获取漫画信息时触发异常:\n' + str(e) + '\n请检查网络或代理配置')
             msg_box.exec_()
             return
         if episode_num == -1:
             msg_box = QMessageBox(QMessageBox.Critical,
-                                  '错误', str(manga_detail))
+                                  '错误', '获取漫画信息时出现错误:\n' + str(manga_detail))
             msg_box.exec_()
             return
         self.ui.manga_title.setText(manga_detail['title'])
@@ -379,9 +379,9 @@ class MainWindow(QMainWindow):
         cookie_sc = SimpleCookie(self.cookie_text)
         self.cookie = {v.key: v.value for k, v in cookie_sc.items()}
         if self.cookie == {}:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 尚未设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 尚未设置cookie')
         else:
-            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.0 - 已设置cookie')
+            self.ui.label.setText('哔哩哔哩漫画下载器 V1.1.1 - 已设置cookie')
         self.base_folder = self.setting_ui.ui.path_input.text()
         self.interval_seconds = self.setting_ui.ui.spinBox.value()
         self.setting_ui.close()
@@ -414,6 +414,10 @@ class MainWindow(QMainWindow):
             json_str = json.dumps(save, indent=4, ensure_ascii=False)
             f.write(json_str)
         self.close()
+
+    def pop_msg_box(self, type, title, content):
+        msg_box = QMessageBox(type, title, content)
+        msg_box.exec()
 
 
 if __name__ == '__main__':
