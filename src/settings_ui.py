@@ -2,7 +2,7 @@ import sys
 from PySide6.QtCore import Qt
 from terminal_downloader import *
 from settings_base_ui import Ui_Form
-from PySide6.QtWidgets import QApplication, QWidget, QFileDialog
+from PySide6.QtWidgets import QApplication, QWidget, QFileDialog, QGraphicsDropShadowEffect
 
 
 class SettingWindow(QWidget):
@@ -11,12 +11,21 @@ class SettingWindow(QWidget):
         self.ui = Ui_Form()
         self.ui.setupUi(self)
         self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         self.ui.btn_close.clicked.connect(self.close)
         self.ui.btn_min.clicked.connect(self.showMinimized)
         self.ui.btn_select.clicked.connect(self.selectPath)
         self.setMouseTracking(True)
         self.isPressed = False
         self.padding = 3
+
+        self.ui.margin_layout.setContentsMargins(5, 5, 5, 5)
+        # add shadow
+        self.effect_shadow = QGraphicsDropShadowEffect(self)
+        self.effect_shadow.setOffset(0, 0)
+        self.effect_shadow.setBlurRadius(10)
+        self.effect_shadow.setColor(Qt.black)
+        self.ui.background.setGraphicsEffect(self.effect_shadow)
 
     def selectPath(self):
         """

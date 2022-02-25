@@ -3,7 +3,8 @@ from core import *
 from settings_ui import SettingWindow
 from downloader_base_ui import Ui_MainWindow
 from PySide6.QtCore import Qt, QThread, Signal
-from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox, QGraphicsDropShadowEffect
+from PySide6.QtGui import QColor
 
 
 class DownloadThread(QThread):
@@ -84,8 +85,17 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.title = '哔哩哔哩漫画下载器 V1.2.2'
+        self.title = '哔哩哔哩漫画下载器 V1.2.3'
         self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setAttribute(Qt.WA_TranslucentBackground)
+
+        # add shadow
+        self.ui.margin_layout.setContentsMargins(5, 5, 5, 5)
+        self.effect_shadow = QGraphicsDropShadowEffect(self)
+        self.effect_shadow.setOffset(0, 0)
+        self.effect_shadow.setBlurRadius(10)
+        self.effect_shadow.setColor(Qt.black)
+        self.ui.background.setGraphicsEffect(self.effect_shadow)
 
         self.setMouseTracking(True)
         self.padding = 3
@@ -93,6 +103,7 @@ class MainWindow(QMainWindow):
         self.direction = None
         self.isPressed = False
         self.is_downloading = False
+        self.setting_ui = None
 
         self.ui.progressBar.setValue(0)
 
@@ -146,15 +157,28 @@ class MainWindow(QMainWindow):
 
             if ret == QMessageBox.No:
                 return
-            self.thread.stop = True
-            self.thread.finished.connect(self.close)
-            return
+        # check if subwindow is showing
+        if self.setting_ui and self.setting_ui.isVisible():
+            msg_box = QMessageBox(
+                QMessageBox.Warning, '注意', '设置尚未保存，需要保存后退出吗？', QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
+            ret = msg_box.exec()
+            if ret == QMessageBox.Yes:
+                self.fetchSettings()
+            elif ret == QMessageBox.No:
+                self.setting_ui.close()
+            else:
+                return
 
         save = {"cookie_text": self.cookie_text,
                 "base_folder": self.base_folder, "interval_seconds": self.interval_seconds}
         with open('./settings.json', 'w') as f:
             json_str = json.dumps(save, indent=4, ensure_ascii=False)
             f.write(json_str)
+
+        if self.is_downloading:
+            self.thread.stop = True
+            self.thread.finished.connect(self.close)
+            return
         self.close()
 
     def showMaximizeOrNormalize(self):
@@ -163,11 +187,14 @@ class MainWindow(QMainWindow):
         """
         if self.isMaximized() == True:
             self.showNormal()
+            self.ui.margin_layout.setContentsMargins(5, 5, 5, 5)
             self.move(self.restorePos)
             self.resize(self.restoreSize)
+
         else:
             self.restoreSize = self.size()
             self.restorePos = self.pos()
+            self.ui.margin_layout.setContentsMargins(0, 0, 0, 0)
             self.showMaximized()
 
     def showSettings(self):

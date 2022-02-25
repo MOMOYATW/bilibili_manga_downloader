@@ -30,15 +30,23 @@ class Ui_MainWindow(object):
         icon = QIcon()
         icon.addFile(u"imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet(u"background-color:#1f2430")
+        MainWindow.setStyleSheet(u"")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.centralwidget.setMouseTracking(True)
-        self.verticalLayout = QVBoxLayout(self.centralwidget)
+        self.margin_layout = QVBoxLayout(self.centralwidget)
+        self.margin_layout.setSpacing(0)
+        self.margin_layout.setObjectName(u"margin_layout")
+        self.margin_layout.setContentsMargins(0, 0, 0, 0)
+        self.background = QWidget(self.centralwidget)
+        self.background.setObjectName(u"background")
+        self.background.setMouseTracking(True)
+        self.background.setStyleSheet(u"background-color:#1f2430")
+        self.verticalLayout = QVBoxLayout(self.background)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
-        self.title_bar = QFrame(self.centralwidget)
+        self.title_bar = QFrame(self.background)
         self.title_bar.setObjectName(u"title_bar")
         self.title_bar.setMaximumSize(QSize(16777215, 35))
         self.title_bar.setMouseTracking(True)
@@ -165,7 +173,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.title_bar)
 
-        self.content_bar = QFrame(self.centralwidget)
+        self.content_bar = QFrame(self.background)
         self.content_bar.setObjectName(u"content_bar")
         self.content_bar.setMouseTracking(True)
         self.content_bar.setFrameShape(QFrame.NoFrame)
@@ -512,7 +520,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout.addWidget(self.content_bar)
 
-        self.status_bar = QFrame(self.centralwidget)
+        self.status_bar = QFrame(self.background)
         self.status_bar.setObjectName(u"status_bar")
         self.status_bar.setMaximumSize(QSize(16777215, 25))
         self.status_bar.setMouseTracking(True)
@@ -531,6 +539,9 @@ class Ui_MainWindow(object):
 
 
         self.verticalLayout.addWidget(self.status_bar)
+
+
+        self.margin_layout.addWidget(self.background)
 
         MainWindow.setCentralWidget(self.centralwidget)
 
