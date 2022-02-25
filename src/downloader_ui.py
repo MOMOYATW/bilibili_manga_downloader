@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.title = '哔哩哔哩漫画下载器 V1.2.3'
+        self.title = '哔哩哔哩漫画下载器 V1.2.5'
         self.setWindowFlags(Qt.FramelessWindowHint |
                             Qt.WindowMinMaxButtonsHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
