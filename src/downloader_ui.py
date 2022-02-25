@@ -86,7 +86,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.title = '哔哩哔哩漫画下载器 V1.2.3'
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(Qt.FramelessWindowHint |
+                            Qt.WindowMinMaxButtonsHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         # add shadow
@@ -172,6 +173,9 @@ class MainWindow(QMainWindow):
             self.thread.finished.connect(self.close)
             return
         self.close()
+
+    def closeEvent(self, event) -> None:
+        self.saveAndClose()
 
     def showMaximizeOrNormalize(self):
         """
