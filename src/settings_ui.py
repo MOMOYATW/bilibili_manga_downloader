@@ -2,7 +2,7 @@ import sys
 from PySide6.QtCore import Qt
 from terminal_downloader import *
 from settings_base_ui import Ui_Form
-from PySide6.QtWidgets import QApplication, QWidget
+from PySide6.QtWidgets import QApplication, QWidget, QFileDialog
 
 
 class SettingWindow(QWidget):
@@ -13,9 +13,24 @@ class SettingWindow(QWidget):
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.ui.btn_close.clicked.connect(self.close)
         self.ui.btn_min.clicked.connect(self.showMinimized)
+        self.ui.btn_select.clicked.connect(self.selectPath)
         self.setMouseTracking(True)
         self.isPressed = False
         self.padding = 3
+
+    def selectPath(self):
+        """
+        Pop out select dialog, if user select a sub path, then use relative path
+        else use absolute path
+        """
+        dir = QFileDialog.getExistingDirectory(
+            None, "选取默认下载路径", self.ui.path_input.text())
+        if dir == "":
+            return
+        rel_path = os.path.relpath(dir)
+        if rel_path.find('..') == -1:
+            dir = os.path.join('.', rel_path)
+        self.ui.path_input.setText(dir)
 
     def mousePressEvent(self, QMouseEvent):
         """

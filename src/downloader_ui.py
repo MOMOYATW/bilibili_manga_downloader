@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.title = '哔哩哔哩漫画下载器 V1.2.1'
+        self.title = '哔哩哔哩漫画下载器 V1.2.2'
         self.setWindowFlags(Qt.FramelessWindowHint)
 
         self.setMouseTracking(True)
