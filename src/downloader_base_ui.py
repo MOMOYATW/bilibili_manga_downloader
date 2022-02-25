@@ -395,15 +395,8 @@ class Ui_MainWindow(object):
 "	color:#cccac2;\n"
 "}\n"
 "QListWidget:focus{\n"
-"	border:1px solid #bc9a56\n"
-"}\n"
-"QScrollBar{width:18px}\n"
-"QScrollBar::handle{background-color:#404755;}\n"
-"QScrollBar::handle::hover{background-color:#4f5767; }\n"
-"QScrollBar::add-page{background-color:#1f2430;}\n"
-"QScrollBar::sub-page{background-color:#1f2430;}\n"
-"QScrollBar::up-arrow{height:0px}\n"
-"QScrollBar::down-arrow{height:0px}")
+"	border:1px solid #bc9a56;\n"
+"}")
 
         self.verticalLayout_5.addWidget(self.listWidget)
 

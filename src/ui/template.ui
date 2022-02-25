@@ -868,15 +868,8 @@ background-color:#fac761;
 	color:#cccac2;
 }
 QListWidget:focus{
-	border:1px solid #bc9a56
-}
-QScrollBar{width:18px}
-QScrollBar::handle{background-color:#404755;}
-QScrollBar::handle::hover{background-color:#4f5767; }
-QScrollBar::add-page{background-color:#1f2430;}
-QScrollBar::sub-page{background-color:#1f2430;}
-QScrollBar::up-arrow{height:0px}
-QScrollBar::down-arrow{height:0px}</string>
+	border:1px solid #bc9a56;
+}</string>
                   </property>
                  </widget>
                 </item>

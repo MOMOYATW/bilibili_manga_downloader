@@ -4,7 +4,6 @@ from settings_ui import SettingWindow
 from downloader_base_ui import Ui_MainWindow
 from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox, QGraphicsDropShadowEffect
-from PySide6.QtGui import QColor
 
 
 class DownloadThread(QThread):
@@ -117,6 +116,17 @@ class MainWindow(QMainWindow):
         self.ui.btn_getinfo.clicked.connect(self.getMangaInfo)
         self.ui.btn_startdownload.clicked.connect(self.startDownload)
         self.ui.btn_moresettings.clicked.connect(self.showSettings)
+
+        self.ui.listWidget.verticalScrollBar().setStyleSheet(
+            '''QScrollBar:vertical{width:18px}
+               QScrollBar::handle:vertical{background-color:#404755;}
+               QScrollBar::handle:vertical::hover{background-color:#4f5767; }
+               QScrollBar::add-page:vertical{background-color:#1f2430;}
+               QScrollBar::sub-page:vertical{background-color:#1f2430;}
+               QScrollBar::up-arrow:vertical{height:0px}
+               QScrollBar::down-arrow:vertical{height:0px}
+               QScrollBar::add-line:vertical{height:0px}
+               QScrollBar::sub-line:vertical{height:0px}''')
 
         # read out settings and parse cookie
         self.cookie_text, self.base_folder, self.interval_seconds = read_config_file(
