@@ -240,6 +240,10 @@ class Ui_Form(object):
 "background-color:#ffcc66;\n"
 "color:#805500;\n"
 "border-style:outset;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
 "}")
         self.btn_select.setFlat(False)
 
@@ -298,6 +302,34 @@ class Ui_Form(object):
 
         self.verticalLayout.addWidget(self.content_bar)
 
+        self.btn_frame = QFrame(self.background)
+        self.btn_frame.setObjectName(u"btn_frame")
+        self.btn_frame.setMaximumSize(QSize(16777215, 40))
+        self.btn_frame.setFrameShape(QFrame.StyledPanel)
+        self.btn_frame.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_10 = QHBoxLayout(self.btn_frame)
+        self.horizontalLayout_10.setSpacing(0)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.btn_save = QPushButton(self.btn_frame)
+        self.btn_save.setObjectName(u"btn_save")
+        self.btn_save.setMinimumSize(QSize(150, 32))
+        self.btn_save.setMaximumSize(QSize(150, 16777215))
+        self.btn_save.setStyleSheet(u"QPushButton{\n"
+"background-color:#ffcc66;\n"
+"color:#805500;\n"
+"border-style:outset;\n"
+"}\n"
+"\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
+"}")
+
+        self.horizontalLayout_10.addWidget(self.btn_save)
+
+
+        self.verticalLayout.addWidget(self.btn_frame)
+
         self.status_bar = QFrame(self.background)
         self.status_bar.setObjectName(u"status_bar")
         self.status_bar.setMaximumSize(QSize(16777215, 25))
@@ -330,7 +362,7 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Settings", None))
         self.icon_label.setText("")
-        self.label.setText(QCoreApplication.translate("Form", u"\u66f4\u591a\u8bbe\u7f6e - \u5173\u95ed\u7a97\u53e3\u4f7f\u8bbe\u7f6e\u751f\u6548", None))
+        self.label.setText(QCoreApplication.translate("Form", u"\u66f4\u591a\u8bbe\u7f6e", None))
         self.btn_min.setText("")
         self.btn_close.setText("")
         self.cookie_label.setText(QCoreApplication.translate("Form", u"cookie", None))
@@ -359,6 +391,7 @@ class Ui_Form(object):
         self.interval_label.setText(QCoreApplication.translate("Form", u"\u95f4\u9694\u65f6\u957f", None))
         self.spinBox.setSuffix(QCoreApplication.translate("Form", u"\u6beb\u79d2", None))
         self.spinBox.setPrefix("")
+        self.btn_save.setText(QCoreApplication.translate("Form", u"\u4fdd\u5b58\u8bbe\u7f6e", None))
         self.copyright.setText(QCoreApplication.translate("Form", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
     # retranslateUi
 

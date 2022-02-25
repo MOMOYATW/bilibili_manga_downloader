@@ -520,9 +520,8 @@ color:#805500;
 border-style:outset;
 }
 
-QPushButton:pressed{
-background-color:#ffcc66;
-color:#805500;
+QPushButton:hover{
+background-color:#fac761;
 }</string>
                   </property>
                   <property name="text">
@@ -929,9 +928,8 @@ color:#805500;
 border-style:outset;
 }
 
-QPushButton:pressed{
-background-color:#ffcc66;
-color:#805500;
+QPushButton:hover{
+background-color:#fac761;
 }</string>
                </property>
                <property name="text">
@@ -991,9 +989,8 @@ color:#805500;
 border-style:outset;
 }
 
-QPushButton:pressed{
-background-color:#ffcc66;
-color:#805500;
+QPushButton:hover{
+background-color:#fac761;
 }</string>
                </property>
                <property name="text">
@@ -1034,9 +1031,8 @@ color:#805500;
 border-style:outset;
 }
 
-QPushButton:pressed{
-background-color:#ffcc66;
-color:#805500;
+QPushButton:hover{
+background-color:#fac761;
 }</string>
                </property>
                <property name="text">
@@ -1077,9 +1073,8 @@ color:#805500;
 border-style:outset;
 }
 
-QPushButton:pressed{
-background-color:#ffcc66;
-color:#805500;
+QPushButton:hover{
+background-color:#fac761;
 }</string>
                </property>
                <property name="text">

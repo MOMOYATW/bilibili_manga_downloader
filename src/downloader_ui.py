@@ -159,15 +159,7 @@ class MainWindow(QMainWindow):
                 return
         # check if subwindow is showing
         if self.setting_ui and self.setting_ui.isVisible():
-            msg_box = QMessageBox(
-                QMessageBox.Warning, '注意', '设置尚未保存，需要保存后退出吗？', QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel)
-            ret = msg_box.exec()
-            if ret == QMessageBox.Yes:
-                self.fetchSettings()
-            elif ret == QMessageBox.No:
-                self.setting_ui.close()
-            else:
-                return
+            self.setting_ui.close()
 
         save = {"cookie_text": self.cookie_text,
                 "base_folder": self.base_folder, "interval_seconds": self.interval_seconds}
@@ -205,7 +197,7 @@ class MainWindow(QMainWindow):
         self.setting_ui.ui.cookie_input.setText(self.cookie_text)
         self.setting_ui.ui.path_input.setText(self.base_folder)
         self.setting_ui.ui.spinBox.setValue(self.interval_seconds)
-        self.setting_ui.ui.btn_close.clicked.connect(self.fetchSettings)
+        self.setting_ui.ui.btn_save.clicked.connect(self.fetchSettings)
         self.setting_ui.show()
 
     def mousePressEvent(self, QMouseEvent):

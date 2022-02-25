@@ -237,9 +237,8 @@ class Ui_MainWindow(object):
 "border-style:outset;\n"
 "}\n"
 "\n"
-"QPushButton:pressed{\n"
-"background-color:#ffcc66;\n"
-"color:#805500;\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
 "}")
         self.btn_getinfo.setFlat(False)
 
@@ -434,9 +433,8 @@ class Ui_MainWindow(object):
 "border-style:outset;\n"
 "}\n"
 "\n"
-"QPushButton:pressed{\n"
-"background-color:#ffcc66;\n"
-"color:#805500;\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
 "}")
         self.btn_startdownload.setFlat(False)
 
@@ -464,9 +462,8 @@ class Ui_MainWindow(object):
 "border-style:outset;\n"
 "}\n"
 "\n"
-"QPushButton:pressed{\n"
-"background-color:#ffcc66;\n"
-"color:#805500;\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
 "}")
         self.btn_selectall.setFlat(False)
 
@@ -485,9 +482,8 @@ class Ui_MainWindow(object):
 "border-style:outset;\n"
 "}\n"
 "\n"
-"QPushButton:pressed{\n"
-"background-color:#ffcc66;\n"
-"color:#805500;\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
 "}")
         self.btn_cancelall.setFlat(False)
 
@@ -506,9 +502,8 @@ class Ui_MainWindow(object):
 "border-style:outset;\n"
 "}\n"
 "\n"
-"QPushButton:pressed{\n"
-"background-color:#ffcc66;\n"
-"color:#805500;\n"
+"QPushButton:hover{\n"
+"background-color:#fac761;\n"
 "}")
         self.btn_moresettings.setFlat(False)
 
