@@ -19,6 +19,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
     QLineEdit, QListWidget, QListWidgetItem, QMainWindow,
     QProgressBar, QPushButton, QSizePolicy, QVBoxLayout,
     QWidget)
+import sources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -28,7 +29,7 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QSize(400, 270))
         MainWindow.setMouseTracking(True)
         icon = QIcon()
-        icon.addFile(u"imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/imgs/imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet(u"")
         self.centralwidget = QWidget(MainWindow)
@@ -79,7 +80,7 @@ class Ui_MainWindow(object):
         self.icon_label = QLabel(self.icon_box)
         self.icon_label.setObjectName(u"icon_label")
         self.icon_label.setMouseTracking(True)
-        self.icon_label.setPixmap(QPixmap(u"imgs/icon.png"))
+        self.icon_label.setPixmap(QPixmap(u":/imgs/imgs/icon.png"))
         self.icon_label.setScaledContents(True)
 
         self.horizontalLayout_6.addWidget(self.icon_label)
@@ -135,7 +136,7 @@ class Ui_MainWindow(object):
         self.btn_min.setStyleSheet(u"QPushButton{border:none}\n"
 "QPushButton:hover{background-color:#363a45}")
         icon1 = QIcon()
-        icon1.addFile(u"imgs/minimize.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/imgs/imgs/minimize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_min.setIcon(icon1)
         self.btn_min.setIconSize(QSize(16, 16))
 
@@ -149,7 +150,7 @@ class Ui_MainWindow(object):
         self.btn_max.setStyleSheet(u"QPushButton{border:none}\n"
 "QPushButton:hover{background-color:#363a45}")
         icon2 = QIcon()
-        icon2.addFile(u"imgs/maximum.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/imgs/imgs/maximum.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_max.setIcon(icon2)
 
         self.horizontalLayout_2.addWidget(self.btn_max)
@@ -162,7 +163,7 @@ class Ui_MainWindow(object):
         self.btn_close.setStyleSheet(u"QPushButton{border:none}\n"
 "QPushButton:hover{background-color:#d41325}")
         icon3 = QIcon()
-        icon3.addFile(u"imgs/close.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon3.addFile(u":/imgs/imgs/close.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_close.setIcon(icon3)
 
         self.horizontalLayout_2.addWidget(self.btn_close)

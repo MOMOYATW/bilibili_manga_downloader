@@ -18,6 +18,7 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
     QLineEdit, QPushButton, QSizePolicy, QSpinBox,
     QVBoxLayout, QWidget)
+import sources_rc
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -25,7 +26,7 @@ class Ui_Form(object):
             Form.setObjectName(u"Form")
         Form.resize(550, 295)
         icon = QIcon()
-        icon.addFile(u"imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/imgs/imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
         Form.setWindowIcon(icon)
         Form.setStyleSheet(u"")
         self.margin_layout = QVBoxLayout(Form)
@@ -72,7 +73,7 @@ class Ui_Form(object):
         self.icon_label = QLabel(self.icon_box)
         self.icon_label.setObjectName(u"icon_label")
         self.icon_label.setMouseTracking(True)
-        self.icon_label.setPixmap(QPixmap(u"imgs/icon.png"))
+        self.icon_label.setPixmap(QPixmap(u":/imgs/imgs/icon.png"))
         self.icon_label.setScaledContents(True)
 
         self.horizontalLayout_6.addWidget(self.icon_label)
@@ -128,7 +129,7 @@ class Ui_Form(object):
         self.btn_min.setStyleSheet(u"QPushButton{border:none}\n"
 "QPushButton:hover{background-color:#363a45}")
         icon1 = QIcon()
-        icon1.addFile(u"imgs/minimize.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/imgs/imgs/minimize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_min.setIcon(icon1)
         self.btn_min.setIconSize(QSize(16, 16))
 
@@ -142,7 +143,7 @@ class Ui_Form(object):
         self.btn_close.setStyleSheet(u"QPushButton{border:none}\n"
 "QPushButton:hover{background-color:#d41325}")
         icon2 = QIcon()
-        icon2.addFile(u"imgs/close.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/imgs/imgs/close.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_close.setIcon(icon2)
 
         self.horizontalLayout_2.addWidget(self.btn_close)

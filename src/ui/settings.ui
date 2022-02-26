@@ -14,8 +14,8 @@
    <string>Settings</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>imgs/icon.png</normaloff>imgs/icon.png</iconset>
+   <iconset resource="sources.qrc">
+    <normaloff>:/imgs/imgs/icon.png</normaloff>:/imgs/imgs/icon.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true"/>
@@ -162,7 +162,7 @@
                   <string/>
                  </property>
                  <property name="pixmap">
-                  <pixmap>imgs/icon.png</pixmap>
+                  <pixmap resource="sources.qrc">:/imgs/imgs/icon.png</pixmap>
                  </property>
                  <property name="scaledContents">
                   <bool>true</bool>
@@ -276,8 +276,8 @@ QPushButton:hover{background-color:#363a45}</string>
                <string/>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>imgs/minimize.png</normaloff>imgs/minimize.png</iconset>
+               <iconset resource="sources.qrc">
+                <normaloff>:/imgs/imgs/minimize.png</normaloff>:/imgs/imgs/minimize.png</iconset>
               </property>
               <property name="iconSize">
                <size>
@@ -306,8 +306,8 @@ QPushButton:hover{background-color:#d41325}</string>
                <string/>
               </property>
               <property name="icon">
-               <iconset>
-                <normaloff>imgs/close.png</normaloff>imgs/close.png</iconset>
+               <iconset resource="sources.qrc">
+                <normaloff>:/imgs/imgs/close.png</normaloff>:/imgs/imgs/close.png</iconset>
               </property>
              </widget>
             </item>
@@ -736,6 +736,8 @@ background-color:#fac761;
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="sources.qrc"/>
+ </resources>
  <connections/>
 </ui>

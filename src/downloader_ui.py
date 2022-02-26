@@ -2,8 +2,10 @@ import sys
 from core import *
 from settings_ui import SettingWindow
 from downloader_base_ui import Ui_MainWindow
-from PySide6.QtCore import Qt, QThread, Signal
+from PySide6.QtCore import Qt, QThread, Signal, QUrl
 from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox, QGraphicsDropShadowEffect
+from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+import sources_rc
 
 
 class DownloadThread(QThread):
@@ -11,6 +13,7 @@ class DownloadThread(QThread):
     pop_message = Signal(QMessageBox.Icon, str, str)
     sleep_thread = Signal()
     update_checkbox = Signal(int, int, int, str)
+    play_music = Signal()
 
     def __init__(self, window) -> None:
         super(DownloadThread, self).__init__()
@@ -27,6 +30,8 @@ class DownloadThread(QThread):
             widget = self.window.ui.listWidget.itemWidget(item)
             if widget.isChecked():
                 download_sets.append([self.window.episode_list[i], i])
+        if download_sets == []:
+            return
         for i, download in enumerate(download_sets):
             episode_id = download[1]
             download = download[0]
@@ -77,6 +82,7 @@ class DownloadThread(QThread):
             self.update_checkbox.emit(
                 episode_id, -1, -1, '{} - {}'.format(download['short_title'], download['title']))
         self.progress_changed.emit(100)
+        self.play_music.emit()
 
 
 class MainWindow(QMainWindow):
@@ -84,7 +90,7 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.title = '哔哩哔哩漫画下载器 V1.2.5'
+        self.title = '哔哩哔哩漫画下载器 V1.2.6'
         self.setWindowFlags(Qt.FramelessWindowHint |
                             Qt.WindowMinMaxButtonsHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
@@ -96,7 +102,15 @@ class MainWindow(QMainWindow):
         self.effect_shadow.setBlurRadius(10)
         self.effect_shadow.setColor(Qt.black)
         self.ui.background.setGraphicsEffect(self.effect_shadow)
-
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        self.audioOutput = QAudioOutput()
+        self.player = QMediaPlayer()
+        self.player.setAudioOutput(self.audioOutput)
+        self.player.setSource(QUrl.fromLocalFile(os.path.join(
+            base_path, "mp3", "download_finished.mp3")))
         self.setMouseTracking(True)
         self.padding = 3
         self.isDrag = False
@@ -443,6 +457,7 @@ class MainWindow(QMainWindow):
             self.thread.progress_changed.connect(self.ui.progressBar.setValue)
             self.thread.pop_message.connect(self.popMsgBox)
             self.thread.update_checkbox.connect(self.setCheckBox)
+            self.thread.play_music.connect(self.playMusic)
             self.thread.start()
         else:
             self.thread.stop = True
@@ -499,6 +514,10 @@ class MainWindow(QMainWindow):
         else:
             widget.setText(
                 title + ' - 正在下载中({}/{})'.format(image_id, images_num))
+
+    def playMusic(self):
+        self.player.stop()
+        self.player.play()
 
 
 if __name__ == '__main__':
