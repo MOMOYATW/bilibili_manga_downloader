@@ -130,12 +130,12 @@ def read_config_file(attributes_dict):
         with open('./settings.json', 'r', encoding='utf-8') as f:
             json_data = json.load(f)
         for attribute in attributes_dict.keys():
-            if attribute in attributes_dict:
+            if attribute in json_data:
                 value_list.append(json_data[attribute])
             else:
                 value_list.append(attributes_dict[attribute])
         return value_list
-    return attributes_dict.values
+    return attributes_dict.values()
 
 
 def parse_website(website):

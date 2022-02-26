@@ -89,7 +89,7 @@ class DownloadThread(QThread):
 class MainWindow(CustomWindow):
     def __init__(self):
         super().__init__()
-        self.title = '哔哩哔哩漫画下载器 V1.2.6'
+        self.title = '哔哩哔哩漫画下载器 V1.2.7'
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
