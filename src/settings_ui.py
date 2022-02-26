@@ -1,31 +1,28 @@
 import sys
 from PySide6.QtCore import Qt
+from CustomWindow import CustomWindow
 from terminal_downloader import *
-from settings_base_ui import Ui_Form
+from settings_base_ui import Ui_MainWindow
 from PySide6.QtWidgets import QApplication, QWidget, QFileDialog, QGraphicsDropShadowEffect
 
 
-class SettingWindow(QWidget):
+class SettingWindow(CustomWindow):
     def __init__(self):
         super().__init__()
-        self.ui = Ui_Form()
+        self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        self.maximize = False
+        self.edge_scaling = False
+        self.title_bar_height = self.ui.title_bar.height()
+        self.outermost_layout = self.ui.outermost_layout
+        self.main_widget = self.ui.background
+
         self.ui.btn_close.clicked.connect(self.close)
         self.ui.btn_min.clicked.connect(self.showMinimized)
         self.ui.btn_select.clicked.connect(self.selectPath)
-        self.setMouseTracking(True)
-        self.isPressed = False
-        self.padding = 3
 
-        self.ui.margin_layout.setContentsMargins(5, 5, 5, 5)
-        # add shadow
-        self.effect_shadow = QGraphicsDropShadowEffect(self)
-        self.effect_shadow.setOffset(0, 0)
-        self.effect_shadow.setBlurRadius(10)
-        self.effect_shadow.setColor(Qt.black)
-        self.ui.background.setGraphicsEffect(self.effect_shadow)
+        self.drawShadow()
+        self.loadStyleSheet()
 
     def selectPath(self):
         """
@@ -41,50 +38,23 @@ class SettingWindow(QWidget):
             dir = os.path.join('.', rel_path)
         self.ui.path_input.setText(dir)
 
-    def mousePressEvent(self, QMouseEvent):
+    def loadStyleSheet(self):
         """
-        only can be drag when using left button and click the bar
+        Load qss
         """
-        if QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.ui.title_bar.height():
-            self.isPressed = True
-            self.startMovePosition = QMouseEvent.globalPos()
-            self.startMousePosition = QMouseEvent.pos()
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        styleFile = 'style.qss'
+        if os.path.exists(os.path.join('.', styleFile)):
+            styleFile = os.path.join('.', styleFile)
+        else:
+            styleFile = os.path.join(base_path, 'style', styleFile)
 
-    def mouseReleaseEvent(self, QMouseEvent):
-        """
-        release the button
-        """
-        self.isPressed = False
-
-    def mouseMoveEvent(self, QMouseEvent):
-        """
-        drag custom title bar
-        """
-        if self.isPressed:
-            if self.isMaximized() == True:
-                """
-                when window is maximum
-                restore the window size and maintain the mouse relative position
-                """
-                self.showNormal()
-                # calculate mouse position rate
-                pos_rate = QMouseEvent.x() / self.size().width()
-                # calculate the distance from left to mouse
-                normal_pos = self.restoreSize.width() * pos_rate
-                # set the mouse position
-                mouse_pos = QMouseEvent.pos()
-                mouse_pos.setX(normal_pos)
-                # resize the window
-                self.resize(self.restoreSize)
-                # calculate the window global position
-                final_pos = QMouseEvent.globalPos()
-                final_pos.setX(final_pos.x() - normal_pos)
-                self.move(final_pos)
-                self.startMovePosition = QMouseEvent.globalPos()
-                self.startMousePosition = mouse_pos
-            MovePos = QMouseEvent.globalPos()
-            self.move(MovePos - self.startMousePosition)
-            self.startMovePosition = MovePos
+        with open(styleFile, 'r') as f:
+            qss = f.read()
+            self.setStyleSheet(qss)
 
 
 if __name__ == '__main__':

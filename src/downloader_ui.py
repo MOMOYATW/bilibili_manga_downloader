@@ -3,8 +3,9 @@ from core import *
 from settings_ui import SettingWindow
 from downloader_base_ui import Ui_MainWindow
 from PySide6.QtCore import Qt, QThread, Signal, QUrl
-from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox, QGraphicsDropShadowEffect
+from PySide6.QtWidgets import QApplication,  QCheckBox, QListWidgetItem, QMessageBox
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from CustomWindow import CustomWindow
 import sources_rc
 
 
@@ -85,40 +86,24 @@ class DownloadThread(QThread):
         self.play_music.emit()
 
 
-class MainWindow(QMainWindow):
+class MainWindow(CustomWindow):
     def __init__(self):
         super().__init__()
+        self.title = '哔哩哔哩漫画下载器 V1.2.6'
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.title = '哔哩哔哩漫画下载器 V1.2.6'
-        self.setWindowFlags(Qt.FramelessWindowHint |
-                            Qt.WindowMinMaxButtonsHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
 
-        # add shadow
-        self.ui.margin_layout.setContentsMargins(5, 5, 5, 5)
-        self.effect_shadow = QGraphicsDropShadowEffect(self)
-        self.effect_shadow.setOffset(0, 0)
-        self.effect_shadow.setBlurRadius(10)
-        self.effect_shadow.setColor(Qt.black)
-        self.ui.background.setGraphicsEffect(self.effect_shadow)
-        if getattr(sys, 'frozen', False):
-            base_path = sys._MEIPASS
-        else:
-            base_path = os.path.abspath(".")
-        self.audioOutput = QAudioOutput()
-        self.player = QMediaPlayer()
-        self.player.setAudioOutput(self.audioOutput)
-        self.player.setSource(QUrl.fromLocalFile(os.path.join(
-            base_path, "mp3", "download_finished.mp3")))
-        self.setMouseTracking(True)
-        self.padding = 3
-        self.isDrag = False
-        self.direction = None
-        self.isPressed = False
+        # set Custom Window paramters
+        self.main_widget = self.ui.background
+        self.outermost_layout = self.ui.margin_layout
+        self.title_bar_height = self.ui.title_bar.height()
+
+        self.drawShadow()
+        self.loadAudioFile()
+        self.loadStyleSheet()
+
         self.is_downloading = False
-        self.setting_ui = None
-
+        self.setting_ui = SettingWindow()
         self.ui.progressBar.setValue(0)
 
         self.ui.btn_min.clicked.connect(self.showMinimized)
@@ -131,17 +116,6 @@ class MainWindow(QMainWindow):
         self.ui.btn_startdownload.clicked.connect(self.startDownload)
         self.ui.btn_moresettings.clicked.connect(self.showSettings)
 
-        self.ui.listWidget.verticalScrollBar().setStyleSheet(
-            '''QScrollBar:vertical{width:18px}
-               QScrollBar::handle:vertical{background-color:#404755;}
-               QScrollBar::handle:vertical::hover{background-color:#4f5767; }
-               QScrollBar::add-page:vertical{background-color:#1f2430;}
-               QScrollBar::sub-page:vertical{background-color:#1f2430;}
-               QScrollBar::up-arrow:vertical{height:0px}
-               QScrollBar::down-arrow:vertical{height:0px}
-               QScrollBar::add-line:vertical{height:0px}
-               QScrollBar::sub-line:vertical{height:0px}''')
-
         # read out settings and parse cookie
         self.cookie_text, self.base_folder, self.interval_seconds = read_config_file(
             {"cookie_text": "", "base_folder": "./", "interval_seconds": 1000})
@@ -150,6 +124,39 @@ class MainWindow(QMainWindow):
             self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
             self.ui.label.setText(self.title + ' - 已设置cookie')
+
+    def loadAudioFile(self):
+        """
+        Load audio file from temp directory
+        and set the player
+        """
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        self.audioOutput = QAudioOutput()
+        self.player = QMediaPlayer()
+        self.player.setAudioOutput(self.audioOutput)
+        self.player.setSource(QUrl.fromLocalFile(os.path.join(
+            base_path, "mp3", "download_finished.mp3")))
+
+    def loadStyleSheet(self):
+        """
+        Load qss
+        """
+        if getattr(sys, 'frozen', False):
+            base_path = sys._MEIPASS
+        else:
+            base_path = os.path.abspath(".")
+        styleFile = 'style.qss'
+        if os.path.exists(os.path.join('.', styleFile)):
+            styleFile = os.path.join('.', styleFile)
+        else:
+            styleFile = os.path.join(base_path, 'style', styleFile)
+
+        with open(styleFile, 'r') as f:
+            qss = f.read()
+            self.setStyleSheet(qss)
 
     def selectAll(self):
         """
@@ -201,203 +208,15 @@ class MainWindow(QMainWindow):
     def closeEvent(self, event) -> None:
         self.saveAndClose()
 
-    def showMaximizeOrNormalize(self):
-        """
-        Maximize or normalize the winodw
-        """
-        if self.isMaximized() == True:
-            self.showNormal()
-            self.ui.margin_layout.setContentsMargins(5, 5, 5, 5)
-            self.move(self.restorePos)
-            self.resize(self.restoreSize)
-
-        else:
-            self.restoreSize = self.size()
-            self.restorePos = self.pos()
-            self.ui.margin_layout.setContentsMargins(0, 0, 0, 0)
-            self.showMaximized()
-
     def showSettings(self):
         """
         Show Settings Window
         """
-        self.setting_ui = SettingWindow()
         self.setting_ui.ui.cookie_input.setText(self.cookie_text)
         self.setting_ui.ui.path_input.setText(self.base_folder)
         self.setting_ui.ui.spinBox.setValue(self.interval_seconds)
         self.setting_ui.ui.btn_save.clicked.connect(self.fetchSettings)
         self.setting_ui.show()
-
-    def mousePressEvent(self, QMouseEvent):
-        """
-        only can be drag when using left button and click the bar
-        """
-        if QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.ui.title_bar.height():
-            self.isPressed = True
-            self.startMovePosition = QMouseEvent.globalPos()
-            self.startMousePosition = QMouseEvent.pos()
-
-        if QMouseEvent.button() == Qt.MouseButton.LeftButton and (QMouseEvent.x() <= self.padding or self.size().width() - QMouseEvent.x() <= self.padding or QMouseEvent.y() <= self.padding or self.size().height() - QMouseEvent.y() <= self.padding):
-            self.isDrag = True
-            self.btnY = self.pos().y() + self.size().height() - self.minimumHeight()
-            self.rightX = self.pos().x() + self.size().width() - self.minimumWidth()
-
-    def mouseDoubleClickEvent(self, QMouseEvent):
-        """
-        double click to maximum and minimum the window
-        """
-        if QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.ui.title_bar.height():
-            self.showMaximizeOrNormalize()
-
-    def mouseReleaseEvent(self, QMouseEvent):
-        """
-        release the button
-        """
-        self.isPressed = False
-        self.isDrag = False
-
-    def mouseMoveEvent(self, QMouseEvent):
-        """
-        drag custom title bar
-        """
-        if self.isMaximized() == False and not self.isDrag:
-            if QMouseEvent.x() <= self.padding and QMouseEvent.y() <= self.padding:
-                """
-                left top
-                """
-                self.setCursor(Qt.SizeFDiagCursor)
-                self.direction = 'lt'
-            elif QMouseEvent.x() <= self.padding and self.size().height() - QMouseEvent.y() <= self.padding:
-                """
-                left bottom
-                """
-                self.setCursor(Qt.SizeBDiagCursor)
-                self.direction = 'lb'
-            elif self.size().width() - QMouseEvent.x() <= self.padding and QMouseEvent.y() <= self.padding:
-                """
-                right top
-                """
-                self.setCursor(Qt.SizeBDiagCursor)
-                self.direction = 'rt'
-            elif self.size().width() - QMouseEvent.x() <= self.padding and self.size().height() - QMouseEvent.y() <= self.padding:
-                """
-                right bottom
-                """
-                self.setCursor(Qt.SizeFDiagCursor)
-                self.direction = 'rb'
-            elif QMouseEvent.x() <= self.padding:
-                """
-                left
-                """
-                self.setCursor(Qt.SizeHorCursor)
-                self.direction = 'l'
-            elif self.size().width() - QMouseEvent.x() <= self.padding:
-                """
-                right
-                """
-                self.setCursor(Qt.SizeHorCursor)
-                self.direction = 'r'
-            elif QMouseEvent.y() <= self.padding:
-                """
-                top
-                """
-                self.setCursor(Qt.SizeVerCursor)
-                self.direction = 't'
-            elif self.size().height() - QMouseEvent.y() <= self.padding:
-                """
-                bottom
-                """
-                self.setCursor(Qt.SizeVerCursor)
-                self.direction = 'b'
-            else:
-                self.direction = None
-                self.setCursor(Qt.ArrowCursor)
-
-        if self.isDrag:
-            curr_size = self.size()
-            curr_pos = self.pos()
-            if self.direction == 'l':
-                curr_size.setWidth(
-                    max(curr_size.width() - QMouseEvent.x(), self.minimumWidth()))
-                curr_pos.setX(min(curr_pos.x() + QMouseEvent.x(),
-                              self.rightX))
-                self.resize(curr_size)
-                self.move(curr_pos)
-            elif self.direction == 'r':
-                curr_size.setWidth(
-                    max(QMouseEvent.x(), self.minimumWidth()))
-                self.resize(curr_size)
-            elif self.direction == 't':
-                curr_size.setHeight(
-                    max(curr_size.height() - QMouseEvent.y(), self.minimumHeight()))
-                curr_pos.setY(min(curr_pos.y() + QMouseEvent.y(), self.btnY))
-                self.resize(curr_size)
-                self.move(curr_pos)
-            elif self.direction == 'b':
-                curr_size.setHeight(
-                    max(QMouseEvent.y(), self.minimumHeight()))
-                self.resize(curr_size)
-            elif self.direction == 'lt':
-                curr_size.setWidth(
-                    max(curr_size.width() - QMouseEvent.x(), self.minimumWidth()))
-                curr_size.setHeight(
-                    max(curr_size.height() - QMouseEvent.y(), self.minimumHeight()))
-                curr_pos.setX(min(curr_pos.x() + QMouseEvent.x(), self.rightX))
-                curr_pos.setY(min(curr_pos.y() + QMouseEvent.y(), self.btnY))
-                self.resize(curr_size)
-                self.move(curr_pos)
-            elif self.direction == 'lb':
-                curr_size.setWidth(
-                    max(curr_size.width() - QMouseEvent.x(), self.minimumWidth()))
-                curr_size.setHeight(
-                    max(QMouseEvent.y(), self.minimumHeight()))
-                curr_pos.setX(min(curr_pos.x() + QMouseEvent.x(),
-                              self.rightX))
-                self.resize(curr_size)
-                self.move(curr_pos)
-            elif self.direction == 'rt':
-                curr_size.setHeight(
-                    max(curr_size.height() - QMouseEvent.y(), self.minimumHeight()))
-                curr_size.setWidth(
-                    max(QMouseEvent.x(), self.minimumWidth()))
-                curr_pos.setY(min(curr_pos.y() + QMouseEvent.y(), self.btnY))
-                self.resize(curr_size)
-                self.move(curr_pos)
-            elif self.direction == 'rb':
-                curr_size.setWidth(
-                    max(QMouseEvent.x(), self.minimumWidth()))
-                curr_size.setHeight(
-                    max(QMouseEvent.y(), self.minimumHeight()))
-                self.resize(curr_size)
-            else:
-                raise('Unexpected Error')
-            return
-
-        if self.isPressed:
-            if self.isMaximized() == True:
-                """
-                when window is maximum
-                restore the window size and maintain the mouse relative position
-                """
-                self.showNormal()
-                # calculate mouse position rate
-                pos_rate = QMouseEvent.x() / self.size().width()
-                # calculate the distance from left to mouse
-                normal_pos = self.restoreSize.width() * pos_rate
-                # set the mouse position
-                mouse_pos = QMouseEvent.pos()
-                mouse_pos.setX(normal_pos)
-                # resize the window
-                self.resize(self.restoreSize)
-                # calculate the window global position
-                final_pos = QMouseEvent.globalPos()
-                final_pos.setX(final_pos.x() - normal_pos)
-                self.move(final_pos)
-                self.startMovePosition = QMouseEvent.globalPos()
-                self.startMousePosition = mouse_pos
-            MovePos = QMouseEvent.globalPos()
-            self.move(MovePos - self.startMousePosition)
-            self.startMovePosition = MovePos
 
     def getMangaInfo(self):
         """
@@ -457,7 +276,7 @@ class MainWindow(QMainWindow):
             self.thread.progress_changed.connect(self.ui.progressBar.setValue)
             self.thread.pop_message.connect(self.popMsgBox)
             self.thread.update_checkbox.connect(self.setCheckBox)
-            self.thread.play_music.connect(self.playMusic)
+            self.thread.play_music.connect(self.playAudio)
             self.thread.start()
         else:
             self.thread.stop = True
@@ -515,7 +334,7 @@ class MainWindow(QMainWindow):
             widget.setText(
                 title + ' - 正在下载中({}/{})'.format(image_id, images_num))
 
-    def playMusic(self):
+    def playAudio(self):
         self.player.stop()
         self.player.play()
 

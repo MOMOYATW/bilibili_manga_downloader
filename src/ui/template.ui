@@ -55,7 +55,7 @@
        <bool>true</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color:#1f2430</string>
+       <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <property name="spacing">
@@ -227,7 +227,7 @@
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:#cccac2</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>哔哩哔哩漫画下载器 V1.0.0 - 尚未设置cookie</string>
@@ -285,8 +285,7 @@
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{border:none}
-QPushButton:hover{background-color:#363a45}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string/>
@@ -315,8 +314,7 @@ QPushButton:hover{background-color:#363a45}</string>
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{border:none}
-QPushButton:hover{background-color:#363a45}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string/>
@@ -339,8 +337,7 @@ QPushButton:hover{background-color:#363a45}</string>
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{border:none}
-QPushButton:hover{background-color:#d41325}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string/>
@@ -441,7 +438,7 @@ QPushButton:hover{background-color:#d41325}</string>
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:#cccac2</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>漫画网址</string>
@@ -475,15 +472,7 @@ QPushButton:hover{background-color:#d41325}</string>
                    <string/>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QLineEdit{
-	border:1px solid #383f4d;
-	background-color:#242936;
-	color:#cccac2
-}
-
-QLineEdit:focus{
-	border:1px solid #c4a25f;
-}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="placeholderText">
                    <string/>
@@ -514,15 +503,7 @@ QLineEdit:focus{
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QPushButton{
-background-color:#ffcc66;
-color:#805500;
-border-style:outset;
-}
-
-QPushButton:hover{
-background-color:#fac761;
-}</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>获取漫画信息</string>
@@ -553,7 +534,7 @@ background-color:#fac761;
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:#cccac2</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>提示：仅支持哔哩哔哩漫画，例如https://manga.bilibili.com/detail/mc28528</string>
@@ -656,7 +637,7 @@ background-color:#fac761;
                       <bool>true</bool>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">color:#cccac2</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>漫画标题</string>
@@ -669,7 +650,7 @@ background-color:#fac761;
                       <bool>true</bool>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">color:#cccac2</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>暂无</string>
@@ -718,7 +699,7 @@ background-color:#fac761;
                       <bool>true</bool>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">color:#cccac2</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>漫画作者</string>
@@ -731,7 +712,7 @@ background-color:#fac761;
                       <bool>true</bool>
                      </property>
                      <property name="styleSheet">
-                      <string notr="true">color:#cccac2</string>
+                      <string notr="true"/>
                      </property>
                      <property name="text">
                       <string>暂无</string>
@@ -786,7 +767,7 @@ background-color:#fac761;
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:#cccac2</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>漫画描述</string>
@@ -799,7 +780,7 @@ background-color:#fac761;
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:#cccac2</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>暂无</string>
@@ -851,7 +832,7 @@ background-color:#fac761;
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">color:#cccac2</string>
+                   <string notr="true"/>
                   </property>
                   <property name="text">
                    <string>章节列表</string>
@@ -864,12 +845,7 @@ background-color:#fac761;
                    <bool>true</bool>
                   </property>
                   <property name="styleSheet">
-                   <string notr="true">QListWidget{
-	color:#cccac2;
-}
-QListWidget:focus{
-	border:1px solid #bc9a56;
-}</string>
+                   <string notr="true"/>
                   </property>
                  </widget>
                 </item>
@@ -915,15 +891,7 @@ QListWidget:focus{
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{
-background-color:#ffcc66;
-color:#805500;
-border-style:outset;
-}
-
-QPushButton:hover{
-background-color:#fac761;
-}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string>开始下载</string>
@@ -976,15 +944,7 @@ background-color:#fac761;
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{
-background-color:#ffcc66;
-color:#805500;
-border-style:outset;
-}
-
-QPushButton:hover{
-background-color:#fac761;
-}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string>全选</string>
@@ -1018,15 +978,7 @@ background-color:#fac761;
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{
-background-color:#ffcc66;
-color:#805500;
-border-style:outset;
-}
-
-QPushButton:hover{
-background-color:#fac761;
-}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string>全不选</string>
@@ -1060,15 +1012,7 @@ background-color:#fac761;
                 <bool>true</bool>
                </property>
                <property name="styleSheet">
-                <string notr="true">QPushButton{
-background-color:#ffcc66;
-color:#805500;
-border-style:outset;
-}
-
-QPushButton:hover{
-background-color:#fac761;
-}</string>
+                <string notr="true"/>
                </property>
                <property name="text">
                 <string>更多设置</string>
@@ -1123,7 +1067,7 @@ background-color:#fac761;
              <bool>true</bool>
             </property>
             <property name="styleSheet">
-             <string notr="true">color:#cccac2</string>
+             <string notr="true"/>
             </property>
             <property name="text">
              <string>Developed by Tao Ye. 2022©All Rights Reserved.</string>
