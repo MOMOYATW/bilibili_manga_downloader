@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox, QGraphicsDropShadowEffect
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QEnterEvent
+from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QEnterEvent, QIcon
 from enum import Enum
 
 
@@ -66,12 +66,20 @@ class CustomWindow(QMainWindow):
             # normalize
             self.showNormal()
             self.outermost_layout.setContentsMargins(5, 5, 5, 5)
+            windowed_icon = QIcon()
+            windowed_icon.addFile(
+                u":/imgs/imgs/maximize.png", QSize(), QIcon.Normal, QIcon.Off)
+            self.ui.btn_max.setIcon(windowed_icon)
         else:
             # maximize
             self.restoreSize = self.size()
             self.restorePos = self.pos()
             self.setCursor(Qt.ArrowCursor)
             self.outermost_layout.setContentsMargins(0, 0, 0, 0)
+            maximize_icon = QIcon()
+            maximize_icon.addFile(
+                u":/imgs/imgs/windowed.png", QSize(), QIcon.Normal, QIcon.Off)
+            self.ui.btn_max.setIcon(maximize_icon)
             self.showMaximized()
 
     def mousePressEvent(self, QMouseEvent):

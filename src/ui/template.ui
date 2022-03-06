@@ -321,7 +321,7 @@
                </property>
                <property name="icon">
                 <iconset resource="sources.qrc">
-                 <normaloff>:/imgs/imgs/maximum.png</normaloff>:/imgs/imgs/maximum.png</iconset>
+                 <normaloff>:/imgs/imgs/maximize.png</normaloff>:/imgs/imgs/maximize.png</iconset>
                </property>
               </widget>
              </item>

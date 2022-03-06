@@ -148,7 +148,7 @@ class Ui_MainWindow(object):
         self.btn_max.setMouseTracking(True)
         self.btn_max.setStyleSheet(u"")
         icon2 = QIcon()
-        icon2.addFile(u":/imgs/imgs/maximum.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/imgs/imgs/maximize.png", QSize(), QIcon.Normal, QIcon.Off)
         self.btn_max.setIcon(icon2)
 
         self.horizontalLayout_2.addWidget(self.btn_max)
