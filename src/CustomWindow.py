@@ -1,28 +1,10 @@
 from ctypes.wintypes import MSG
-from pickle import TRUE
 from PySide6.QtWidgets import QMainWindow, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QEnterEvent, QIcon
+from PySide6.QtGui import QIcon
 from win32api import *
 from win32gui import *
-import win32con
-from enum import Enum
-
-
-class ScalingDirection(Enum):
-    # Directions:
-    # 1   2   3
-    # 4   5   6
-    # 7   8   9
-    left_top = 1
-    top = 2
-    right_top = 3
-    left = 4
-    center = 5
-    right = 6
-    left_bottom = 7
-    bottom = 8
-    right_bottom = 9
+from win32con import *
 
 
 class CustomWindow(QMainWindow):
@@ -37,7 +19,8 @@ class CustomWindow(QMainWindow):
 
         # set window flags
         self.setWindowFlags(Qt.FramelessWindowHint |
-                            Qt.WindowMinMaxButtonsHint)
+                            Qt.WindowMinMaxButtonsHint |
+                            Qt.WindowSystemMenuHint)
         self.setAttribute(Qt.WA_TranslucentBackground)
 
         # set effect shadow
@@ -48,10 +31,7 @@ class CustomWindow(QMainWindow):
 
         if self.edge_scaling:
             # set edge scaling parameters
-            self.setMouseTracking(True)
             self.dragPadding = 5
-            self.isScaling = False
-            self.scalingDirection = ScalingDirection.center
 
     def drawShadow(self):
         """
@@ -67,21 +47,7 @@ class CustomWindow(QMainWindow):
         if self.window().isMaximized():
             # normalize
             self.window().showNormal()
-            self.outermost_layout.setContentsMargins(5, 5, 5, 5)
-            windowed_icon = QIcon()
-            windowed_icon.addFile(
-                u":/imgs/imgs/maximize.png", QSize(), QIcon.Normal, QIcon.Off)
-            self.ui.btn_max.setIcon(windowed_icon)
         else:
-            # maximize
-            self.restoreSize = self.size()
-            self.restorePos = self.pos()
-            self.setCursor(Qt.ArrowCursor)
-            self.outermost_layout.setContentsMargins(0, 0, 0, 0)
-            maximize_icon = QIcon()
-            maximize_icon.addFile(
-                u":/imgs/imgs/windowed.png", QSize(), QIcon.Normal, QIcon.Off)
-            self.ui.btn_max.setIcon(maximize_icon)
             self.window().showMaximized()
 
     def mousePressEvent(self, QMouseEvent):
@@ -90,17 +56,9 @@ class CustomWindow(QMainWindow):
         """
         if QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.title_bar_height:
             ReleaseCapture()
-            SendMessage(self.window().winId(), win32con.WM_SYSCOMMAND,
-                        win32con.SC_MOVE + win32con.HTCAPTION, 0)
+            SendMessage(self.window().winId(), WM_SYSCOMMAND,
+                        SC_MOVE + HTCAPTION, 0)
             QMouseEvent.ignore()
-
-        if self.edge_scaling and QMouseEvent.button() == Qt.MouseButton.LeftButton and (QMouseEvent.x() <= self.dragPadding or
-                                                                                        QMouseEvent.y() <= self.dragPadding or
-                                                                                        self.size().width() - QMouseEvent.x() <= self.dragPadding or
-                                                                                        self.size().height() - QMouseEvent.y() <= self.dragPadding):
-            # self.isScaling = True
-            self.btnY = self.pos().y() + self.size().height() - self.minimumHeight()
-            self.rightX = self.pos().x() + self.size().width() - self.minimumWidth()
 
     def mouseDoubleClickEvent(self, QMouseEvent):
         """
@@ -110,42 +68,67 @@ class CustomWindow(QMainWindow):
         if self.maximize and QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.title_bar_height:
             self.showMaximizeOrNormalize()
 
-    def mouseReleaseEvent(self, QMouseEvent):
-        """
-        Release the button
-        """
-        if self.edge_scaling:
-            self.isScaling = False
-
     def nativeEvent(self, eventType, message):
         msg = MSG.from_address(message.__int__())
 
-        if msg.message == win32con.WM_NCHITTEST:
-            xPos = (LOWORD(msg.lParam) - self.frameGeometry().x()) % 65536
-            yPos = HIWORD(msg.lParam) - self.frameGeometry().y()
-            w, h = self.width(), self.height()
+        if self.maximize:
+            if self.window().isMaximized():
+                maximize_icon = QIcon()
+                maximize_icon.addFile(
+                    u":/imgs/imgs/windowed.png", QSize(), QIcon.Normal, QIcon.Off)
+                self.ui.btn_max.setIcon(maximize_icon)
+                self.outermost_layout.setContentsMargins(0, 0, 0, 0)
+            else:
+                windowed_icon = QIcon()
+                windowed_icon.addFile(
+                    u":/imgs/imgs/maximize.png", QSize(), QIcon.Normal, QIcon.Off)
+                self.ui.btn_max.setIcon(windowed_icon)
+                self.outermost_layout.setContentsMargins(5, 5, 5, 5)
+
+        if self.edge_scaling and not self.window().isMaximized() and msg.message == WM_NCHITTEST:
+            r = self.devicePixelRatioF()
+            xPos = (LOWORD(msg.lParam) - self.frameGeometry().x()*r) % 65536
+            yPos = HIWORD(msg.lParam) - self.frameGeometry().y()*r
+            w, h = self.width()*r, self.height()*r
             lx = xPos < self.dragPadding
             rx = xPos > w - self.dragPadding
             ty = yPos < self.dragPadding
             by = yPos > h - self.dragPadding
 
             if (lx and ty):
-                return True, win32con.HTTOPLEFT
+                return True, HTTOPLEFT
             elif (rx and by):
-                return True, win32con.HTBOTTOMRIGHT
+                return True, HTBOTTOMRIGHT
             elif (rx and ty):
-                return True, win32con.HTTOPRIGHT
+                return True, HTTOPRIGHT
             elif (lx and by):
-                return True, win32con.HTBOTTOMLEFT
+                return True, HTBOTTOMLEFT
             elif ty:
-                return True, win32con.HTTOP
+                return True, HTTOP
             elif by:
-                return True, win32con.HTBOTTOM
+                return True, HTBOTTOM
             elif lx:
-                return True, win32con.HTLEFT
+                return True, HTLEFT
             elif rx:
-                return True, win32con.HTRIGHT
+                return True, HTRIGHT
 
-    def eventFilter(self, watched, event) -> bool:
-        if isinstance(event, QEnterEvent):
-            self.setCursor(Qt.ArrowCursor)
+    @staticmethod
+    def addWindowAnimation(hWnd):
+        """ Enables the maximize and minimize animation of the window
+
+        Parameters
+        ----------
+        hWnd : int or `sip.voidptr`
+            Window handle
+        """
+        hWnd = int(hWnd)
+        style = GetWindowLong(hWnd, GWL_STYLE)
+        SetWindowLong(
+            hWnd,
+            GWL_STYLE,
+            style
+            | WS_MAXIMIZEBOX
+            | WS_CAPTION
+            | CS_DBLCLKS
+            | WS_THICKFRAME,
+        )
