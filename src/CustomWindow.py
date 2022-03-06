@@ -1,6 +1,11 @@
-from PySide6.QtWidgets import QApplication, QMainWindow, QCheckBox, QListWidgetItem, QMessageBox, QGraphicsDropShadowEffect
+from ctypes.wintypes import MSG
+from pickle import TRUE
+from PySide6.QtWidgets import QMainWindow, QGraphicsDropShadowEffect
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QEnterEvent, QIcon
+from win32api import *
+from win32gui import *
+import win32con
 from enum import Enum
 
 
@@ -41,9 +46,6 @@ class CustomWindow(QMainWindow):
         self.effect_shadow.setBlurRadius(10)
         self.effect_shadow.setColor(Qt.black)
 
-        # about drag window
-        self.isDraging = False
-
         if self.edge_scaling:
             # set edge scaling parameters
             self.setMouseTracking(True)
@@ -62,9 +64,9 @@ class CustomWindow(QMainWindow):
         """
         Maximize or normalize the winodw
         """
-        if self.isMaximized() == True:
+        if self.window().isMaximized():
             # normalize
-            self.showNormal()
+            self.window().showNormal()
             self.outermost_layout.setContentsMargins(5, 5, 5, 5)
             windowed_icon = QIcon()
             windowed_icon.addFile(
@@ -80,22 +82,23 @@ class CustomWindow(QMainWindow):
             maximize_icon.addFile(
                 u":/imgs/imgs/windowed.png", QSize(), QIcon.Normal, QIcon.Off)
             self.ui.btn_max.setIcon(maximize_icon)
-            self.showMaximized()
+            self.window().showMaximized()
 
     def mousePressEvent(self, QMouseEvent):
         """
         Only can be drag when using left button and click the title bar
         """
         if QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.title_bar_height:
-            self.isDraging = True
-            self.startMovePosition = QMouseEvent.globalPos()
-            self.startMousePosition = QMouseEvent.pos()
+            ReleaseCapture()
+            SendMessage(self.window().winId(), win32con.WM_SYSCOMMAND,
+                        win32con.SC_MOVE + win32con.HTCAPTION, 0)
+            QMouseEvent.ignore()
 
         if self.edge_scaling and QMouseEvent.button() == Qt.MouseButton.LeftButton and (QMouseEvent.x() <= self.dragPadding or
                                                                                         QMouseEvent.y() <= self.dragPadding or
                                                                                         self.size().width() - QMouseEvent.x() <= self.dragPadding or
                                                                                         self.size().height() - QMouseEvent.y() <= self.dragPadding):
-            self.isScaling = True
+            # self.isScaling = True
             self.btnY = self.pos().y() + self.size().height() - self.minimumHeight()
             self.rightX = self.pos().x() + self.size().width() - self.minimumWidth()
 
@@ -111,135 +114,37 @@ class CustomWindow(QMainWindow):
         """
         Release the button
         """
-        self.isDraging = False
         if self.edge_scaling:
             self.isScaling = False
 
-    def mouseMoveEvent(self, QMouseEvent):
-        """
-        Drag and scaling custom window
-        """
-        if self.isMaximized() == False and self.edge_scaling:
-            # when not maximize
-            # if not scaling then judging where mouse is
-            # or scaling then scaling the window
-            if not self.isScaling:
-                if QMouseEvent.x() <= self.dragPadding and QMouseEvent.y() <= self.dragPadding:
-                    self.setCursor(Qt.SizeFDiagCursor)
-                    self.scalingDirection = ScalingDirection.left_top
-                elif QMouseEvent.x() <= self.dragPadding and self.size().height() - QMouseEvent.y() <= self.dragPadding:
-                    self.setCursor(Qt.SizeBDiagCursor)
-                    self.scalingDirection = ScalingDirection.left_bottom
-                elif self.size().width() - QMouseEvent.x() <= self.dragPadding and QMouseEvent.y() <= self.dragPadding:
-                    self.setCursor(Qt.SizeBDiagCursor)
-                    self.scalingDirection = ScalingDirection.right_top
-                elif self.size().width() - QMouseEvent.x() <= self.dragPadding and self.size().height() - QMouseEvent.y() <= self.dragPadding:
-                    self.setCursor(Qt.SizeFDiagCursor)
-                    self.scalingDirection = ScalingDirection.right_bottom
-                elif QMouseEvent.x() <= self.dragPadding:
-                    self.setCursor(Qt.SizeHorCursor)
-                    self.scalingDirection = ScalingDirection.left
-                elif self.size().width() - QMouseEvent.x() <= self.dragPadding:
-                    self.setCursor(Qt.SizeHorCursor)
-                    self.scalingDirection = ScalingDirection.right
-                elif QMouseEvent.y() <= self.dragPadding:
-                    self.setCursor(Qt.SizeVerCursor)
-                    self.scalingDirection = ScalingDirection.top
-                elif self.size().height() - QMouseEvent.y() <= self.dragPadding:
-                    self.setCursor(Qt.SizeVerCursor)
-                    self.scalingDirection = ScalingDirection.bottom
-                else:
-                    self.scalingDirection = ScalingDirection.center
-                    self.setCursor(Qt.ArrowCursor)
-            else:
-                curr_size = self.size()
-                curr_pos = self.pos()
-                if self.scalingDirection == ScalingDirection.left:
-                    curr_size.setWidth(
-                        max(curr_size.width() - QMouseEvent.x(), self.minimumWidth()))
-                    curr_pos.setX(min(curr_pos.x() + QMouseEvent.x(),
-                                      self.rightX))
-                    self.resize(curr_size)
-                    self.move(curr_pos)
-                elif self.scalingDirection == ScalingDirection.right:
-                    curr_size.setWidth(
-                        max(QMouseEvent.x(), self.minimumWidth()))
-                    self.resize(curr_size)
-                elif self.scalingDirection == ScalingDirection.top:
-                    curr_size.setHeight(
-                        max(curr_size.height() - QMouseEvent.y(), self.minimumHeight()))
-                    curr_pos.setY(
-                        min(curr_pos.y() + QMouseEvent.y(), self.btnY))
-                    self.resize(curr_size)
-                    self.move(curr_pos)
-                elif self.scalingDirection == ScalingDirection.bottom:
-                    curr_size.setHeight(
-                        max(QMouseEvent.y(), self.minimumHeight()))
-                    self.resize(curr_size)
-                elif self.scalingDirection == ScalingDirection.left_top:
-                    curr_size.setWidth(
-                        max(curr_size.width() - QMouseEvent.x(), self.minimumWidth()))
-                    curr_size.setHeight(
-                        max(curr_size.height() - QMouseEvent.y(), self.minimumHeight()))
-                    curr_pos.setX(
-                        min(curr_pos.x() + QMouseEvent.x(), self.rightX))
-                    curr_pos.setY(
-                        min(curr_pos.y() + QMouseEvent.y(), self.btnY))
-                    self.resize(curr_size)
-                    self.move(curr_pos)
-                elif self.scalingDirection == ScalingDirection.left_bottom:
-                    curr_size.setWidth(
-                        max(curr_size.width() - QMouseEvent.x(), self.minimumWidth()))
-                    curr_size.setHeight(
-                        max(QMouseEvent.y(), self.minimumHeight()))
-                    curr_pos.setX(min(curr_pos.x() + QMouseEvent.x(),
-                                      self.rightX))
-                    self.resize(curr_size)
-                    self.move(curr_pos)
-                elif self.scalingDirection == ScalingDirection.right_top:
-                    curr_size.setHeight(
-                        max(curr_size.height() - QMouseEvent.y(), self.minimumHeight()))
-                    curr_size.setWidth(
-                        max(QMouseEvent.x(), self.minimumWidth()))
-                    curr_pos.setY(
-                        min(curr_pos.y() + QMouseEvent.y(), self.btnY))
-                    self.resize(curr_size)
-                    self.move(curr_pos)
-                elif self.scalingDirection == ScalingDirection.right_bottom:
-                    curr_size.setWidth(
-                        max(QMouseEvent.x(), self.minimumWidth()))
-                    curr_size.setHeight(
-                        max(QMouseEvent.y(), self.minimumHeight()))
-                    self.resize(curr_size)
-                else:
-                    self.setCursor(Qt.ArrowCursor)
-                return
+    def nativeEvent(self, eventType, message):
+        msg = MSG.from_address(message.__int__())
 
-        if self.isDraging:
-            if self.isMaximized() == True:
-                """
-                when window is maximum
-                restore the window size and maintain the mouse relative position
-                """
-                # calculate mouse position rate
-                pos_rate = QMouseEvent.x() / self.size().width()
-                # calculate the distance from left to mouse
-                normal_pos = self.restoreSize.width() * pos_rate
-                # set the mouse position
-                mouse_pos = QMouseEvent.pos()
-                mouse_pos.setX(normal_pos)
-                self.showMaximizeOrNormalize()
-                # calculate the window global position
-                final_pos = QMouseEvent.globalPos()
-                final_pos.setX(final_pos.x() - normal_pos)
-                self.move(final_pos)
-                self.startMovePosition = QMouseEvent.globalPos()
-                self.startMousePosition = mouse_pos
-                self.isScaling = False
-            self.setCursor(Qt.ArrowCursor)
-            MovePos = QMouseEvent.globalPos()
-            self.move(MovePos - self.startMousePosition)
-            self.startMovePosition = MovePos
+        if msg.message == win32con.WM_NCHITTEST:
+            xPos = (LOWORD(msg.lParam) - self.frameGeometry().x()) % 65536
+            yPos = HIWORD(msg.lParam) - self.frameGeometry().y()
+            w, h = self.width(), self.height()
+            lx = xPos < self.dragPadding
+            rx = xPos > w - self.dragPadding
+            ty = yPos < self.dragPadding
+            by = yPos > h - self.dragPadding
+
+            if (lx and ty):
+                return True, win32con.HTTOPLEFT
+            elif (rx and by):
+                return True, win32con.HTBOTTOMRIGHT
+            elif (rx and ty):
+                return True, win32con.HTTOPRIGHT
+            elif (lx and by):
+                return True, win32con.HTBOTTOMLEFT
+            elif ty:
+                return True, win32con.HTTOP
+            elif by:
+                return True, win32con.HTBOTTOM
+            elif lx:
+                return True, win32con.HTLEFT
+            elif rx:
+                return True, win32con.HTRIGHT
 
     def eventFilter(self, watched, event) -> bool:
         if isinstance(event, QEnterEvent):
