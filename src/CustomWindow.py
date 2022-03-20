@@ -70,13 +70,6 @@ class CustomWindow(QMainWindow):
         if self.maximize and QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.title_bar_height:
             self.showMaximizeOrNormalize()
 
-    def togglePressedEvent(self):
-        if not self.window().isMaximized():
-            self.toggle_pressed = True
-
-    def toggleReleasedEvent(self):
-        self.toggle_pressed = False
-
     def nativeEvent(self, eventType, message):
         msg = MSG.from_address(message.__int__())
 

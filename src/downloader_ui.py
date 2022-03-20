@@ -3,9 +3,9 @@ from core import *
 from settings_ui import SettingWindow
 from downloader_base_ui import Ui_MainWindow
 from PySide6.QtCore import Qt, QThread, Signal, QUrl
-from PySide6.QtWidgets import QApplication,  QCheckBox, QListWidgetItem, QMessageBox
+from PySide6.QtWidgets import QApplication,  QCheckBox, QListWidgetItem, QMessageBox, QSizeGrip
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
-from PySide6.QtGui import QPixmap
+from PySide6.QtGui import QPixmap, QPalette, QColor
 from CustomWindow import CustomWindow
 import tempfile
 import sources_rc
@@ -92,6 +92,7 @@ class MainWindow(CustomWindow):
     def __init__(self):
         super().__init__()
         self.title = '哔哩哔哩漫画下载器 V1.3.1'
+        self.setWindowTitle(self.title)
         self.tempdir = tempfile.mkdtemp()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -119,8 +120,7 @@ class MainWindow(CustomWindow):
         self.ui.btn_getinfo.clicked.connect(self.getMangaInfo)
         self.ui.btn_startdownload.clicked.connect(self.startDownload)
         self.ui.btn_moresettings.clicked.connect(self.showSettings)
-        self.ui.adjustBtn.pressed.connect(self.togglePressedEvent)
-        self.ui.adjustBtn.released.connect(self.toggleReleasedEvent)
+        self.sizegrip = QSizeGrip(self.ui.sizegrip)
 
         # read out settings and parse cookie
         self.cookie_text, self.base_folder, self.interval_seconds = read_config_file(

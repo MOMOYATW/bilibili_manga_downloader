@@ -57,5 +57,6 @@ QSpinBox::up-button{
 }
 
 QLabel#cover{background-color:#242936}
-QPushButton#adjustBtn{border-radius:5px; background-color:#1f2430}
-QPushButton:hover#adjustBtn{background-color:#4b5169}
+QSizeGrip{ background-color:transparent; height:20px; width: 20px;}
+QLabel#grip_icon{background-color:transparent}
+QFrame:hover#sizegrip{background-color:#4b5169;border-radius:5px;}

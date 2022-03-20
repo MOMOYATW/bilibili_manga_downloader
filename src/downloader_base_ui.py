@@ -251,7 +251,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 2)
         self.cover_description = QFrame(self.comic_description)
         self.cover_description.setObjectName(u"cover_description")
-        self.cover_description.setMinimumSize(QSize(100, 128))
+        self.cover_description.setMinimumSize(QSize(100, 135))
         self.cover_description.setMaximumSize(QSize(100, 128))
         self.cover_description.setFrameShape(QFrame.StyledPanel)
         self.cover_description.setFrameShadow(QFrame.Raised)
@@ -489,7 +489,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5 = QHBoxLayout(self.status_bar)
         self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_5.setContentsMargins(9, 0, 4, 0)
+        self.horizontalLayout_5.setContentsMargins(-1, 0, 4, 2)
         self.copyright = QLabel(self.status_bar)
         self.copyright.setObjectName(u"copyright")
         self.copyright.setMouseTracking(True)
@@ -497,14 +497,25 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_5.addWidget(self.copyright)
 
-        self.adjustBtn = QPushButton(self.status_bar)
-        self.adjustBtn.setObjectName(u"adjustBtn")
-        self.adjustBtn.setMaximumSize(QSize(20, 20))
-        icon4 = QIcon()
-        icon4.addFile(u":/imgs/imgs/scale.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.adjustBtn.setIcon(icon4)
+        self.sizegrip = QFrame(self.status_bar)
+        self.sizegrip.setObjectName(u"sizegrip")
+        self.sizegrip.setMinimumSize(QSize(20, 20))
+        self.sizegrip.setMaximumSize(QSize(20, 20))
+        self.sizegrip.setFrameShape(QFrame.StyledPanel)
+        self.sizegrip.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_9 = QVBoxLayout(self.sizegrip)
+        self.verticalLayout_9.setSpacing(0)
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.verticalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.grip_icon = QLabel(self.sizegrip)
+        self.grip_icon.setObjectName(u"grip_icon")
+        self.grip_icon.setPixmap(QPixmap(u":/imgs/imgs/scale.png"))
+        self.grip_icon.setScaledContents(True)
 
-        self.horizontalLayout_5.addWidget(self.adjustBtn)
+        self.verticalLayout_9.addWidget(self.grip_icon)
+
+
+        self.horizontalLayout_5.addWidget(self.sizegrip)
 
 
         self.verticalLayout.addWidget(self.status_bar)
@@ -520,7 +531,7 @@ class Ui_MainWindow(object):
     # setupUi
 
     def retranslateUi(self, MainWindow):
-        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Bilibili Manga Downloader V1.0.0", None))
+        MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Bilibili Manga Downloader", None))
         self.icon_label.setText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"\u54d4\u54e9\u54d4\u54e9\u6f2b\u753b\u4e0b\u8f7d\u5668 V1.0.0 - \u5c1a\u672a\u8bbe\u7f6ecookie", None))
         self.btn_min.setText("")
@@ -537,7 +548,7 @@ class Ui_MainWindow(object):
         self.website_input.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
         self.website_input.setInputMask("")
-        self.website_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"https://manga.bilibili.com/detail/mc28528", None))
+        self.website_input.setPlaceholderText("")
         self.btn_getinfo.setText(QCoreApplication.translate("MainWindow", u"\u83b7\u53d6\u6f2b\u753b\u4fe1\u606f", None))
         self.cover.setText("")
         self.title_label.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u6807\u9898", None))
@@ -552,6 +563,6 @@ class Ui_MainWindow(object):
         self.btn_cancelall.setText(QCoreApplication.translate("MainWindow", u"\u5168\u4e0d\u9009", None))
         self.btn_moresettings.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u591a\u8bbe\u7f6e", None))
         self.copyright.setText(QCoreApplication.translate("MainWindow", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
-        self.adjustBtn.setText("")
+        self.grip_icon.setText("")
     # retranslateUi
 
