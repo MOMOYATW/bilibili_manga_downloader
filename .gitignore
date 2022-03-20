@@ -1,8 +1,13 @@
 .vscode/
 .qt_for_python/
 __pycache__/
+ui/
 build/
 dist/
+imgs/
+mp3/
+style/
 settings.json
 *.spec
 *.qrc
+*.qss
