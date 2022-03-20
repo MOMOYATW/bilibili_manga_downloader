@@ -55,3 +55,7 @@ QSpinBox::down-button{
 QSpinBox::up-button{
     border-style:outset;
 }
+
+QLabel#cover{background-color:#242936}
+QPushButton#adjustBtn{border-radius:5px; background-color:#1f2430}
+QPushButton:hover#adjustBtn{background-color:#4b5169}

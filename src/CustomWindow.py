@@ -12,10 +12,12 @@ class CustomWindow(QMainWindow):
         super().__init__()
         # set these parameters first
         self.maximize = True
-        self.edge_scaling = True
+        self.edge_scaling = False
         self.title_bar_height = None
         self.outermost_layout = None
         self.main_widget = None
+        self.toggle_pressed = False
+        self.prePos = None
 
         # set window flags
         self.setWindowFlags(Qt.FramelessWindowHint |
@@ -68,6 +70,13 @@ class CustomWindow(QMainWindow):
         if self.maximize and QMouseEvent.button() == Qt.MouseButton.LeftButton and QMouseEvent.y() <= self.title_bar_height:
             self.showMaximizeOrNormalize()
 
+    def togglePressedEvent(self):
+        if not self.window().isMaximized():
+            self.toggle_pressed = True
+
+    def toggleReleasedEvent(self):
+        self.toggle_pressed = False
+
     def nativeEvent(self, eventType, message):
         msg = MSG.from_address(message.__int__())
 
@@ -111,24 +120,3 @@ class CustomWindow(QMainWindow):
                 return True, HTLEFT
             elif rx:
                 return True, HTRIGHT
-
-    @staticmethod
-    def addWindowAnimation(hWnd):
-        """ Enables the maximize and minimize animation of the window
-
-        Parameters
-        ----------
-        hWnd : int or `sip.voidptr`
-            Window handle
-        """
-        hWnd = int(hWnd)
-        style = GetWindowLong(hWnd, GWL_STYLE)
-        SetWindowLong(
-            hWnd,
-            GWL_STYLE,
-            style
-            | WS_MAXIMIZEBOX
-            | WS_CAPTION
-            | CS_DBLCLKS
-            | WS_THICKFRAME,
-        )

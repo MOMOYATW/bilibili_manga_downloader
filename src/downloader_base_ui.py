@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(665, 539)
+        MainWindow.resize(665, 550)
         MainWindow.setMinimumSize(QSize(400, 270))
         MainWindow.setMouseTracking(True)
         icon = QIcon()
@@ -196,7 +196,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8 = QHBoxLayout(self.input_sets)
         self.horizontalLayout_8.setSpacing(9)
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
-        self.horizontalLayout_8.setContentsMargins(9, 0, 9, 0)
+        self.horizontalLayout_8.setContentsMargins(9, 0, 0, 0)
         self.website_label = QLabel(self.input_sets)
         self.website_label.setObjectName(u"website_label")
         self.website_label.setMinimumSize(QSize(0, 0))
@@ -229,24 +229,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_3.addWidget(self.input_sets)
 
-        self.frame = QFrame(self.manga_input)
-        self.frame.setObjectName(u"frame")
-        self.frame.setMouseTracking(True)
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_4 = QHBoxLayout(self.frame)
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.tips_label = QLabel(self.frame)
-        self.tips_label.setObjectName(u"tips_label")
-        self.tips_label.setMouseTracking(True)
-        self.tips_label.setStyleSheet(u"")
-        self.tips_label.setWordWrap(True)
-
-        self.horizontalLayout_4.addWidget(self.tips_label)
-
-
-        self.verticalLayout_3.addWidget(self.frame)
-
 
         self.verticalLayout_2.addWidget(self.manga_input)
 
@@ -255,11 +237,47 @@ class Ui_MainWindow(object):
         self.manga_detail.setMouseTracking(True)
         self.manga_detail.setFrameShape(QFrame.StyledPanel)
         self.manga_detail.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_6 = QVBoxLayout(self.manga_detail)
+        self.verticalLayout_8 = QVBoxLayout(self.manga_detail)
+        self.verticalLayout_8.setSpacing(0)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayout_8.setContentsMargins(-1, 0, 0, 0)
+        self.comic_description = QFrame(self.manga_detail)
+        self.comic_description.setObjectName(u"comic_description")
+        self.comic_description.setFrameShape(QFrame.StyledPanel)
+        self.comic_description.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_4 = QHBoxLayout(self.comic_description)
+        self.horizontalLayout_4.setSpacing(2)
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.horizontalLayout_4.setContentsMargins(0, 0, 0, 2)
+        self.cover_description = QFrame(self.comic_description)
+        self.cover_description.setObjectName(u"cover_description")
+        self.cover_description.setMinimumSize(QSize(100, 128))
+        self.cover_description.setMaximumSize(QSize(100, 128))
+        self.cover_description.setFrameShape(QFrame.StyledPanel)
+        self.cover_description.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_7 = QVBoxLayout(self.cover_description)
+        self.verticalLayout_7.setSpacing(0)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.cover = QLabel(self.cover_description)
+        self.cover.setObjectName(u"cover")
+        self.cover.setStyleSheet(u"")
+        self.cover.setScaledContents(True)
+
+        self.verticalLayout_7.addWidget(self.cover)
+
+
+        self.horizontalLayout_4.addWidget(self.cover_description)
+
+        self.text_description = QFrame(self.comic_description)
+        self.text_description.setObjectName(u"text_description")
+        self.text_description.setFrameShape(QFrame.StyledPanel)
+        self.text_description.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_6 = QVBoxLayout(self.text_description)
         self.verticalLayout_6.setSpacing(0)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalLayout_6.setContentsMargins(9, 0, -1, 0)
-        self.title_and_author = QFrame(self.manga_detail)
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.title_and_author = QFrame(self.text_description)
         self.title_and_author.setObjectName(u"title_and_author")
         self.title_and_author.setMouseTracking(True)
         self.title_and_author.setFrameShape(QFrame.StyledPanel)
@@ -325,7 +343,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.title_and_author)
 
-        self.description = QFrame(self.manga_detail)
+        self.description = QFrame(self.text_description)
         self.description.setObjectName(u"description")
         self.description.setMouseTracking(True)
         self.description.setFrameShape(QFrame.StyledPanel)
@@ -353,6 +371,12 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_6.addWidget(self.description)
 
+
+        self.horizontalLayout_4.addWidget(self.text_description)
+
+
+        self.verticalLayout_8.addWidget(self.comic_description)
+
         self.manga_list = QFrame(self.manga_detail)
         self.manga_list.setObjectName(u"manga_list")
         self.manga_list.setMouseTracking(True)
@@ -378,7 +402,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_5.addWidget(self.listWidget)
 
 
-        self.verticalLayout_6.addWidget(self.manga_list)
+        self.verticalLayout_8.addWidget(self.manga_list)
 
 
         self.verticalLayout_2.addWidget(self.manga_detail)
@@ -390,6 +414,7 @@ class Ui_MainWindow(object):
         self.user_operate.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_12 = QHBoxLayout(self.user_operate)
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(-1, 5, 0, 0)
         self.btn_startdownload = QPushButton(self.user_operate)
         self.btn_startdownload.setObjectName(u"btn_startdownload")
         sizePolicy1.setHeightForWidth(self.btn_startdownload.sizePolicy().hasHeightForWidth())
@@ -455,20 +480,31 @@ class Ui_MainWindow(object):
 
         self.status_bar = QFrame(self.background)
         self.status_bar.setObjectName(u"status_bar")
-        self.status_bar.setMaximumSize(QSize(16777215, 25))
+        self.status_bar.setMinimumSize(QSize(0, 30))
+        self.status_bar.setMaximumSize(QSize(16777215, 30))
+        self.status_bar.setSizeIncrement(QSize(0, 0))
         self.status_bar.setMouseTracking(True)
         self.status_bar.setFrameShape(QFrame.NoFrame)
         self.status_bar.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_5 = QHBoxLayout(self.status_bar)
         self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_5.setContentsMargins(9, 0, 4, 0)
         self.copyright = QLabel(self.status_bar)
         self.copyright.setObjectName(u"copyright")
         self.copyright.setMouseTracking(True)
         self.copyright.setStyleSheet(u"")
 
         self.horizontalLayout_5.addWidget(self.copyright)
+
+        self.adjustBtn = QPushButton(self.status_bar)
+        self.adjustBtn.setObjectName(u"adjustBtn")
+        self.adjustBtn.setMaximumSize(QSize(20, 20))
+        icon4 = QIcon()
+        icon4.addFile(u":/imgs/imgs/scale.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.adjustBtn.setIcon(icon4)
+
+        self.horizontalLayout_5.addWidget(self.adjustBtn)
 
 
         self.verticalLayout.addWidget(self.status_bar)
@@ -500,9 +536,10 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(accessibility)
         self.website_input.setAccessibleDescription("")
 #endif // QT_CONFIG(accessibility)
-        self.website_input.setPlaceholderText("")
+        self.website_input.setInputMask("")
+        self.website_input.setPlaceholderText(QCoreApplication.translate("MainWindow", u"https://manga.bilibili.com/detail/mc28528", None))
         self.btn_getinfo.setText(QCoreApplication.translate("MainWindow", u"\u83b7\u53d6\u6f2b\u753b\u4fe1\u606f", None))
-        self.tips_label.setText(QCoreApplication.translate("MainWindow", u"\u63d0\u793a\uff1a\u4ec5\u652f\u6301\u54d4\u54e9\u54d4\u54e9\u6f2b\u753b\uff0c\u4f8b\u5982https://manga.bilibili.com/detail/mc28528", None))
+        self.cover.setText("")
         self.title_label.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u6807\u9898", None))
         self.manga_title.setText(QCoreApplication.translate("MainWindow", u"\u6682\u65e0", None))
         self.author_label.setText(QCoreApplication.translate("MainWindow", u"\u6f2b\u753b\u4f5c\u8005", None))
@@ -515,5 +552,6 @@ class Ui_MainWindow(object):
         self.btn_cancelall.setText(QCoreApplication.translate("MainWindow", u"\u5168\u4e0d\u9009", None))
         self.btn_moresettings.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u591a\u8bbe\u7f6e", None))
         self.copyright.setText(QCoreApplication.translate("MainWindow", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
+        self.adjustBtn.setText("")
     # retranslateUi
 

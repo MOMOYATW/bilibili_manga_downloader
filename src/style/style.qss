@@ -31,6 +31,10 @@ QLineEdit{
 	color:#cccac2
 }
 
+QLineEdit::placeholder{
+	color:black
+}
+
 QLineEdit:focus{
 	border:1px solid #c4a25f;
 }
@@ -55,3 +59,5 @@ QSpinBox::down-button{
 QSpinBox::up-button{
     border-style:outset;
 }
+
+QFrame#cover_description{background-color:black}

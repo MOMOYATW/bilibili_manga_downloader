@@ -5,7 +5,9 @@ from downloader_base_ui import Ui_MainWindow
 from PySide6.QtCore import Qt, QThread, Signal, QUrl
 from PySide6.QtWidgets import QApplication,  QCheckBox, QListWidgetItem, QMessageBox
 from PySide6.QtMultimedia import QMediaPlayer, QAudioOutput
+from PySide6.QtGui import QPixmap
 from CustomWindow import CustomWindow
+import tempfile
 import sources_rc
 
 
@@ -90,6 +92,7 @@ class MainWindow(CustomWindow):
     def __init__(self):
         super().__init__()
         self.title = '哔哩哔哩漫画下载器 V1.3.1'
+        self.tempdir = tempfile.mkdtemp()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -97,6 +100,7 @@ class MainWindow(CustomWindow):
         self.main_widget = self.ui.background
         self.outermost_layout = self.ui.margin_layout
         self.title_bar_height = self.ui.title_bar.height()
+        self.edge_scaling = False
 
         self.drawShadow()
         self.loadAudioFile()
@@ -115,6 +119,8 @@ class MainWindow(CustomWindow):
         self.ui.btn_getinfo.clicked.connect(self.getMangaInfo)
         self.ui.btn_startdownload.clicked.connect(self.startDownload)
         self.ui.btn_moresettings.clicked.connect(self.showSettings)
+        self.ui.adjustBtn.pressed.connect(self.togglePressedEvent)
+        self.ui.adjustBtn.released.connect(self.toggleReleasedEvent)
 
         # read out settings and parse cookie
         self.cookie_text, self.base_folder, self.interval_seconds = read_config_file(
@@ -240,8 +246,14 @@ class MainWindow(CustomWindow):
                            '错误', '获取漫画信息时出现错误:\n' + str(manga_detail))
             return
         # set ui
+        print(manga_detail)
+        response = requests.get(manga_detail['vertical_cover'])
+        pixmap = QPixmap()
+        pixmap.loadFromData(response.content)
+        self.ui.cover.setPixmap(pixmap)
         self.ui.manga_title.setText(manga_detail['title'])
-        self.ui.manga_author.setText(str(manga_detail['author_name']))
+        self.ui.manga_author.setText(" ".join(str(i)
+                                     for i in manga_detail['author_name']))
         self.ui.manga_description.setText(manga_detail['classic_lines'])
         self.ui.listWidget.clear()
 
