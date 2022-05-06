@@ -42,7 +42,7 @@ if __name__ == '__main__':
         if not folder:
             os.makedirs(save_folder)
         try:
-            length, images_list = get_images_list(episode['id'], cookie)
+            length, images_list = fetch_images_list(episode['id'], cookie)
         except Exception as e:
             print('Exception:', e)
             print('Please check your proxy configuration or internet connection.')

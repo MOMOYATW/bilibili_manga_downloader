@@ -7,7 +7,7 @@ from http.cookies import SimpleCookie
 BILIBILI_MANGA_ENDPOINT = 'https://manga.bilibili.com/twirp/comic.v1.Comic/'
 
 
-def get_images_list(episode_id, cookie):
+def fetch_images_list(episode_id, cookie):
     """
     Get the images list of certain episode
 
@@ -80,6 +80,7 @@ def download_episode_image(download_path, image_url, index):
 
     image_path = os.path.join(
         download_path, '{}.jpg'.format(str(index).zfill(3)))
+
     image = os.path.exists(image_path)
     if image:
         return False

@@ -42,13 +42,20 @@ class DownloadThread(QThread):
             delta_value = 1 / len(download_sets) * 100
             self.update_checkbox.emit(
                 episode_id, 0, 0, '{} - {}'.format(download['short_title'], download['title']))
-            save_folder = os.path.join(self.window.base_folder, self.window.ui.manga_title.text(),
-                                       '{} - {}'.format(download['short_title'], download['title']))
+
+            # fixed issue #1
+            # check path name
+            safe_manga_title = re.sub(
+                '[\/:*?"<>|]', '_', self.window.ui.manga_title.text())
+            safe_filename = re.sub(
+                '[\/:*?"<>|]', '_', '{} - {}'.format(download['short_title'], download['title']))
+            save_folder = os.path.join(
+                self.window.base_folder, safe_manga_title, safe_filename)
             folder = os.path.exists(save_folder)
             if not folder:
                 os.makedirs(save_folder)
             try:
-                length, images_list = get_images_list(
+                length, images_list = fetch_images_list(
                     download['id'], self.window.cookie)
             except Exception as e:
                 self.pop_message.emit(QMessageBox.Critical, '错误',
