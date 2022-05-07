@@ -50,7 +50,7 @@ class DownloadThread(QThread):
             safe_filename = re.sub(
                 '[\/:*?"<>|]', '_', '{} - {}'.format(download['short_title'], download['title']))
             save_folder = os.path.join(
-                self.window.base_folder, safe_manga_title, safe_filename)
+                self.window.config['base_folder'], safe_manga_title, safe_filename)
             folder = os.path.exists(save_folder)
             if not folder:
                 os.makedirs(save_folder)
@@ -84,7 +84,7 @@ class DownloadThread(QThread):
                     continue
                 if res:
                     # control speed
-                    QThread.msleep(self.window.interval_seconds)
+                    QThread.msleep(self.window.config['interval_seconds'])
 
             if self.stop:
                 self.stop = False
@@ -130,9 +130,9 @@ class MainWindow(CustomWindow):
         self.sizegrip = QSizeGrip(self.ui.sizegrip)
 
         # read out settings and parse cookie
-        self.cookie_text, self.base_folder, self.interval_seconds = read_config_file(
+        self.config = read_config_file(
             {"cookie_text": "", "base_folder": "./", "interval_seconds": 1000})
-        self.cookie = parse_cookie_text(self.cookie_text)
+        self.cookie = parse_cookie_text(self.config['cookie_text'])
         if self.cookie == {}:
             self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
@@ -212,8 +212,7 @@ class MainWindow(CustomWindow):
         if self.setting_ui and self.setting_ui.isVisible():
             self.setting_ui.close()
 
-        save = {"cookie_text": self.cookie_text,
-                "base_folder": self.base_folder, "interval_seconds": self.interval_seconds}
+        save = self.config
         with open('./settings.json', 'w') as f:
             json_str = json.dumps(save, indent=4, ensure_ascii=False)
             f.write(json_str)
@@ -231,9 +230,9 @@ class MainWindow(CustomWindow):
         """
         Show Settings Window
         """
-        self.setting_ui.ui.cookie_input.setText(self.cookie_text)
-        self.setting_ui.ui.path_input.setText(self.base_folder)
-        self.setting_ui.ui.spinBox.setValue(self.interval_seconds)
+        self.setting_ui.ui.cookie_input.setText(self.config['cookie_text'])
+        self.setting_ui.ui.path_input.setText(self.config['base_folder'])
+        self.setting_ui.ui.spinBox.setValue(self.config['interval_seconds'])
         self.setting_ui.ui.btn_save.clicked.connect(self.fetchSettings)
         self.setting_ui.show()
 
@@ -328,14 +327,14 @@ class MainWindow(CustomWindow):
         """
         From subwindow get informations and close it
         """
-        self.cookie_text = self.setting_ui.ui.cookie_input.text()
-        self.cookie = parse_cookie_text(self.cookie_text)
+        self.config['cookie_text'] = self.setting_ui.ui.cookie_input.text()
+        self.cookie = parse_cookie_text(self.config['cookie_text'])
         if self.cookie == {}:
             self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
             self.ui.label.setText(self.title + ' - 已设置cookie')
-        self.base_folder = self.setting_ui.ui.path_input.text()
-        self.interval_seconds = self.setting_ui.ui.spinBox.value()
+        self.config['base_folder'] = self.setting_ui.ui.path_input.text()
+        self.config['interval_seconds'] = self.setting_ui.ui.spinBox.value()
         self.setting_ui.close()
 
     def popMsgBox(self, type, title, content):

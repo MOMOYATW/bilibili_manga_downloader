@@ -117,7 +117,7 @@ def parse_cookie_text(cookie_text):
     return cookie
 
 
-def read_config_file(attributes_dict):
+def read_config_file(attributes_dict: dict) -> dict:
     """
     Read configurations in file 'settings.json', if file do not exist then return default settings.
 
@@ -125,20 +125,20 @@ def read_config_file(attributes_dict):
       attributes_dict    - attributes need to read out, with default value
 
     Returns:
-      Attributes value ordered in list, or default value when not exist
+      Attributes value ordered in dict, or default value when not exist
     """
-    value_list = []
+    value_dict = {}
     file = os.path.exists('./settings.json')
     if file:
         with open('./settings.json', 'r', encoding='utf-8') as f:
             json_data = json.load(f)
         for attribute in attributes_dict.keys():
             if attribute in json_data:
-                value_list.append(json_data[attribute])
+                value_dict[attribute] = json_data[attribute]
             else:
-                value_list.append(attributes_dict[attribute])
-        return value_list
-    return attributes_dict.values()
+                value_dict[attribute] = attributes_dict[attribute]
+        return value_dict
+    return attributes_dict
 
 
 def parse_website(website):
@@ -189,4 +189,5 @@ def fetch_latest_version():
 
 
 if __name__ == '__main__':
-    pass
+    print(read_config_file(
+        {"cookie_text": "", "base_folder": "./", "interval_seconds": 1000}))
