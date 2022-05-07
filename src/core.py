@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import img2pdf
 import requests
 from http.cookies import SimpleCookie
 
@@ -155,3 +156,19 @@ def parse_website(website):
     else:
         manga_id = manga_id[0]
     return int(manga_id[2:])
+
+
+def convert_images_to_pdf(download_path, savefile_path):
+    """
+    Convert images to a pdf file
+
+    Parameters:
+      download_path - images path
+      savefile_path - name of the pdf to save (with .pdf)
+
+    Returns:
+
+    """
+    with open(savefile_path, "wb") as f:
+        f.write(img2pdf.convert(
+            [i for i in os.listdir(download_path) if i.endswith('.jpg')]))
