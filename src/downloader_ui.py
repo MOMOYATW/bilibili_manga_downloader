@@ -98,7 +98,7 @@ class DownloadThread(QThread):
 class MainWindow(CustomWindow):
     def __init__(self):
         super().__init__()
-        self.title = '哔哩哔哩漫画下载器 V1.4.1'
+        self.title = '哔哩哔哩漫画下载器 {}'.format(VERSION_TAG)
         self.setWindowTitle(self.title)
         self.tempdir = tempfile.mkdtemp()
         self.ui = Ui_MainWindow()
@@ -137,6 +137,12 @@ class MainWindow(CustomWindow):
             self.ui.label.setText(self.title + ' - 尚未设置cookie')
         else:
             self.ui.label.setText(self.title + ' - 已设置cookie')
+
+        # check version
+        latest_version_info = fetch_latest_version()
+        if latest_version_info['version'] != VERSION_TAG:
+            self.popMsgBox(QMessageBox.Information, '信息', '检测到有新版本发布!\n新版本信息：\n{}'.format(
+                latest_version_info['detail']))
 
     def loadAudioFile(self):
         """

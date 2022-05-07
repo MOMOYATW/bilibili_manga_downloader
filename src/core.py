@@ -6,6 +6,7 @@ import requests
 from http.cookies import SimpleCookie
 
 BILIBILI_MANGA_ENDPOINT = 'https://manga.bilibili.com/twirp/comic.v1.Comic/'
+VERSION_TAG = 'v1.4.1'
 
 
 def fetch_images_list(episode_id, cookie):
@@ -172,3 +173,20 @@ def convert_images_to_pdf(download_path, savefile_path):
     with open(savefile_path, "wb") as f:
         f.write(img2pdf.convert(
             [i for i in os.listdir(download_path) if i.endswith('.jpg')]))
+
+
+def fetch_latest_version():
+    """
+    Fetch Latest Verson and Detail informations
+
+    Returns:
+      [version, detail]
+    """
+    response = requests.get(
+        "https://api.github.com/repos/MOMOYATW/bilibili_manga_downloader/releases/latest")
+    response = response.json()
+    return {'version': response['tag_name'], 'detail': response['body'], 'download_url': response['assets'][0]['browser_download_url']}
+
+
+if __name__ == '__main__':
+    pass
