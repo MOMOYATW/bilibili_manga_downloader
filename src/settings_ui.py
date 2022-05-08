@@ -56,6 +56,19 @@ class SettingWindow(CustomWindow):
             qss = f.read()
             self.setStyleSheet(qss)
 
+    def init(self, config: dict, fetchSettings) -> None:
+        self.ui.cookie_input.setText(config['cookie_text'])
+        self.ui.path_input.setText(config['base_folder'])
+        self.ui.spinBox.setValue(config['interval_seconds'])
+        self.ui.btn_save.clicked.connect(fetchSettings)
+
+    def getSettings(self):
+        config = {}
+        config['cookie_text'] = self.ui.cookie_input.text()
+        config['base_folder'] = self.ui.path_input.text()
+        config['interval_seconds'] = self.ui.spinBox.value()
+        return config
+
 
 if __name__ == '__main__':
     """

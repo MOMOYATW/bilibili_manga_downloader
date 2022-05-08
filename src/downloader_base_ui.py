@@ -487,13 +487,22 @@ class Ui_MainWindow(object):
         self.status_bar.setFrameShape(QFrame.NoFrame)
         self.status_bar.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_5 = QHBoxLayout(self.status_bar)
-        self.horizontalLayout_5.setSpacing(0)
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.horizontalLayout_5.setContentsMargins(-1, 0, 4, 2)
+        self.information = QLabel(self.status_bar)
+        self.information.setObjectName(u"information")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.information.sizePolicy().hasHeightForWidth())
+        self.information.setSizePolicy(sizePolicy2)
+
+        self.horizontalLayout_5.addWidget(self.information)
+
         self.copyright = QLabel(self.status_bar)
         self.copyright.setObjectName(u"copyright")
         self.copyright.setMouseTracking(True)
         self.copyright.setStyleSheet(u"")
+        self.copyright.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_5.addWidget(self.copyright)
 
@@ -533,7 +542,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"Bilibili Manga Downloader", None))
         self.icon_label.setText("")
-        self.label.setText(QCoreApplication.translate("MainWindow", u"\u54d4\u54e9\u54d4\u54e9\u6f2b\u753b\u4e0b\u8f7d\u5668 V1.0.0 - \u5c1a\u672a\u8bbe\u7f6ecookie", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"\u54d4\u54e9\u54d4\u54e9\u6f2b\u753b\u4e0b\u8f7d\u5668", None))
         self.btn_min.setText("")
         self.btn_max.setText("")
         self.btn_close.setText("")
@@ -562,7 +571,8 @@ class Ui_MainWindow(object):
         self.btn_selectall.setText(QCoreApplication.translate("MainWindow", u"\u5168\u9009", None))
         self.btn_cancelall.setText(QCoreApplication.translate("MainWindow", u"\u5168\u4e0d\u9009", None))
         self.btn_moresettings.setText(QCoreApplication.translate("MainWindow", u"\u66f4\u591a\u8bbe\u7f6e", None))
-        self.copyright.setText(QCoreApplication.translate("MainWindow", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
+        self.information.setText("")
+        self.copyright.setText(QCoreApplication.translate("MainWindow", u"2022\u00a9All Rights Reserved.", None))
         self.grip_icon.setText("")
     # retranslateUi
 

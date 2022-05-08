@@ -98,7 +98,7 @@ class DownloadThread(QThread):
 class MainWindow(CustomWindow):
     def __init__(self):
         super().__init__()
-        self.title = '哔哩哔哩漫画下载器 {}'.format(VERSION_TAG)
+        self.title = '哔哩哔哩漫画下载器 {}'.format(CURRENT_VERSION_TAG)
         self.setWindowTitle(self.title)
         self.tempdir = tempfile.mkdtemp()
         self.ui = Ui_MainWindow()
@@ -111,13 +111,18 @@ class MainWindow(CustomWindow):
         self.edge_scaling = False
 
         self.drawShadow()
+
+        # init source files
         self.loadAudioFile()
         self.loadStyleSheet()
 
+        # init parameters
         self.is_downloading = False
         self.setting_ui = SettingWindow()
         self.ui.progressBar.setValue(0)
+        self.ui.label.setText(self.title)
 
+        # connect buttons
         self.ui.btn_min.clicked.connect(self.showMinimized)
         self.ui.btn_close.clicked.connect(self.saveAndClose)
         self.ui.btn_max.clicked.connect(self.showMaximizeOrNormalize)
@@ -130,17 +135,16 @@ class MainWindow(CustomWindow):
         self.sizegrip = QSizeGrip(self.ui.sizegrip)
 
         # read out settings and parse cookie
-        self.config = read_config_file(
-            {"cookie_text": "", "base_folder": "./", "interval_seconds": 1000})
+        self.config = read_config_file(DEFAULT_CONFIG_SETTINGS)
         self.cookie = parse_cookie_text(self.config['cookie_text'])
         if self.cookie == {}:
-            self.ui.label.setText(self.title + ' - 尚未设置cookie')
+            self.ui.information.setText('尚未设置cookie')
         else:
-            self.ui.label.setText(self.title + ' - 已设置cookie')
+            self.ui.information.setText('')
 
         # check version
         latest_version_info = fetch_latest_version()
-        if latest_version_info['version'] != VERSION_TAG:
+        if latest_version_info['version'] != CURRENT_VERSION_TAG:
             self.popMsgBox(QMessageBox.Information, '信息', '检测到有新版本发布!\n新版本信息：\n{}'.format(
                 latest_version_info['detail']))
 
@@ -230,10 +234,7 @@ class MainWindow(CustomWindow):
         """
         Show Settings Window
         """
-        self.setting_ui.ui.cookie_input.setText(self.config['cookie_text'])
-        self.setting_ui.ui.path_input.setText(self.config['base_folder'])
-        self.setting_ui.ui.spinBox.setValue(self.config['interval_seconds'])
-        self.setting_ui.ui.btn_save.clicked.connect(self.fetchSettings)
+        self.setting_ui.init(self.config, self.fetchSettings)
         self.setting_ui.show()
 
     def getMangaInfo(self):
@@ -327,14 +328,12 @@ class MainWindow(CustomWindow):
         """
         From subwindow get informations and close it
         """
-        self.config['cookie_text'] = self.setting_ui.ui.cookie_input.text()
+        self.config = self.setting_ui.getSettings()
         self.cookie = parse_cookie_text(self.config['cookie_text'])
         if self.cookie == {}:
-            self.ui.label.setText(self.title + ' - 尚未设置cookie')
+            self.ui.information.setText('尚未设置cookie')
         else:
-            self.ui.label.setText(self.title + ' - 已设置cookie')
-        self.config['base_folder'] = self.setting_ui.ui.path_input.text()
-        self.config['interval_seconds'] = self.setting_ui.ui.spinBox.value()
+            self.ui.information.setText('')
         self.setting_ui.close()
 
     def popMsgBox(self, type, title, content):

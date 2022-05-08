@@ -6,7 +6,11 @@ import requests
 from http.cookies import SimpleCookie
 
 BILIBILI_MANGA_ENDPOINT = 'https://manga.bilibili.com/twirp/comic.v1.Comic/'
-VERSION_TAG = 'v1.4.1'
+CURRENT_VERSION_TAG = 'v1.5.0'
+DEFAULT_CONFIG_SETTINGS = {"cookie_text": "",
+                           "base_folder": "./",
+                           "interval_seconds": 1000,
+                           "pdf": False}
 
 
 def fetch_images_list(episode_id, cookie):

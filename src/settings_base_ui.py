@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QLineEdit, QMainWindow, QPushButton, QSizePolicy,
-    QSpinBox, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QHBoxLayout,
+    QLabel, QLineEdit, QMainWindow, QPushButton,
+    QSizePolicy, QSpinBox, QVBoxLayout, QWidget)
 import sources_rc
 import sources_rc
 
@@ -25,7 +25,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(550, 293)
+        MainWindow.resize(550, 468)
         icon = QIcon()
         icon.addFile(u":/imgs/imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -160,9 +160,7 @@ class Ui_MainWindow(object):
         self.content_bar.setFrameShape(QFrame.NoFrame)
         self.content_bar.setFrameShadow(QFrame.Raised)
         self.verticalLayout_2 = QVBoxLayout(self.content_bar)
-        self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.cookie_set = QFrame(self.content_bar)
         self.cookie_set.setObjectName(u"cookie_set")
         self.cookie_set.setFrameShape(QFrame.StyledPanel)
@@ -260,6 +258,26 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.interval_set)
 
+        self.pdf_set = QFrame(self.content_bar)
+        self.pdf_set.setObjectName(u"pdf_set")
+        self.pdf_set.setFrameShape(QFrame.StyledPanel)
+        self.pdf_set.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_11 = QHBoxLayout(self.pdf_set)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.pdf_label = QLabel(self.pdf_set)
+        self.pdf_label.setObjectName(u"pdf_label")
+
+        self.horizontalLayout_11.addWidget(self.pdf_label)
+
+        self.pdf_checkbox = QCheckBox(self.pdf_set)
+        self.pdf_checkbox.setObjectName(u"pdf_checkbox")
+        self.pdf_checkbox.setMaximumSize(QSize(15, 16777215))
+
+        self.horizontalLayout_11.addWidget(self.pdf_checkbox)
+
+
+        self.verticalLayout_2.addWidget(self.pdf_set)
+
 
         self.verticalLayout.addWidget(self.content_bar)
 
@@ -297,6 +315,7 @@ class Ui_MainWindow(object):
         self.copyright.setObjectName(u"copyright")
         self.copyright.setMouseTracking(True)
         self.copyright.setStyleSheet(u"")
+        self.copyright.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_5.addWidget(self.copyright)
 
@@ -345,7 +364,9 @@ class Ui_MainWindow(object):
         self.interval_label.setText(QCoreApplication.translate("MainWindow", u"\u95f4\u9694\u65f6\u957f", None))
         self.spinBox.setSuffix(QCoreApplication.translate("MainWindow", u"\u6beb\u79d2", None))
         self.spinBox.setPrefix("")
+        self.pdf_label.setText(QCoreApplication.translate("MainWindow", u"\u5408\u6210 PDF \u6587\u4ef6", None))
+        self.pdf_checkbox.setText("")
         self.btn_save.setText(QCoreApplication.translate("MainWindow", u"\u4fdd\u5b58\u8bbe\u7f6e", None))
-        self.copyright.setText(QCoreApplication.translate("MainWindow", u"Developed by Tao Ye. 2022\u00a9All Rights Reserved.", None))
+        self.copyright.setText(QCoreApplication.translate("MainWindow", u"2022\u00a9All Rights Reserved.", None))
     # retranslateUi
 
