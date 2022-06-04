@@ -7,6 +7,7 @@ dist/
 imgs/
 mp3/
 style/
+old_version/
 settings.json
 *.spec
 *.qrc

@@ -1,5 +1,5 @@
 import sys
-from downloader_ui import MainWindow
+from downloader_main_ui import MainWindow
 from PySide6.QtWidgets import QApplication
 
 
