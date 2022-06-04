@@ -68,8 +68,8 @@ class SettingsWindow(WindowsFramelessWindow):
             QMessageBox(QMessageBox.Information, '检测到新版本', '版本{}现已发布,\n{}\n'.format(
                 detail['version'], detail['detail'])).exec()
         else:
-            QMessageBox(QMessageBox.Information, '恭喜', '当前版本是最新版{}'.format(
-                detail['version'])).exec()
+            QMessageBox(QMessageBox.Information, '检查更新', '{}'.format(
+                detail)).exec()
         self.ui.PbCheckUpdate.setDisabled(False)
 
     def selectPath(self):
