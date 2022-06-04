@@ -104,5 +104,4 @@ def fetch_latest_version():
 
 
 if __name__ == '__main__':
-    print(fetch_tokuten(31351,
-                        {"SESSDATA": "815fd5a5%2C1666406454%2C9089a%2A41"}))
+    pass
