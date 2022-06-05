@@ -66,6 +66,8 @@ class ParseResultWindow(WindowsFramelessWindow):
 
             if self.ep_list[i]['is_locked']:
                 item.setFlags(item.flags() & Qt.NoItemFlags)
+                item.setText("{} - 漫币：{}".format(item.text(),
+                             self.ep_list[i]['pay_gold']))
             item.setSizeHint(QSize(0, 50))
             self.ui.LwChapterList.addItem(item)
 
@@ -116,6 +118,25 @@ class ParseResultWindow(WindowsFramelessWindow):
             return
         self.addTaskSignal.emit(downloaditems)
         self.close()
+
+    def applyTaskInList(self, tasks):
+        if tasks == {}:
+            return
+        for i in range(len(self.ep_list)):
+            item = self.ui.LwChapterList.item(i)
+            if self.ep_list[i]['id'] in tasks:
+                item.setSelected(True)
+                item.setFlags(item.flags() & Qt.NoItemFlags)
+                item.setText(
+                    '{} {} - {}'.format(self.ep_list[i]['short_title'], self.ep_list[i]['title'], '已添加到任务列表中'))
+
+        for i in range(len(self.tokuten)):
+            item = self.ui.LwChapterList.item(len(self.ep_list) + i)
+            if self.tokuten[i]['item']['id'] in tasks:
+                item.setSelected(True)
+                item.setFlags(item.flags() & Qt.NoItemFlags)
+                item.setText(
+                    '{} {} - {}'.format(self.tokuten[i]['item']['title'], self.tokuten[i]['item']['detail'], '已添加到任务列表中'))
 
     def changeIconMaximized(self):
         """ overload function """

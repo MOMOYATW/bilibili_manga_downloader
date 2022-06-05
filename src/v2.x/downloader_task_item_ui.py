@@ -7,23 +7,37 @@ from downloader_task_item_base_ui import Ui_Form
 class DownloadTaskItem(QWidget):
     double_click_signal = Signal(int)
 
-    def __init__(self, task_info, resource={}, qss="") -> None:
+    def __init__(self, task_info, resource={}, qss="", total=True) -> None:
         super().__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
         self.resource = resource
         self.setStyleSheet(qss)
-
-        self.manga_id = task_info['info']['id']
-        self.ui.LItemTitle.setText(task_info['info']['title'])
-        self.ui.LItemStatus.setText('排队中')
-        self.ui.LItemCount.setText(
-            '共{}个任务'.format(len(task_info) - 1))
-        self.ui.PbProgress.setValue(0)
+        self.total = total
+        if total:
+            self.manga_id = task_info['info']['id']
+            self.ui.LItemTitle.setText(task_info['info']['title'])
+            self.ui.LItemStatus.setText('排队中')
+            self.ui.LItemCount.setText(
+                '共{}个任务'.format(len(task_info) - 1))
+            self.ui.PbProgress.setValue(0)
+        else:
+            self.ui.LItemTitle.setText("{} {}".format(
+                task_info['short_title'], task_info['title']))
+            if task_info['status'] == 'pending':
+                self.ui.LItemStatus.setText('排队中')
+            elif task_info['status'] == 'running':
+                self.ui.LItemStatus.setText('下载中')
+            elif task_info['status'] == 'finished':
+                self.ui.LItemStatus.setText('已完成')
+            else:
+                self.ui.LItemStatus.setText('部分失败')
+            self.ui.LItemCount.setText('')
+            self.ui.PbProgress.setValue(task_info['progress'] * 100)
 
     def mouseDoubleClickEvent(self, event) -> None:
-        if event.button() == Qt.LeftButton:
+        if event.button() == Qt.LeftButton and self.total:
             self.double_click_signal.emit(self.manga_id)
 
     def enterEvent(self, event) -> None:

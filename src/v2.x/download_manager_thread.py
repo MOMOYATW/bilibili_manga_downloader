@@ -9,6 +9,10 @@ class DownloadManagerThread(QThread):
     feedback_task_signal = Signal(bool, dict)
     update_task_status_signal = Signal(int, str)
     update_task_progress_signal = Signal(int, float)
+    response_parse_signal = Signal(dict)
+    response_detail_signal = Signal(dict)
+    update_detail_progress_signal = Signal(dict, float)
+    update_detail_status_signal = Signal(dict, str)
 
     def __init__(self, config) -> None:
         super(DownloadManagerThread, self).__init__()
@@ -44,6 +48,7 @@ class DownloadManagerThread(QThread):
                 self.updateTaskProgress)
             self.running_thread[-1].start()
             latest_task['status'] = 'running'
+            self.update_detail_status_signal.emit(latest_task_index, '下载中')
             self.task_dict[latest_task_index[0]]['info']['cnt']['running'] += 1
             self.task_dict[latest_task_index[0]
                            ]['info']['cnt']['pending'] -= 1
@@ -51,6 +56,9 @@ class DownloadManagerThread(QThread):
 
     def updateTaskProgress(self, index, value):
         self.task_dict[index[0]]['info']['progress'] += value
+        self.task_dict[index[0]][index[1]]['progress'] += value
+        self.update_detail_progress_signal.emit(
+            index, self.task_dict[index[0]][index[1]]['progress'])
         self.update_task_progress_signal.emit(index[0],
                                               self.task_dict[index[0]]['info']['progress'] / (len(self.task_dict[index[0]]) - 1))
         self.updateTaskInfo(index[0])
@@ -92,6 +100,7 @@ class DownloadManagerThread(QThread):
             if task['id'] not in self.task_dict[manga_info['id']]:
                 self.task_dict[manga_info['id']][task['id']] = task
                 self.task_dict[manga_info['id']][task['id']]['type'] = 'honpen'
+                self.task_dict[manga_info['id']][task['id']]['progress'] = 0
                 self.task_dict[manga_info['id']
                                ][task['id']]['status'] = 'pending'
                 self.task_dict[manga_info['id']]['info']['cnt']['pending'] += 1
@@ -104,6 +113,8 @@ class DownloadManagerThread(QThread):
                 self.task_dict[manga_info['id']
                                ][tokuten['item']['id']]['type'] = 'tokuten'
                 self.task_dict[manga_info['id']
+                               ][tokuten['item']['id']]['process'] = 0
+                self.task_dict[manga_info['id']
                                ][tokuten['item']['id']]['status'] = 'pending'
                 self.task_dict[manga_info['id']]['info']['cnt']['pending'] += 1
                 # add to queue
@@ -112,6 +123,10 @@ class DownloadManagerThread(QThread):
 
         self.feedback_task_signal.emit(
             new_manga, self.task_dict[manga_info['id']])
+
+        self.sendTaskToDetail(manga_info['id'])
+        self.updateTaskProgress(
+            self.pending_task[-1], 0)
         self.dispatch()
 
     def removeFinishedThread(self, index):
@@ -124,9 +139,15 @@ class DownloadManagerThread(QThread):
             return
         thread = self.running_thread.pop(pop_index)
         self.task_dict[index[0]][index[1]]['status'] = 'finished'
+        self.task_dict[index[0]]['info']['cnt']['progress'] = 1
         self.task_dict[index[0]]['info']['cnt']['running'] -= 1
+
         if len(thread.err_log) != 0:
             self.task_dict[index[0]]['info']['cnt']['error'] += 1
+            self.update_detail_status_signal.emit(index, '部分失败')
+        else:
+            self.update_detail_status_signal.emit(index, '已完成')
+            self.update_detail_progress_signal.emit(index, 1)
         print(thread.err_log)
         self.updateTaskInfo(index[0])
         self.dispatch()
@@ -135,3 +156,15 @@ class DownloadManagerThread(QThread):
         for thread in self.running_thread:
             thread.terminate()
         return super().terminate()
+
+    def sendTaskToParse(self, manga_id):
+        if manga_id in self.task_dict:
+            self.response_parse_signal.emit(self.task_dict[manga_id])
+            return
+        self.response_parse_signal.emit({})
+
+    def sendTaskToDetail(self, manga_id):
+        if manga_id in self.task_dict:
+            self.response_detail_signal.emit(self.task_dict[manga_id])
+            return
+        self.response_detail_signal.emit({})

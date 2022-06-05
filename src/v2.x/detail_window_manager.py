@@ -1,11 +1,15 @@
-from downloader_parse_ui import ParseResultWindow
+from downloader_task_detail_ui import TaskDetailWindow
+from PySide6.QtCore import Signal
 
 
-class ParseWindowManager():
-    def __init__(self, resource, qss) -> None:
+class DetailWindowManager():
+
+    def __init__(self, resource, qss, config, showResultWindow) -> None:
         self.record = {}
         self.resource = resource
         self.qss = qss
+        self.showResultWindow = showResultWindow
+        self.config = config
 
     def __isWindowExist(self, manga_id: str) -> bool:
         """
@@ -19,23 +23,25 @@ class ParseWindowManager():
         """
         return manga_id in self.record
 
-    def createWindow(self, parse_result: dict) -> ParseResultWindow:
+    def createWindow(self, manga_id) -> TaskDetailWindow:
         """
         Use parse result to create window and add to manager
 
         Parameters:
-            parse_result - parse result fetch from server
 
         Returns:
             A parse result window which created by parse_result
         """
-        if self.__isWindowExist(parse_result['id']):
-            return self.record[parse_result['id']]
-        self.record[parse_result['id']] = ParseResultWindow(
-            parse_result, self.resource, self.qss)
-        self.record[parse_result['id']].closedSignal.connect(
+        if self.__isWindowExist(manga_id):
+            return self.record[manga_id]
+        self.record[manga_id] = TaskDetailWindow(
+            manga_id, self.resource, self.qss, self.config)
+        self.record[manga_id].searchSignal.connect(
+            self.showResultWindow
+        )
+        self.record[manga_id].closedSignal.connect(
             self.destroyWindow)
-        return self.record[parse_result['id']]
+        return self.record[manga_id]
 
     def destroyWindow(self, manga_id: str) -> None:
         """
@@ -49,7 +55,7 @@ class ParseWindowManager():
         """
         del self.record[manga_id]
 
-    def getParseWindow(self, manga_id: str) -> ParseResultWindow or None:
+    def getParseWindow(self, manga_id: str) -> TaskDetailWindow or None:
         """
         Get window from manager by manga_id
 
@@ -78,8 +84,16 @@ class ParseWindowManager():
             window.close()
         self.record.clear()
 
-    def passToParseWindow(self, dict):
+    def passToDetailWindow(self, dict):
         if dict == {}:
             return
         if dict['info']['id'] in self.record:
             self.record[dict['info']['id']].applyTaskInList(dict)
+
+    def updateDetailProgress(self, dict, value):
+        if dict[0] in self.record:
+            self.record[dict[0]].updateProgress(dict[1], value)
+
+    def updateDetailStatus(self, dict, value):
+        if dict[0] in self.record:
+            self.record[dict[0]].updateTaskStatus(dict[1], value)

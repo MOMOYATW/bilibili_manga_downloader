@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(556, 655)
+        MainWindow.resize(517, 600)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -152,43 +152,6 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.FCookie)
 
-        self.FImageWidth = QFrame(self.FContentBar)
-        self.FImageWidth.setObjectName(u"FImageWidth")
-        self.FImageWidth.setMinimumSize(QSize(0, 40))
-        self.FImageWidth.setFrameShape(QFrame.StyledPanel)
-        self.FImageWidth.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_7 = QHBoxLayout(self.FImageWidth)
-        self.horizontalLayout_7.setSpacing(10)
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
-        self.LImageWidth = QLabel(self.FImageWidth)
-        self.LImageWidth.setObjectName(u"LImageWidth")
-        self.LImageWidth.setMinimumSize(QSize(100, 0))
-        self.LImageWidth.setMaximumSize(QSize(100, 16777215))
-        self.LImageWidth.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.horizontalLayout_7.addWidget(self.LImageWidth)
-
-        self.SbImageWidth = QSpinBox(self.FImageWidth)
-        self.SbImageWidth.setObjectName(u"SbImageWidth")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.SbImageWidth.sizePolicy().hasHeightForWidth())
-        self.SbImageWidth.setSizePolicy(sizePolicy3)
-        self.SbImageWidth.setMaximumSize(QSize(16777215, 40))
-        self.SbImageWidth.setWrapping(False)
-        self.SbImageWidth.setAlignment(Qt.AlignCenter)
-        self.SbImageWidth.setMinimum(100)
-        self.SbImageWidth.setMaximum(2000)
-        self.SbImageWidth.setSingleStep(100)
-        self.SbImageWidth.setValue(1100)
-
-        self.horizontalLayout_7.addWidget(self.SbImageWidth)
-
-
-        self.verticalLayout_2.addWidget(self.FImageWidth)
-
         self.FDownloadFolder = QFrame(self.FContentBar)
         self.FDownloadFolder.setObjectName(u"FDownloadFolder")
         self.FDownloadFolder.setMinimumSize(QSize(0, 40))
@@ -243,6 +206,9 @@ class Ui_MainWindow(object):
 
         self.SbMaxThread = QSpinBox(self.FMaxThread)
         self.SbMaxThread.setObjectName(u"SbMaxThread")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.SbMaxThread.sizePolicy().hasHeightForWidth())
         self.SbMaxThread.setSizePolicy(sizePolicy3)
         self.SbMaxThread.setMaximumSize(QSize(16777215, 40))
@@ -388,9 +354,6 @@ class Ui_MainWindow(object):
         self.PbMinimize.setText("")
         self.PbClose.setText("")
         self.LCookie.setText("")
-        self.LImageWidth.setText("")
-        self.SbImageWidth.setSuffix(QCoreApplication.translate("MainWindow", u"\u50cf\u7d20", None))
-        self.SbImageWidth.setPrefix("")
         self.LDownloadFolder.setText("")
         self.PbSelect.setText("")
         self.LMaxThread.setText("")

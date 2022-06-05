@@ -15,6 +15,7 @@ from core import read_config_file, save_config_file, VERSION_TAG
 from check_update_thread import CheckUpdateThread
 from parse_window_manager import ParseWindowManager
 from download_manager_thread import DownloadManagerThread
+from detail_window_manager import DetailWindowManager
 
 
 class MainWindow(WindowsFramelessWindow):
@@ -61,6 +62,7 @@ class MainWindow(WindowsFramelessWindow):
         self.taskDetail = None
 
         self.parseWindowManager = ParseWindowManager(self.resource, self.qss)
+        self.detailWindowManager = DetailWindowManager(self.resource, self.qss, self.config, self.showResultWindow)
         self.settingsWindow = None
         self.downloadManagerThread = DownloadManagerThread(self.config)
         self.downloadManagerThread.send_task_signal.connect(
@@ -72,6 +74,17 @@ class MainWindow(WindowsFramelessWindow):
         )
         self.downloadManagerThread.update_task_progress_signal.connect(
             self.updateRowInTableDownloadProgress
+        )
+        self.downloadManagerThread.response_parse_signal.connect(
+            self.parseWindowManager.passToParseWindow)
+        self.downloadManagerThread.response_detail_signal.connect(
+            self.detailWindowManager.passToDetailWindow
+        )
+        self.downloadManagerThread.update_detail_progress_signal.connect(
+            self.detailWindowManager.updateDetailProgress
+        )
+        self.downloadManagerThread.update_detail_status_signal.connect(
+            self.detailWindowManager.updateDetailStatus
         )
         self.downloadManagerThread.start()
 
@@ -90,6 +103,7 @@ class MainWindow(WindowsFramelessWindow):
 
         # load from sources_rc
         self.resource = {}
+        self.resource['cover'] = {}
         self.resource["logo_pixmap"] = QPixmap(
             QPixmap(u":/imgs/icon.png"))
         self.resource["logo_icon"] = QIcon()
@@ -162,6 +176,7 @@ class MainWindow(WindowsFramelessWindow):
         parseWindow = self.parseWindowManager.createWindow(parse_result)
         parseWindow.addTaskSignal.connect(
             self.downloadManagerThread.send_task_signal.emit)
+        self.downloadManagerThread.sendTaskToParse(parse_result['id'])
         parseWindow.show()
 
     def showSettings(self):
@@ -175,10 +190,6 @@ class MainWindow(WindowsFramelessWindow):
 
     def updateConfig(self, config):
         self.config = config
-
-    def showTaskDetail(self, manga_id):
-        """ Open task detail window"""
-        pass
 
     def changeIconMaximized(self):
         """ overload function """
@@ -197,6 +208,11 @@ class MainWindow(WindowsFramelessWindow):
             return
         self.updateRowInTable(manga_task)
 
+    def showDetailWindow(self, manga_id):
+        DetailWindow = self.detailWindowManager.createWindow(manga_id)
+        self.downloadManagerThread.sendTaskToDetail(manga_id)
+        DetailWindow.show()
+
     def insertRowInTable(self, manga_task):
         manga_id = manga_task['info']['id']
         cover_url = manga_task['info']['horizontal_cover']
@@ -206,7 +222,8 @@ class MainWindow(WindowsFramelessWindow):
         self.loadThread[manga_id].start()
 
         download_task_item = DownloadTaskItem(manga_task)
-        # download_task_item.double_click_signal.connect(self.showTaskDetail)
+        download_task_item.double_click_signal.connect(
+            self.showDetailWindow)
         item = QListWidgetItem()
         item.setSizeHint(download_task_item.sizeHint())
         self.ui.LwTaskList.addItem(item)
@@ -238,6 +255,7 @@ class MainWindow(WindowsFramelessWindow):
     def loadImage(self, content, manga_id):
         cover = QPixmap()
         cover.loadFromData(content)
+        self.resource['cover'][manga_id] = cover
         for i in range(self.ui.LwTaskList.count()):
             item = self.ui.LwTaskList.item(i)
             widget = self.ui.LwTaskList.itemWidget(item)
