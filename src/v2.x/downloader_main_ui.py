@@ -10,7 +10,6 @@ from frameless_window import WindowsFramelessWindow
 from downloader_main_base_ui import Ui_MainWindow
 from downloader_settings_ui import SettingsWindow
 from downloader_task_item_ui import DownloadTaskItem
-from downloader_task_detail_ui import TaskDetailWindow
 from core import read_config_file, save_config_file, VERSION_TAG
 from check_update_thread import CheckUpdateThread
 from parse_window_manager import ParseWindowManager
@@ -23,6 +22,14 @@ class MainWindow(WindowsFramelessWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        self.config = read_config_file({"cookie": {},
+                                        "download_folder": "./",
+                                        "max_thread_num": 1,
+                                        "check_update_when_start": True,
+                                        "sleep_time": 1000,
+                                        "style": "dark.qss"})
+
         self.loadResources()
 
         self.ui.LTitle.setText('哔哩哔哩漫画下载器 {}'.format(VERSION_TAG))
@@ -45,12 +52,6 @@ class MainWindow(WindowsFramelessWindow):
         self.ui.LeSearchBar.returnPressed.connect(self.startSearch)
         self.ui.PbSettings.clicked.connect(self.showSettings)
 
-        self.config = read_config_file({"cookie": {},
-                                        "download_folder": "./",
-                                        "max_thread_num": 1,
-                                        "check_update_when_start": True,
-                                        "sleep_time": 1000})
-
         if self.config['check_update_when_start']:
             self.check_update_thread = CheckUpdateThread()
             self.check_update_thread.result_signal.connect(
@@ -62,7 +63,8 @@ class MainWindow(WindowsFramelessWindow):
         self.taskDetail = None
 
         self.parseWindowManager = ParseWindowManager(self.resource, self.qss)
-        self.detailWindowManager = DetailWindowManager(self.resource, self.qss, self.config, self.showResultWindow)
+        self.detailWindowManager = DetailWindowManager(
+            self.resource, self.qss, self.config, self.showResultWindow)
         self.settingsWindow = None
         self.downloadManagerThread = DownloadManagerThread(self.config)
         self.downloadManagerThread.send_task_signal.connect(
@@ -95,7 +97,7 @@ class MainWindow(WindowsFramelessWindow):
             base_path = sys._MEIPASS
         else:
             base_path = "./"
-        styleFile = os.path.join(base_path, 'style.qss')
+        styleFile = os.path.join(base_path, self.config['style'])
         # set style sheet
         with open(styleFile, 'r') as f:
             self.qss = f.read()
