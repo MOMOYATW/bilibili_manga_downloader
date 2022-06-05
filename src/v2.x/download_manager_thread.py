@@ -113,7 +113,7 @@ class DownloadManagerThread(QThread):
                 self.task_dict[manga_info['id']
                                ][tokuten['item']['id']]['type'] = 'tokuten'
                 self.task_dict[manga_info['id']
-                               ][tokuten['item']['id']]['process'] = 0
+                               ][tokuten['item']['id']]['progress'] = 0
                 self.task_dict[manga_info['id']
                                ][tokuten['item']['id']]['status'] = 'pending'
                 self.task_dict[manga_info['id']]['info']['cnt']['pending'] += 1

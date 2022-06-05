@@ -23,8 +23,13 @@ class DownloadTaskItem(QWidget):
                 '共{}个任务'.format(len(task_info) - 1))
             self.ui.PbProgress.setValue(0)
         else:
-            self.ui.LItemTitle.setText("{} {}".format(
-                task_info['short_title'], task_info['title']))
+            if task_info['type'] == 'honpen':
+                self.ui.LItemTitle.setText("{} {}".format(
+                    task_info['short_title'], task_info['title']))
+            else:
+                self.ui.LItemTitle.setText("{} {}".format(
+                    task_info['item']['title'], task_info['item']['detail']
+                ))
             if task_info['status'] == 'pending':
                 self.ui.LItemStatus.setText('排队中')
             elif task_info['status'] == 'running':
