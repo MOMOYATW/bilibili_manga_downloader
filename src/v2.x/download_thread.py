@@ -1,6 +1,7 @@
 import os
+from urllib import response
 from PySide6.QtCore import QThread, Signal
-from service import fetch_image_list, fetch_image_token, fetch_image, fetch_image_size
+from service import fetch_image_list, fetch_image_token, fetch_image, fetch_video
 
 
 class DownloadThread(QThread):
@@ -14,6 +15,7 @@ class DownloadThread(QThread):
         self.download_path = download_path
         self.task = task
         self.err_log = []
+        self.progress = 0
 
     def run(self):
         """ Download images to file """
@@ -22,7 +24,6 @@ class DownloadThread(QThread):
             self.config['download_folder'], self.download_path)
         if not os.path.exists(curr_download_folder):
             os.makedirs(curr_download_folder)
-        err_cnt = 0
         if self.task['type'] == 'honpen':
             img_list = fetch_image_list(self.index[1], self.config['cookie'])
             if img_list['code'] != 0:
@@ -33,8 +34,7 @@ class DownloadThread(QThread):
             # iterate over image list
             for i, image in enumerate(img_list['data']['images']):
                 # get image token which required when downloading
-                img_token = fetch_image_token(
-                    [image['path']], self.config['width'])
+                img_token = fetch_image_token([image['path']])
                 if img_token['code'] != 0:
                     # handle error
                     print('获取图像token信息时出错\nDetail:{}'.format(img_token['msg']))
@@ -42,53 +42,112 @@ class DownloadThread(QThread):
                 token = img_token['data'][0]['token']
                 url = img_token['data'][0]['url']
                 # if image already exist
-                if os.path.exists(os.path.join(curr_download_folder, "{}.jpg".format(str(i).zfill(3)))):
-                    # img_size = fetch_image_size("{}?token={}".format(
-                    #     url, token), self.config['cookie'])
-                    # file_size = os.path.getsize(os.path.join(
-                    #     curr_download_folder, "{}.jpg".format(str(i).zfill(3))))
-                    # if img_size == file_size:
-                    #     self.update_signal.emit(
-                    #         self.index, (i + 1) / len(img_list['data']['images']))
-                    #     continue
-                    self.update_signal.emit(
-                        self.index, (i + 1 - err_cnt) / len(img_list['data']['images']))
-                    continue
+                suffix = url.split('?')[
+                    0].split('.')[-1]
+                data_count = 0
+                download_path = os.path.join(
+                    curr_download_folder, "{}.{}".format(str(i).zfill(3), suffix))
+                if os.path.exists(download_path):
+                    data_count = os.path.getsize(download_path)
+
                 # save image to local file
-                content = fetch_image("{}?token={}".format(
-                    url, token), self.config['cookie'])
+                content = fetch_image(
+                    "{}?token={}".format(url, token), range_start=data_count, cookie=self.config['cookie'])
                 if content is None:
                     self.err_log.append([self.index, i])
-                    err_cnt += 1
                     continue
-                with open(os.path.join(curr_download_folder, "{}.jpg".format(str(i).zfill(3))), 'wb') as file:
-                    file.write(content)
+                if content.headers['content-type'] == 'text/html' or int(content.headers['content-length']) == 0:
+                    self.progress += 1
+                    self.update_signal.emit(
+                        self.index, 1 / len(img_list['data']['images']))
+                    continue
+                chunk_size = 1024
+                content_size = int(
+                    content.headers['content-length']) + data_count
+                self.progress += (data_count /
+                                  content_size) if content_size > 0 else 0
                 self.update_signal.emit(
-                    self.index, (i + 1 - err_cnt) / len(img_list['data']['images']))
+                    self.index, ((data_count /
+                                 content_size) if content_size > 0 else 0) / len(img_list['data']['images']))
+                with open(download_path, 'ab') as file:
+                    for data in content.iter_content(chunk_size=chunk_size):
+                        file.write(data)
+                        self.progress += (len(data) /
+                                          content_size) if content_size > 0 else 0
+                        self.update_signal.emit(self.index,
+                                                ((len(data) /
+                                                 content_size) if content_size > 0 else 0) / len(img_list['data']['images']))
                 QThread.msleep(self.config['sleep_time'])
         elif self.task['type'] == 'tokuten':
-            for i, image in enumerate(self.task['item']['pic']):
-                # if image already exist
-                if os.path.exists(os.path.join(curr_download_folder, "{}.jpg".format(str(i).zfill(3)))):
-                    # img_size = fetch_image_size(image, self.config['cookie'])
-                    # file_size = os.path.getsize(os.path.join(
-                    #     curr_download_folder, "{}.jpg".format(str(i).zfill(3))))
-                    # if img_size == file_size:
-                    #     self.update_signal.emit(
-                    #         self.index, (i + 1 - err_cnt) / len(self.task['item']['pic']))
-                    #     continue
+            # if tokuten is image set
+            if len(self.task['item']['pic']) != 0:
+                for i, image in enumerate(self.task['item']['pic']):
+                    # if image already exist
+                    suffix = self.task['item']['pic'][i].split('?')[
+                        0].split('.')[-1]
+                    data_count = 0
+                    download_path = os.path.join(
+                        curr_download_folder, "{}.{}".format(str(i).zfill(3), suffix))
+                    if os.path.exists(download_path):
+                        data_count = os.path.getsize(download_path)
+
+                    # save image to local file
+                    content = fetch_image(
+                        image, range_start=data_count, cookie=self.config['cookie'])
+                    if content is None:
+                        self.err_log.append([self.index, i])
+                        continue
+                    if content.headers['content-type'] == 'text/html' or content.headers['content-length'] == 0:
+                        self.progress += 1
+                        self.update_signal.emit(
+                            self.index, 1 / len(self.task['item']['pic']))
+                        continue
+                    chunk_size = 1024
+                    content_size = int(
+                        content.headers['content-length']) + data_count
+                    self.progress += (data_count /
+                                      content_size) if content_size > 0 else 0
                     self.update_signal.emit(
-                        self.index, (i + 1 - err_cnt) / len(self.task['item']['pic']))
-                    continue
-                # save image to local file
-                content = fetch_image(image, self.config['cookie'])
+                        self.index, ((data_count /
+                                     content_size) if content_size > 0 else 0) / len(self.task['item']['pic']))
+                    with open(download_path, 'ab') as file:
+                        for data in content.iter_content(chunk_size=chunk_size):
+                            file.write(data)
+                            self.progress += (len(data) /
+                                              content_size) if content_size > 0 else 0
+                            self.update_signal.emit(
+                                self.index, ((len(data) /
+                                             content_size) if content_size > 0 else 0) / len(self.task['item']['pic']))
+                    QThread.msleep(self.config['sleep_time'])
+            else:
+                # currently it must be video type
+                # get suffix
+                suffix = self.task['item']['video']['url'].split('?')[
+                    0].split('.')[-1]
+                # check if already exist
+                data_count = 0
+                download_path = os.path.join(
+                    curr_download_folder, "{}.{}".format(str(0).zfill(3), suffix))
+                if os.path.exists(download_path):
+                    data_count = os.path.getsize(download_path)
+                content = fetch_video(
+                    self.task['item']['video']['url'], self.config['cookie'], data_count)
                 if content is None:
-                    self.err_log.append([self.index, i])
-                    err_cnt += 1
-                    continue
-                with open(os.path.join(curr_download_folder, "{}.jpg".format(str(i).zfill(3))), 'wb') as file:
-                    file.write(content)
+                    self.err_log.append([self.index, 0])
+                    return
+                if content.headers['content-type'] == 'text/html':
+                    self.update_signal.emit(
+                        self.index, 1)
+                    return
+                chunk_size = 1024
+                content_size = int(
+                    content.headers['content-length']) + data_count
                 self.update_signal.emit(
-                    self.index, (i + 1 - err_cnt) / len(self.task['item']['pic']))
-                QThread.msleep(self.config['sleep_time'])
+                    self.index, (data_count / content_size) if content_size > 0 else 0)
+                with open(download_path, 'ab') as file:
+                    for data in content.iter_content(chunk_size=chunk_size):
+                        file.write(data)
+                        self.update_signal.emit(
+                            self.index, (len(data) / content_size) if content_size > 0 else 0)
+
         self.finished_signal.emit(self.index)

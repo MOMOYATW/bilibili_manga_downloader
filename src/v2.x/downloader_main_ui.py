@@ -45,7 +45,6 @@ class MainWindow(WindowsFramelessWindow):
         self.ui.PbSettings.clicked.connect(self.showSettings)
 
         self.config = read_config_file({"cookie": {},
-                                        "width": 1100,
                                         "download_folder": "./",
                                         "max_thread_num": 1,
                                         "check_update_when_start": True,
@@ -68,8 +67,11 @@ class MainWindow(WindowsFramelessWindow):
             self.downloadManagerThread.createDownloadTasks)
         self.downloadManagerThread.feedback_task_signal.connect(
             self.addDownloadTask)
-        self.downloadManagerThread.update_task_singal.connect(
+        self.downloadManagerThread.update_task_status_signal.connect(
             self.updateRowInTableDownloadStatus
+        )
+        self.downloadManagerThread.update_task_progress_signal.connect(
+            self.updateRowInTableDownloadProgress
         )
         self.downloadManagerThread.start()
 
@@ -217,13 +219,21 @@ class MainWindow(WindowsFramelessWindow):
             if widget.manga_id == manga_task['info']['id']:
                 widget.updateTaskNum(manga_task)
 
-    def updateRowInTableDownloadStatus(self, manga_id, status, value):
+    def updateRowInTableDownloadStatus(self, manga_id, status):
         for i in range(self.ui.LwTaskList.count()):
             item = self.ui.LwTaskList.item(i)
             widget = self.ui.LwTaskList.itemWidget(item)
             if widget.manga_id == manga_id:
                 widget.updateTaskStatus(status)
-                widget.updateProgress(value)
+                break
+
+    def updateRowInTableDownloadProgress(self, manga_id, value):
+        for i in range(self.ui.LwTaskList.count()):
+            item = self.ui.LwTaskList.item(i)
+            widget = self.ui.LwTaskList.itemWidget(item)
+            if widget.manga_id == manga_id:
+                widget.updateProgress(value * 100)
+                break
 
     def loadImage(self, content, manga_id):
         cover = QPixmap()

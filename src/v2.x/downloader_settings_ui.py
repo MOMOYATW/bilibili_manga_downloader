@@ -29,19 +29,12 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbClose.clicked.connect(self.close)
         self.ui.LCookie.setText('登录账户Cookie')
-        self.ui.LImageWidth.setText('下载图片宽度')
         self.ui.LDownloadFolder.setText('下载根目录')
         self.ui.LMaxThread.setText('最大下载线程数')
         self.ui.LCheckUpdateStart.setText('启动时检查更新')
         self.ui.LSleepTime.setText('下载间隔时间')
         self.ui.PbSubmit.setText('保存设置')
         self.ui.LeCookie.setText(json.dumps(self.config['cookie']))
-        if self.config['width'] is None:
-            self.ui.SbImageWidth.setDisabled(True)
-            self.ui.SbImageWidth.setMaximum(9999)
-            self.ui.SbImageWidth.setValue(9999)
-        else:
-            self.ui.SbImageWidth.setValue(self.config['width'])
         self.ui.LeDownloadFolder.setText(self.config['download_folder'])
         self.ui.SbMaxThread.setValue(self.config['max_thread_num'])
         self.ui.CbCheckUpdateStart.setChecked(
@@ -74,21 +67,17 @@ class SettingsWindow(WindowsFramelessWindow):
 
     def selectPath(self):
         """
-        Pop out select dialog, if user select a sub path, then use relative path
-        else use absolute path
+        Pop out select dialog, use absolute path
+        use relative path manually
         """
         dir = QFileDialog.getExistingDirectory(
             None, "选取默认下载路径", self.ui.LeDownloadFolder.text())
         if dir == "":
             return
-        rel_path = os.path.relpath(dir)
-        if rel_path.find('..') == -1:
-            dir = os.path.join('.', rel_path)
         self.ui.LeDownloadFolder.setText(dir)
 
     def submitConfig(self):
         self.config['cookie'] = json.loads(self.ui.LeCookie.text())
-        self.config['width'] = self.ui.SbImageWidth.value()
         self.config['download_folder'] = self.ui.LeDownloadFolder.text()
         self.config['max_thread_num'] = self.ui.SbMaxThread.value()
         self.config['check_update_when_start'] = self.ui.CbCheckUpdateStart.isChecked()
@@ -97,6 +86,9 @@ class SettingsWindow(WindowsFramelessWindow):
         self.close()
 
     def closeEvent(self, event) -> None:
+        """
+        Terminate all threads before window closed
+        """
         if self.check_update_thread is not None and self.check_update_thread.isRunning():
             self.check_update_thread.terminate()
         event.accept()

@@ -47,6 +47,7 @@ class DownloadTaskItem(QWidget):
 
     def updateProgress(self, value):
         self.ui.PbProgress.setValue(value)
+        self.update()
 
 
 if __name__ == '__main__':

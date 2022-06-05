@@ -1,7 +1,7 @@
 import os
 import json
 
-VERSION_TAG = 'v2.0.0'
+VERSION_TAG = 'v2.1.0'
 
 
 def read_config_file(attributes_dict: dict) -> dict:

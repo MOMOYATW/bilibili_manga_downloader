@@ -1,6 +1,6 @@
-from time import sleep
 import requests
 import json
+from core import read_config_file
 
 BILIBILI_MANGA_ENDPOINT = 'https://manga.bilibili.com/twirp/comic.v1.Comic/'
 
@@ -37,11 +37,10 @@ def fetch_image_list(ep_id, cookie=None):
     return response_data
 
 
-def fetch_image_token(urls, width, cookie=None):
-    # add width info
-    if width is not None:
-        for i in range(len(urls)):
-            urls[i] += "@{}w.jpg".format(width)
+def fetch_image_token(urls, cookie=None):
+    """
+    fetch image token with original size
+    """
     urls = json.dumps(urls)
     try:
         response = requests.post(
@@ -58,11 +57,9 @@ def fetch_image_token(urls, width, cookie=None):
 
 
 def fetch_tokuten(comic_id, cookie=None):
-    # https://manga.bilibili.com/twirp/user.v1.User/GetMyAlbum?device=pc&platform=web
-    # appkey=9f7caa979c66756d&mobi_app=ipad_comic&version=41&build=72&platform=ios&device=pad&buvid=YD4254D8C81066A34EE3ACE22425D44668CA&machine=iPad+Air+4G&access_key=302c023bccab0c30b6a0645143387d11&is_teenager=0&ts=1654225204
     try:
         response = requests.post(
-            BILIBILI_MANGA_ENDPOINT + 'GetComicAlbumPlus?version=41', {"comic_id": comic_id}, cookies=cookie)
+            BILIBILI_MANGA_ENDPOINT + 'GetComicAlbumPlus?version=41&platform=ios', {"comic_id": comic_id}, cookies=cookie)
         response_data = json.loads(response.text)
     except requests.exceptions.RequestException as e:
         response_data = {'code': -1, 'msg': e}
@@ -71,12 +68,13 @@ def fetch_tokuten(comic_id, cookie=None):
     return response_data
 
 
-def fetch_image(url, cookie=None):
+def fetch_image(url, range_start=0, cookie=None):
     try:
-        response = requests.get(url, cookies=cookie)
+        response = requests.get(url, cookies=cookie, stream=True, timeout=10, headers={
+                                "range": "bytes={}-".format(range_start)})
     except requests.exceptions.RequestException as e:
         return None
-    return response.content
+    return response
 
 
 def fetch_image_size(url, cookie=None):
@@ -103,5 +101,27 @@ def fetch_latest_version():
     return {'code': 0, 'version': response['tag_name'], 'detail': response['body'], 'download_url': response['assets'][0]['browser_download_url']}
 
 
+def fetch_video(url, cookie, range_start=0, user_agent="bilibili"):
+    try:
+        response = requests.get(url, cookies=cookie, headers={
+                                "user-agent": user_agent, "range": "bytes={}-".format(range_start)}, timeout=10, stream=True)
+    except requests.exceptions.RequestException as e:
+        return None
+    return response
+
+
+def unlock_tokuten(tokuten_id, cookie):
+    try:
+        response = requests.post(
+            BILIBILI_MANGA_ENDPOINT + 'UnlockComicAlbum?version=41', {"id": tokuten_id}, cookies=cookie)
+    except requests.exceptions.RequestException as e:
+        return False, e
+    return True, ""
+
+
 if __name__ == '__main__':
+    # cookie = read_config_file({"cookie": {}})
+    # response = requests.post('https://manga.bilibili.com/twirp/comic.v1.Comic/BuyEpisode?device=pc&platform=web', {
+    #                          "buy_method": 3, "ep_id": 535464, "pay_amount": 19, "auto_pay_gold_status": 2}, cookies=cookie['cookie'])
+    # print(response.text)
     pass
