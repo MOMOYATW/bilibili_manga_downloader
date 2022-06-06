@@ -4,9 +4,8 @@ from PySide6.QtCore import Signal
 
 class DetailWindowManager():
 
-    def __init__(self, showResultWindow) -> None:
+    def __init__(self) -> None:
         self.record = {}
-        self.showResultWindow = showResultWindow
 
     def __isWindowExist(self, manga_id: str) -> bool:
         """
@@ -20,25 +19,26 @@ class DetailWindowManager():
         """
         return manga_id in self.record
 
-    def createWindow(self, manga_id) -> TaskDetailWindow:
+    def createWindow(self, manga_id):
         """
         Use parse result to create window and add to manager
 
         Parameters:
 
         Returns:
-            A parse result window which created by parse_result
+
         """
         if self.__isWindowExist(manga_id):
             return self.record[manga_id]
-        self.record[manga_id] = TaskDetailWindow(
-            manga_id)
-        self.record[manga_id].searchSignal.connect(
-            self.showResultWindow
+        self.record[manga_id] = TaskDetailWindow(manga_id)
+        self.record[manga_id].createParseSignal.connect(
+            self.createParseSignal
         )
         self.record[manga_id].closedSignal.connect(
-            self.destroyWindow)
-        return self.record[manga_id]
+            self.destroyWindow
+        )
+        self.requestTaskInListSignal(manga_id)
+        self.record[manga_id].show()
 
     def destroyWindow(self, manga_id: str) -> None:
         """
@@ -94,3 +94,9 @@ class DetailWindowManager():
     def updateDetailStatus(self, dict, value):
         if dict[0] in self.record:
             self.record[dict[0]].updateTaskStatus(dict[1], value)
+
+    def createParseSignal(self, parse_result):
+        pass
+
+    def requestTaskInListSignal(self):
+        pass

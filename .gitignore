@@ -8,7 +8,7 @@ imgs/
 mp3/
 style/
 old_version/
-settings.json
+*.json
 *.spec
 *.qrc
 *.qss

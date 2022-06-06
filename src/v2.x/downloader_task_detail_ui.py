@@ -10,7 +10,7 @@ import core
 
 class TaskDetailWindow(WindowsFramelessWindow):
     closedSignal = Signal(int)
-    searchSignal = Signal(dict)
+    createParseSignal = Signal(dict)
 
     def __init__(self, manga_id) -> None:
         super().__init__()
@@ -39,11 +39,11 @@ class TaskDetailWindow(WindowsFramelessWindow):
     def startSearch(self):
         self.searchThread = SearchThread(
             'manga.bilibili.com/detail/mc{}'.format(self.manga_id))
-        self.searchThread.message_signal.connect(lambda msg: print(msg))
+        self.searchThread.msgSignal.connect(lambda msg: print(msg))
         self.searchThread.finished.connect(
             lambda: self.ui.PbParsePage.setDisabled(False))
-        self.searchThread.episodes_result_signal.connect(
-            self.searchSignal.emit)
+        self.searchThread.createParseSignal.connect(
+            self.createParseSignal.emit)
         self.searchThread.start()
 
     def changeIconMaximized(self):

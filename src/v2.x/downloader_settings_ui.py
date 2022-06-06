@@ -7,6 +7,7 @@ from frameless_window import WindowsFramelessWindow
 from downloader_settings_base_ui import Ui_MainWindow
 from check_update_thread import CheckUpdateThread
 import core
+import service
 
 
 class SettingsWindow(WindowsFramelessWindow):
@@ -80,6 +81,7 @@ class SettingsWindow(WindowsFramelessWindow):
         core.CONFIG['max_thread_num'] = self.ui.SbMaxThread.value()
         core.CONFIG['check_update_when_start'] = self.ui.CbCheckUpdateStart.isChecked()
         core.CONFIG['sleep_time'] = self.ui.SbSleepTime.value()
+        service.update_cookie()
         self.close()
 
     def closeEvent(self, event) -> None:

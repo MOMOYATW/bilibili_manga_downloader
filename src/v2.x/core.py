@@ -1,6 +1,7 @@
 import os
 import json
 import sys
+import sources_rc
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtCore import QSize
 
@@ -52,7 +53,7 @@ def save_config_file() -> None:
         f.write(json_str)
 
 
-def loadQss():
+def load_qss():
     global QSS
     # fetch style sheet path
     if getattr(sys, 'frozen', False):
@@ -65,7 +66,7 @@ def loadQss():
         QSS = f.read()
 
 
-def loadResource():
+def load_resource():
     global RESOURCE
     RESOURCE = {}
     RESOURCE['cover'] = {}

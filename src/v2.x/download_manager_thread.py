@@ -6,7 +6,6 @@ import core
 
 
 class DownloadManagerThread(QThread):
-    send_task_signal = Signal(dict)
     feedback_task_signal = Signal(bool, dict)
     update_task_status_signal = Signal(int, str)
     update_task_progress_signal = Signal(int, float)

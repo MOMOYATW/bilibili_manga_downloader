@@ -1,7 +1,9 @@
 from downloader_parse_ui import ParseResultWindow
+from PySide6.QtCore import Signal
 
 
 class ParseWindowManager():
+
     def __init__(self) -> None:
         self.record = {}
 
@@ -17,7 +19,7 @@ class ParseWindowManager():
         """
         return manga_id in self.record
 
-    def createWindow(self, parse_result: dict) -> ParseResultWindow:
+    def createWindow(self, parse_result: dict) -> None:
         """
         Use parse result to create window and add to manager
 
@@ -25,15 +27,17 @@ class ParseWindowManager():
             parse_result - parse result fetch from server
 
         Returns:
-            A parse result window which created by parse_result
+
         """
         if self.__isWindowExist(parse_result['id']):
             return self.record[parse_result['id']]
-        self.record[parse_result['id']] = ParseResultWindow(
-            parse_result)
+        self.record[parse_result['id']] = ParseResultWindow(parse_result)
+        self.record[parse_result['id']].addTaskSignal.connect(
+            self.addTaskSignal)
         self.record[parse_result['id']].closedSignal.connect(
             self.destroyWindow)
-        return self.record[parse_result['id']]
+        self.requestTaskInListSignal(parse_result['id'])
+        self.record[parse_result['id']].show()
 
     def destroyWindow(self, manga_id: str) -> None:
         """
@@ -81,3 +85,9 @@ class ParseWindowManager():
             return
         if dict['info']['id'] in self.record:
             self.record[dict['info']['id']].applyTaskInList(dict)
+
+    def addTaskSignal(self, task_patch):
+        pass
+
+    def requestTaskInListSignal(self, manga_id):
+        pass
