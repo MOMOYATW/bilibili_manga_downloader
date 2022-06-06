@@ -33,7 +33,8 @@ class TaskDetailWindow(WindowsFramelessWindow):
         self.ui.PbParsePage.clicked.connect(self.startSearch)
 
         self.ui.LChapterTitle.setText('下载列表')
-        self.ui.PbStartResumeAll.setText('')
+        self.ui.PbStartResumeAll.setText('全部暂停')
+        self.ui.PbStartResumeAll.setDisabled(True)
         self.ui.PbParsePage.setText('前往漫画')
 
     def startSearch(self):

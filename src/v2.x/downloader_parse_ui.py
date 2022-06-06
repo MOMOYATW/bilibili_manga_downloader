@@ -37,6 +37,7 @@ class ParseResultWindow(WindowsFramelessWindow):
         self.ui.PbDownload.setText('开始下载')
         self.ui.LChapterTitle.setText('章节列表')
         self.ui.PbCancelAll.setText('购买模式')
+        self.ui.PbCancelAll.setDisabled(True)
         self.ui.PbSelectAll.setText('选择全部')
         self.ui.LMangaTitle.setText(self.manga_info['title'])
         self.ui.LAuthor.setText(", ".join(str(i)

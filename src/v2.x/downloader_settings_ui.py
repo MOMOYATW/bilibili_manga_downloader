@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from frameless_window import WindowsFramelessWindow
 from downloader_settings_base_ui import Ui_MainWindow
 from check_update_thread import CheckUpdateThread
+from downloader_login_web_ui import LoginWebWindow
 import core
 import service
 
@@ -27,12 +28,13 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbClose.clicked.connect(self.close)
-        self.ui.LCookie.setText('登录账户Cookie')
+        self.ui.LCookie.setText('账户Cookie')
         self.ui.LDownloadFolder.setText('下载根目录')
         self.ui.LMaxThread.setText('最大下载线程数')
         self.ui.LCheckUpdateStart.setText('启动时检查更新')
         self.ui.LSleepTime.setText('下载间隔时间')
         self.ui.PbSubmit.setText('保存设置')
+        self.ui.PbLogin.setText('自动获取')
         self.ui.LeCookie.setText(json.dumps(core.CONFIG['cookie']))
         self.ui.LeDownloadFolder.setText(core.CONFIG['download_folder'])
         self.ui.SbMaxThread.setValue(core.CONFIG['max_thread_num'])
@@ -44,7 +46,9 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.PbSubmit.clicked.connect(self.submitConfig)
         self.ui.PbCheckUpdate.setText('检查更新')
         self.ui.PbCheckUpdate.clicked.connect(self.checkUpdate)
+        self.ui.PbLogin.clicked.connect(self.showLogin)
         self.check_update_thread = None
+        self.login_window = None
 
     def toggleMaxState(self):
         return
@@ -91,6 +95,16 @@ class SettingsWindow(WindowsFramelessWindow):
         if self.check_update_thread is not None and self.check_update_thread.isRunning():
             self.check_update_thread.terminate()
         event.accept()
+
+    def showLogin(self):
+        if self.login_window is None or not self.login_window.isVisible():
+            self.login_window = LoginWebWindow()
+            self.login_window.cookieSignal.connect(self.updateCookie)
+            self.login_window.show()
+
+    def updateCookie(self, cookie):
+        if 'SESSDATA' in cookie:
+            self.ui.LeCookie.setText(json.dumps(cookie))
 
 
 if __name__ == '__main__':

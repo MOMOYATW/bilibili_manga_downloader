@@ -149,6 +149,17 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_6.addWidget(self.LeCookie)
 
+        self.PbLogin = QPushButton(self.FCookie)
+        self.PbLogin.setObjectName(u"PbLogin")
+        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.PbLogin.sizePolicy().hasHeightForWidth())
+        self.PbLogin.setSizePolicy(sizePolicy3)
+        self.PbLogin.setMinimumSize(QSize(80, 40))
+
+        self.horizontalLayout_6.addWidget(self.PbLogin)
+
 
         self.verticalLayout_2.addWidget(self.FCookie)
 
@@ -206,11 +217,11 @@ class Ui_MainWindow(object):
 
         self.SbMaxThread = QSpinBox(self.FMaxThread)
         self.SbMaxThread.setObjectName(u"SbMaxThread")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.SbMaxThread.sizePolicy().hasHeightForWidth())
-        self.SbMaxThread.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.SbMaxThread.sizePolicy().hasHeightForWidth())
+        self.SbMaxThread.setSizePolicy(sizePolicy4)
         self.SbMaxThread.setMaximumSize(QSize(16777215, 40))
         self.SbMaxThread.setWrapping(False)
         self.SbMaxThread.setAlignment(Qt.AlignCenter)
@@ -243,8 +254,8 @@ class Ui_MainWindow(object):
 
         self.CbCheckUpdateStart = QCheckBox(self.FCheckUpdateStart)
         self.CbCheckUpdateStart.setObjectName(u"CbCheckUpdateStart")
-        sizePolicy3.setHeightForWidth(self.CbCheckUpdateStart.sizePolicy().hasHeightForWidth())
-        self.CbCheckUpdateStart.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.CbCheckUpdateStart.sizePolicy().hasHeightForWidth())
+        self.CbCheckUpdateStart.setSizePolicy(sizePolicy4)
         self.CbCheckUpdateStart.setMaximumSize(QSize(16777215, 40))
         self.CbCheckUpdateStart.setChecked(True)
 
@@ -252,11 +263,11 @@ class Ui_MainWindow(object):
 
         self.PbCheckUpdate = QPushButton(self.FCheckUpdateStart)
         self.PbCheckUpdate.setObjectName(u"PbCheckUpdate")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.PbCheckUpdate.sizePolicy().hasHeightForWidth())
-        self.PbCheckUpdate.setSizePolicy(sizePolicy4)
+        sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.PbCheckUpdate.sizePolicy().hasHeightForWidth())
+        self.PbCheckUpdate.setSizePolicy(sizePolicy5)
         self.PbCheckUpdate.setMinimumSize(QSize(0, 40))
         self.PbCheckUpdate.setMaximumSize(QSize(80, 40))
 
@@ -284,8 +295,8 @@ class Ui_MainWindow(object):
 
         self.SbSleepTime = QSpinBox(self.FSleepTime)
         self.SbSleepTime.setObjectName(u"SbSleepTime")
-        sizePolicy3.setHeightForWidth(self.SbSleepTime.sizePolicy().hasHeightForWidth())
-        self.SbSleepTime.setSizePolicy(sizePolicy3)
+        sizePolicy4.setHeightForWidth(self.SbSleepTime.sizePolicy().hasHeightForWidth())
+        self.SbSleepTime.setSizePolicy(sizePolicy4)
         self.SbSleepTime.setMaximumSize(QSize(16777215, 40))
         self.SbSleepTime.setWrapping(False)
         self.SbSleepTime.setAlignment(Qt.AlignCenter)
@@ -354,6 +365,7 @@ class Ui_MainWindow(object):
         self.PbMinimize.setText("")
         self.PbClose.setText("")
         self.LCookie.setText("")
+        self.PbLogin.setText("")
         self.LDownloadFolder.setText("")
         self.PbSelect.setText("")
         self.LMaxThread.setText("")
