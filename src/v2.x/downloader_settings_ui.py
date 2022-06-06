@@ -81,7 +81,7 @@ class SettingsWindow(WindowsFramelessWindow):
         core.CONFIG['max_thread_num'] = self.ui.SbMaxThread.value()
         core.CONFIG['check_update_when_start'] = self.ui.CbCheckUpdateStart.isChecked()
         core.CONFIG['sleep_time'] = self.ui.SbSleepTime.value()
-        service.update_cookie()
+        service.update_session()
         self.close()
 
     def closeEvent(self, event) -> None:

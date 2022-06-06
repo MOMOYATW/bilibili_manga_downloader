@@ -13,7 +13,7 @@ if __name__ == '__main__':
     core.read_config_file()
     core.load_qss()
     core.load_resource()
-    service.update_cookie()
+    service.update_session()
     widget = MainWindow()
     widget.show()
     sys.exit(app.exec())

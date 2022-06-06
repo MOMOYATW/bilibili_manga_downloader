@@ -1,4 +1,5 @@
-from urllib import response
+import urllib
+import urllib3
 import requests
 import json
 import core
@@ -193,25 +194,29 @@ def unlock_tokuten(tokuten_id):
     return True, ""
 
 
-def update_cookie():
+def update_session():
     """ Apply cookie settings to SESSION """
     SESSION.cookies.update(core.CONFIG['cookie'])
 
+    # system proxy settings will cause error
+    SESSION.trust_env = False
+    system_proxy = urllib.request.getproxies()
+    # correct system proxy manually
+    for key in system_proxy:
+        system_proxy[key] = system_proxy[key].split('//')[1]
+    SESSION.proxies.update(system_proxy)
+    # update user config so can override if necessary
+    SESSION.proxies.update(core.CONFIG['proxy'])
 
-def update_proxy():
-    """ Apply proxy settings to SESSION """
-    SESSION.proxies = core.CONFIG['proxy']
 
 # https://api.bilibili.com/x/web-interface/nav
-
-
 if __name__ == '__main__':
     # cookie = read_config_file({"cookie": {}})
     # response = requests.post('https://manga.bilibili.com/twirp/comic.v1.Comic/BuyEpisode?device=pc&platform=web', {
     #                          "buy_method": 3, "ep_id": 535464, "pay_amount": 19, "auto_pay_gold_status": 2}, cookies=cookie['cookie'])
     # print(response.text)
     core.read_config_file()
-    update_cookie()
+    update_session()
     response = SESSION.get(
-        'https://api.bilibili.com/x/web-interface/nav')
+        'https://www.google.com', timeout=5)
     print(response.text)

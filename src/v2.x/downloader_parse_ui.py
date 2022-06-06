@@ -20,7 +20,7 @@ class ParseResultWindow(WindowsFramelessWindow):
         # set style sheet
         self.setStyleSheet(core.QSS)
 
-        #
+        # init properties
         self.ep_list = parse_result['ep_list']
         self.tokuten = parse_result['tokuten']
         self.manga_info = parse_result
@@ -28,35 +28,43 @@ class ParseResultWindow(WindowsFramelessWindow):
         parse_result['tokuten'].reverse()
         parse_result.pop('ep_list')
         parse_result.pop('tokuten')
+        self.selectable = 0
+        self.selectAllFlag = True
 
+        # set text
         self.setWindowTitle('漫画详情')
         self.ui.LTitle.setText('解析结果')
-        self.setWindowIcon(core.RESOURCE["logo_icon"])
-        self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
-        self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
-        self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
-        self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
-        self.ui.PbClose.clicked.connect(self.close)
-        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
-        self.ui.PbMaximizeRestore.clicked.connect(self.toggleMaxState)
-
+        self.ui.PbDownload.setText('开始下载')
+        self.ui.LChapterTitle.setText('章节列表')
+        self.ui.PbCancelAll.setText('购买模式')
+        self.ui.PbSelectAll.setText('选择全部')
         self.ui.LMangaTitle.setText(self.manga_info['title'])
         self.ui.LAuthor.setText(", ".join(str(i)
                                 for i in self.manga_info['author_name']))
         self.ui.LDescription.setText(self.manga_info['classic_lines'] + '\n')
 
+        # set icons
+        self.setWindowIcon(core.RESOURCE["logo_icon"])
+        self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
+        self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
+        self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
+
+        # connect signals
+        self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
+        self.ui.PbClose.clicked.connect(self.close)
+        self.ui.PbMaximizeRestore.clicked.connect(self.toggleMaxState)
+        self.ui.PbSelectAll.clicked.connect(self.selectCancelAll)
+        self.ui.PbDownload.clicked.connect(self.addToDownloadList)
+        self.ui.LwChapterList.itemSelectionChanged.connect(
+            self.selectChangeHandle)
+
+        # start thread
         self.fetch_thread = FetchThread(self.manga_info['vertical_cover'])
         self.fetch_thread.resoponse_signal.connect(self.loadImage)
         self.fetch_thread.start()
-        self.ui.PbDownload.setText('开始下载')
-        self.ui.LChapterTitle.setText('章节列表')
-        self.ui.PbCancelAll.setText('取消全部')
-        self.ui.PbSelectAll.setText('选择全部')
 
-        self.ui.PbSelectAll.clicked.connect(self.selectAll)
-        self.ui.PbCancelAll.clicked.connect(self.cancelAll)
-        self.ui.PbDownload.clicked.connect(self.addToDownloadList)
-
+        # update ui
         self.ui.LwChapterList.setSelectionMode(
             QAbstractItemView.MultiSelection)
 
@@ -69,6 +77,8 @@ class ParseResultWindow(WindowsFramelessWindow):
                 item.setFlags(item.flags() & Qt.NoItemFlags)
                 item.setText("{} - 漫币：{}".format(item.text(),
                              self.ep_list[i]['pay_gold']))
+            else:
+                self.selectable += 1
             item.setSizeHint(QSize(0, 50))
             self.ui.LwChapterList.addItem(item)
 
@@ -79,6 +89,8 @@ class ParseResultWindow(WindowsFramelessWindow):
 
             if self.tokuten[i]['isLock']:
                 item.setFlags(item.flags() & Qt.NoItemFlags)
+            else:
+                self.selectable += 1
             item.setSizeHint(QSize(0, 50))
             self.ui.LwChapterList.addItem(item)
 
@@ -87,20 +99,29 @@ class ParseResultWindow(WindowsFramelessWindow):
         Cover.loadFromData(content)
         self.ui.LCover.setPixmap(Cover)
 
-    def selectAll(self):
-        """ select all items """
-        for i in range(self.ui.LwChapterList.count()):
-            item = self.ui.LwChapterList.item(i)
-            if item.flags != Qt.NoItemFlags:
-                item.setSelected(True)
-            else:
-                item.setSelected(False)
+    def selectChangeHandle(self):
+        if len(self.ui.LwChapterList.selectedItems()) == self.selectable:
+            self.selectAllFlag = False
+            self.ui.PbSelectAll.setText('取消全部')
+        else:
+            self.selectAllFlag = True
+            self.ui.PbSelectAll.setText('选中全部')
 
-    def cancelAll(self):
-        """ cancel all items """
-        for i in range(self.ui.LwChapterList.count()):
-            item = self.ui.LwChapterList.item(i)
-            item.setSelected(False)
+    def selectCancelAll(self):
+        """
+        Select or cancel all
+        """
+        if self.selectAllFlag:
+            for i in range(self.ui.LwChapterList.count()):
+                item = self.ui.LwChapterList.item(i)
+                if item.flags != Qt.NoItemFlags:
+                    item.setSelected(True)
+                else:
+                    item.setSelected(False)
+        else:
+            for i in range(self.ui.LwChapterList.count()):
+                item = self.ui.LwChapterList.item(i)
+                item.setSelected(False)
 
     def addToDownloadList(self):
         downloaditems = self.manga_info

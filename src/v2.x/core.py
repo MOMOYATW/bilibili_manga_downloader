@@ -11,7 +11,8 @@ DEFAULT_CONFIG = {"cookie": {},
                   "max_thread_num": 1,
                   "check_update_when_start": True,
                   "sleep_time": 1000,
-                  "style": "dark.qss"}
+                  "style": "dark.qss",
+                  "proxy": {}}
 
 
 def read_config_file() -> None:
