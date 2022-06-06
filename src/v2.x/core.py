@@ -5,7 +5,7 @@ import sources_rc
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtCore import QSize
 
-VERSION_TAG = 'v2.1.0'
+VERSION_TAG = 'v2.1.1'
 DEFAULT_CONFIG = {"cookie": {},
                   "download_folder": "./",
                   "max_thread_num": 1,

@@ -23,7 +23,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(517, 600)
+        MainWindow.resize(517, 609)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -120,7 +120,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QVBoxLayout(self.FContentBar)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
-        self.verticalLayout_2.setContentsMargins(-1, 0, -1, 0)
+        self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.FCookie = QFrame(self.FContentBar)
         self.FCookie.setObjectName(u"FCookie")
         self.FCookie.setMinimumSize(QSize(0, 40))
@@ -310,6 +310,33 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_2.addWidget(self.FSleepTime)
 
+        self.FProxy = QFrame(self.FContentBar)
+        self.FProxy.setObjectName(u"FProxy")
+        self.FProxy.setMinimumSize(QSize(0, 40))
+        self.FProxy.setFrameShape(QFrame.StyledPanel)
+        self.FProxy.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_7 = QHBoxLayout(self.FProxy)
+        self.horizontalLayout_7.setSpacing(10)
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.LProxy = QLabel(self.FProxy)
+        self.LProxy.setObjectName(u"LProxy")
+        self.LProxy.setMinimumSize(QSize(100, 0))
+        self.LProxy.setMaximumSize(QSize(100, 16777215))
+
+        self.horizontalLayout_7.addWidget(self.LProxy)
+
+        self.LeProxy = QLineEdit(self.FProxy)
+        self.LeProxy.setObjectName(u"LeProxy")
+        sizePolicy2.setHeightForWidth(self.LeProxy.sizePolicy().hasHeightForWidth())
+        self.LeProxy.setSizePolicy(sizePolicy2)
+        self.LeProxy.setMaximumSize(QSize(16777215, 40))
+
+        self.horizontalLayout_7.addWidget(self.LeProxy)
+
+
+        self.verticalLayout_2.addWidget(self.FProxy)
+
         self.FOperate = QFrame(self.FContentBar)
         self.FOperate.setObjectName(u"FOperate")
         self.FOperate.setMinimumSize(QSize(0, 40))
@@ -377,6 +404,7 @@ class Ui_MainWindow(object):
         self.LSleepTime.setText("")
         self.SbSleepTime.setSuffix(QCoreApplication.translate("MainWindow", u"\u6beb\u79d2", None))
         self.SbSleepTime.setPrefix("")
+        self.LProxy.setText("")
         self.PbSubmit.setText("")
         self.LStatus.setText("")
     # retranslateUi

@@ -47,6 +47,9 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.PbCheckUpdate.setText('检查更新')
         self.ui.PbCheckUpdate.clicked.connect(self.checkUpdate)
         self.ui.PbLogin.clicked.connect(self.showLogin)
+        self.ui.LProxy.setText('设置HTTPS代理')
+        self.ui.LeProxy.setText(
+            core.CONFIG['proxy']['https'] if 'https' in core.CONFIG['proxy'] else "")
         self.check_update_thread = None
         self.login_window = None
 
@@ -94,6 +97,8 @@ class SettingsWindow(WindowsFramelessWindow):
         """
         if self.check_update_thread is not None and self.check_update_thread.isRunning():
             self.check_update_thread.terminate()
+        if self.login_window is not None and self.login_window.isVisible():
+            self.login_window.close()
         event.accept()
 
     def showLogin(self):
