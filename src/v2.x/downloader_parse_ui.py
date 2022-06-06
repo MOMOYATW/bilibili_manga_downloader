@@ -5,19 +5,19 @@ from PySide6.QtWidgets import QApplication, QListWidgetItem, QAbstractItemView
 from fetch_thread import FetchThread
 from frameless_window import WindowsFramelessWindow
 from downloader_parse_base_ui import Ui_MainWindow
+import core
 
 
 class ParseResultWindow(WindowsFramelessWindow):
     addTaskSignal = Signal(dict)
     closedSignal = Signal(int)
 
-    def __init__(self, parse_result, resource={}, qss="") -> None:
+    def __init__(self, parse_result) -> None:
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.resource = resource
-        self.setStyleSheet(qss)
+        self.setStyleSheet(core.QSS)
 
         self.ep_list = parse_result['ep_list']
         self.tokuten = parse_result['tokuten']
@@ -27,15 +27,15 @@ class ParseResultWindow(WindowsFramelessWindow):
         parse_result.pop('ep_list')
         parse_result.pop('tokuten')
 
-        self.setWindowTitle('解析结果')
+        self.setWindowTitle('漫画详情')
         self.ui.LTitle.setText('解析结果')
-        self.setWindowIcon(self.resource["logo_icon"])
-        self.ui.LIcon.setPixmap(self.resource["logo_pixmap"])
-        self.ui.PbMinimize.setIcon(self.resource["minimize_icon"])
-        self.ui.PbClose.setIcon(self.resource["close_icon"])
+        self.setWindowIcon(core.RESOURCE["logo_icon"])
+        self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
+        self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
+        self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbClose.clicked.connect(self.close)
-        self.ui.PbMaximizeRestore.setIcon(self.resource["maximize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
         self.ui.PbMaximizeRestore.clicked.connect(self.toggleMaxState)
 
         self.ui.LMangaTitle.setText(self.manga_info['title'])
@@ -43,8 +43,7 @@ class ParseResultWindow(WindowsFramelessWindow):
                                 for i in self.manga_info['author_name']))
         self.ui.LDescription.setText(self.manga_info['classic_lines'] + '\n')
 
-        self.fetch_thread = FetchThread(
-            self.manga_info['vertical_cover'], None)
+        self.fetch_thread = FetchThread(self.manga_info['vertical_cover'])
         self.fetch_thread.resoponse_signal.connect(self.loadImage)
         self.fetch_thread.start()
         self.ui.PbDownload.setText('开始下载')
@@ -140,11 +139,11 @@ class ParseResultWindow(WindowsFramelessWindow):
 
     def changeIconMaximized(self):
         """ overload function """
-        self.ui.PbMaximizeRestore.setIcon(self.resource["maximize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
 
     def changeIconNormalized(self):
         """ overload function """
-        self.ui.PbMaximizeRestore.setIcon(self.resource["restore_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["restore_icon"])
 
     def closeEvent(self, event) -> None:
         # check if thread is running

@@ -2,6 +2,7 @@ from PySide6.QtCore import QThread, Signal
 from download_thread import DownloadThread
 import os
 import re
+import core
 
 
 class DownloadManagerThread(QThread):
@@ -14,17 +15,16 @@ class DownloadManagerThread(QThread):
     update_detail_progress_signal = Signal(dict, float)
     update_detail_status_signal = Signal(dict, str)
 
-    def __init__(self, config) -> None:
+    def __init__(self) -> None:
         super(DownloadManagerThread, self).__init__()
         self.finished_task = []
         self.running_thread = []
         self.pending_task = []
         self.resume_task = []
         self.task_dict = {}
-        self.config = config
 
     def dispatch(self):
-        while len(self.running_thread) < self.config['max_thread_num'] and len(self.pending_task) > 0:
+        while len(self.running_thread) < core.CONFIG['max_thread_num'] and len(self.pending_task) > 0:
             latest_task_index = self.pending_task.pop(0)
             latest_task = self.task_dict[latest_task_index[0]
                                          ][latest_task_index[1]]
@@ -40,7 +40,7 @@ class DownloadManagerThread(QThread):
                     latest_task['item']['title'], latest_task['item']['detail']
                 )
             episode_folder = re.sub('[\/:*?"<>|]', '_', episode_folder.strip())
-            self.running_thread.append(DownloadThread(latest_task_index, self.config, os.path.join(
+            self.running_thread.append(DownloadThread(latest_task_index, os.path.join(
                 manga_folder, episode_folder), latest_task))
             self.running_thread[-1].finished_signal.connect(
                 self.removeFinishedThread)

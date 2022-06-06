@@ -4,12 +4,9 @@ from PySide6.QtCore import Signal
 
 class DetailWindowManager():
 
-    def __init__(self, resource, qss, config, showResultWindow) -> None:
+    def __init__(self, showResultWindow) -> None:
         self.record = {}
-        self.resource = resource
-        self.qss = qss
         self.showResultWindow = showResultWindow
-        self.config = config
 
     def __isWindowExist(self, manga_id: str) -> bool:
         """
@@ -35,7 +32,7 @@ class DetailWindowManager():
         if self.__isWindowExist(manga_id):
             return self.record[manga_id]
         self.record[manga_id] = TaskDetailWindow(
-            manga_id, self.resource, self.qss, self.config)
+            manga_id)
         self.record[manga_id].searchSignal.connect(
             self.showResultWindow
         )

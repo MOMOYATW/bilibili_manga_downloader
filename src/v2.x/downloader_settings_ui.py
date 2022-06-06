@@ -6,26 +6,24 @@ from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from frameless_window import WindowsFramelessWindow
 from downloader_settings_base_ui import Ui_MainWindow
 from check_update_thread import CheckUpdateThread
+import core
 
 
 class SettingsWindow(WindowsFramelessWindow):
-    update_settings_signal = Signal(dict)
 
-    def __init__(self, resource={}, qss="", config={}) -> None:
+    def __init__(self) -> None:
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.resource = resource
-        self.setStyleSheet(qss)
-        self.config = config
+        self.setStyleSheet(core.QSS)
 
         self.ui.LTitle.setText('设置')
         self.setWindowTitle('设置')
-        self.setWindowIcon(self.resource["logo_icon"])
-        self.ui.LIcon.setPixmap(self.resource["logo_pixmap"])
-        self.ui.PbMinimize.setIcon(self.resource["minimize_icon"])
-        self.ui.PbClose.setIcon(self.resource["close_icon"])
+        self.setWindowIcon(core.RESOURCE["logo_icon"])
+        self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
+        self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
+        self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbClose.clicked.connect(self.close)
         self.ui.LCookie.setText('登录账户Cookie')
@@ -34,13 +32,13 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.LCheckUpdateStart.setText('启动时检查更新')
         self.ui.LSleepTime.setText('下载间隔时间')
         self.ui.PbSubmit.setText('保存设置')
-        self.ui.LeCookie.setText(json.dumps(self.config['cookie']))
-        self.ui.LeDownloadFolder.setText(self.config['download_folder'])
-        self.ui.SbMaxThread.setValue(self.config['max_thread_num'])
+        self.ui.LeCookie.setText(json.dumps(core.CONFIG['cookie']))
+        self.ui.LeDownloadFolder.setText(core.CONFIG['download_folder'])
+        self.ui.SbMaxThread.setValue(core.CONFIG['max_thread_num'])
         self.ui.CbCheckUpdateStart.setChecked(
-            self.config['check_update_when_start'])
-        self.ui.SbSleepTime.setValue(self.config['sleep_time'])
-        self.ui.PbSelect.setIcon(self.resource['open_icon'])
+            core.CONFIG['check_update_when_start'])
+        self.ui.SbSleepTime.setValue(core.CONFIG['sleep_time'])
+        self.ui.PbSelect.setIcon(core.RESOURCE['open_icon'])
         self.ui.PbSelect.clicked.connect(self.selectPath)
         self.ui.PbSubmit.clicked.connect(self.submitConfig)
         self.ui.PbCheckUpdate.setText('检查更新')
@@ -77,12 +75,11 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.LeDownloadFolder.setText(dir)
 
     def submitConfig(self):
-        self.config['cookie'] = json.loads(self.ui.LeCookie.text())
-        self.config['download_folder'] = self.ui.LeDownloadFolder.text()
-        self.config['max_thread_num'] = self.ui.SbMaxThread.value()
-        self.config['check_update_when_start'] = self.ui.CbCheckUpdateStart.isChecked()
-        self.config['sleep_time'] = self.ui.SbSleepTime.value()
-        self.update_settings_signal.emit(self.config)
+        core.CONFIG['cookie'] = json.loads(self.ui.LeCookie.text())
+        core.CONFIG['download_folder'] = self.ui.LeDownloadFolder.text()
+        core.CONFIG['max_thread_num'] = self.ui.SbMaxThread.value()
+        core.CONFIG['check_update_when_start'] = self.ui.CbCheckUpdateStart.isChecked()
+        core.CONFIG['sleep_time'] = self.ui.SbSleepTime.value()
         self.close()
 
     def closeEvent(self, event) -> None:

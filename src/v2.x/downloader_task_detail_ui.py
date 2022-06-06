@@ -5,31 +5,30 @@ from frameless_window import WindowsFramelessWindow
 from downloader_task_detail_base_ui import Ui_MainWindow
 from downloader_task_item_ui import DownloadTaskItem
 from search_thread import SearchThread
+import core
 
 
 class TaskDetailWindow(WindowsFramelessWindow):
     closedSignal = Signal(int)
     searchSignal = Signal(dict)
 
-    def __init__(self, manga_id, resource={}, qss="", config={}) -> None:
+    def __init__(self, manga_id) -> None:
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        self.resource = resource
-        self.setStyleSheet(qss)
-        self.config = config
+        self.setStyleSheet(core.QSS)
         self.manga_id = manga_id
         self.list = {}
         self.setWindowTitle('任务详情')
         self.ui.LTitle.setText('任务详情')
-        self.setWindowIcon(self.resource["logo_icon"])
-        self.ui.LIcon.setPixmap(self.resource["logo_pixmap"])
-        self.ui.PbMinimize.setIcon(self.resource["minimize_icon"])
-        self.ui.PbClose.setIcon(self.resource["close_icon"])
+        self.setWindowIcon(core.RESOURCE["logo_icon"])
+        self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
+        self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
+        self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbClose.clicked.connect(self.close)
-        self.ui.PbMaximizeRestore.setIcon(self.resource["maximize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
         self.ui.PbMaximizeRestore.clicked.connect(self.toggleMaxState)
         self.ui.PbParsePage.clicked.connect(self.startSearch)
 
@@ -39,7 +38,7 @@ class TaskDetailWindow(WindowsFramelessWindow):
 
     def startSearch(self):
         self.searchThread = SearchThread(
-            'manga.bilibili.com/detail/mc{}'.format(self.manga_id), {'cookie': self.config['cookie']})
+            'manga.bilibili.com/detail/mc{}'.format(self.manga_id))
         self.searchThread.message_signal.connect(lambda msg: print(msg))
         self.searchThread.finished.connect(
             lambda: self.ui.PbParsePage.setDisabled(False))
@@ -49,11 +48,11 @@ class TaskDetailWindow(WindowsFramelessWindow):
 
     def changeIconMaximized(self):
         """ overload function """
-        self.ui.PbMaximizeRestore.setIcon(self.resource["maximize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
 
     def changeIconNormalized(self):
         """ overload function """
-        self.ui.PbMaximizeRestore.setIcon(self.resource["restore_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["restore_icon"])
 
     def closeEvent(self, event) -> None:
         self.closedSignal.emit(self.manga_id)
@@ -70,7 +69,7 @@ class TaskDetailWindow(WindowsFramelessWindow):
                 continue
             download_task_item = DownloadTaskItem(self.list[i], total=False)
             download_task_item.updateTaskCover(
-                self.resource['cover'][self.manga_id])
+                core.RESOURCE['cover'][self.manga_id])
             item = QListWidgetItem()
             item.setSizeHint(download_task_item.sizeHint())
             self.ui.LwChapterList.addItem(item)

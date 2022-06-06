@@ -1,20 +1,19 @@
-import sys
 import os
+import sys
+import core
 import sources_rc
-from PySide6.QtCore import QSize
-from PySide6.QtGui import QPixmap, QIcon
+from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QApplication, QLineEdit, QListWidgetItem, QMessageBox
 from fetch_thread import FetchThread
 from search_thread import SearchThread
+from check_update_thread import CheckUpdateThread
+from download_manager_thread import DownloadManagerThread
+from parse_window_manager import ParseWindowManager
+from detail_window_manager import DetailWindowManager
 from frameless_window import WindowsFramelessWindow
 from downloader_main_base_ui import Ui_MainWindow
 from downloader_settings_ui import SettingsWindow
 from downloader_task_item_ui import DownloadTaskItem
-from core import read_config_file, save_config_file, VERSION_TAG
-from check_update_thread import CheckUpdateThread
-from parse_window_manager import ParseWindowManager
-from download_manager_thread import DownloadManagerThread
-from detail_window_manager import DetailWindowManager
 
 
 class MainWindow(WindowsFramelessWindow):
@@ -22,27 +21,19 @@ class MainWindow(WindowsFramelessWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.setStyleSheet(core.QSS)
 
-        self.config = read_config_file({"cookie": {},
-                                        "download_folder": "./",
-                                        "max_thread_num": 1,
-                                        "check_update_when_start": True,
-                                        "sleep_time": 1000,
-                                        "style": "dark.qss"})
-
-        self.loadResources()
-
-        self.ui.LTitle.setText('哔哩哔哩漫画下载器 {}'.format(VERSION_TAG))
-        self.setWindowTitle('哔哩哔哩漫画下载器 {}'.format(VERSION_TAG))
-        self.setWindowIcon(self.resource["logo_icon"])
-        self.ui.LIcon.setPixmap(self.resource["logo_pixmap"])
-        self.ui.PbMinimize.setIcon(self.resource["minimize_icon"])
-        self.ui.PbMaximizeRestore.setIcon(self.resource["maximize_icon"])
-        self.ui.PbClose.setIcon(self.resource["close_icon"])
+        self.ui.LTitle.setText('哔哩哔哩漫画下载器 {}'.format(core.VERSION_TAG))
+        self.setWindowTitle('哔哩哔哩漫画下载器 {}'.format(core.VERSION_TAG))
+        self.setWindowIcon(core.RESOURCE["logo_icon"])
+        self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
+        self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
+        self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
         self.search_btn = self.ui.LeSearchBar.addAction(
-            self.resource["search_icon"], QLineEdit.TrailingPosition)
+            core.RESOURCE["search_icon"], QLineEdit.TrailingPosition)
         self.search_btn.triggered.connect(self.startSearch)
-        self.ui.PbSettings.setIcon(self.resource["settings_icon"])
+        self.ui.PbSettings.setIcon(core.RESOURCE["settings_icon"])
         self.ui.LeSearchBar.setPlaceholderText("输入关键词搜索或者输入网址进行解析")
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbMaximizeRestore.clicked.connect(self.toggleMaxState)
@@ -52,7 +43,7 @@ class MainWindow(WindowsFramelessWindow):
         self.ui.LeSearchBar.returnPressed.connect(self.startSearch)
         self.ui.PbSettings.clicked.connect(self.showSettings)
 
-        if self.config['check_update_when_start']:
+        if core.CONFIG['check_update_when_start']:
             self.check_update_thread = CheckUpdateThread()
             self.check_update_thread.result_signal.connect(
                 self.showCheckResult)
@@ -62,11 +53,10 @@ class MainWindow(WindowsFramelessWindow):
         self.searchThread = None
         self.taskDetail = None
 
-        self.parseWindowManager = ParseWindowManager(self.resource, self.qss)
-        self.detailWindowManager = DetailWindowManager(
-            self.resource, self.qss, self.config, self.showResultWindow)
+        self.parseWindowManager = ParseWindowManager()
+        self.detailWindowManager = DetailWindowManager(self.showResultWindow)
         self.settingsWindow = None
-        self.downloadManagerThread = DownloadManagerThread(self.config)
+        self.downloadManagerThread = DownloadManagerThread()
         self.downloadManagerThread.send_task_signal.connect(
             self.downloadManagerThread.createDownloadTasks)
         self.downloadManagerThread.feedback_task_signal.connect(
@@ -90,55 +80,6 @@ class MainWindow(WindowsFramelessWindow):
         )
         self.downloadManagerThread.start()
 
-    def loadResources(self):
-        """ Load all resources """
-        # fetch style sheet path
-        if getattr(sys, 'frozen', False):
-            base_path = sys._MEIPASS
-        else:
-            base_path = "./"
-        styleFile = os.path.join(base_path, self.config['style'])
-        # set style sheet
-        with open(styleFile, 'r') as f:
-            self.qss = f.read()
-            self.setStyleSheet(self.qss)
-
-        # load from sources_rc
-        self.resource = {}
-        self.resource['cover'] = {}
-        self.resource["logo_pixmap"] = QPixmap(
-            QPixmap(u":/imgs/icon.png"))
-        self.resource["logo_icon"] = QIcon()
-        self.resource["logo_icon"].addFile(
-            u":/imgs/icon.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["close_icon"] = QIcon()
-        self.resource["close_icon"].addFile(
-            u":/imgs/close.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["minimize_icon"] = QIcon()
-        self.resource["minimize_icon"].addFile(
-            u":/imgs/minimize.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["maximize_icon"] = QIcon()
-        self.resource["maximize_icon"].addFile(
-            u":/imgs/maximize.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["restore_icon"] = QIcon()
-        self.resource["restore_icon"].addFile(
-            u":/imgs/windowed.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["search_icon"] = QIcon()
-        self.resource["search_icon"].addFile(
-            u":/imgs/search.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["settings_icon"] = QIcon()
-        self.resource["settings_icon"].addFile(
-            u":/imgs/settings.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["play_icon"] = QIcon()
-        self.resource["play_icon"].addFile(
-            u":/imgs/start.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["pause_icon"] = QIcon()
-        self.resource["pause_icon"].addFile(
-            u":/imgs/pause.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.resource["open_icon"] = QIcon()
-        self.resource["open_icon"].addFile(
-            u":/imgs/open.png", QSize(), QIcon.Normal, QIcon.Off)
-
     def showCheckResult(self, new, detail):
         if new:
             QMessageBox(QMessageBox.Information, '检测到新版本', '版本{}现已发布,\n{}\n'.format(
@@ -151,7 +92,7 @@ class MainWindow(WindowsFramelessWindow):
         # get content in lineedit
         search_content = self.ui.LeSearchBar.text()
         # start thread
-        self.searchThread = SearchThread(search_content, self.config)
+        self.searchThread = SearchThread(search_content)
         self.searchThread.message_signal.connect(lambda msg: print(msg))
         # self.searchThread.single_result_signal.connect(
         #     self.addDownloadTask)
@@ -184,22 +125,16 @@ class MainWindow(WindowsFramelessWindow):
     def showSettings(self):
         """ Open settings window """
         if self.settingsWindow is None or not self.settingsWindow.isVisible():
-            self.settingsWindow = SettingsWindow(
-                self.resource, self.qss, self.config)
-            self.settingsWindow.update_settings_signal.connect(
-                self.updateConfig)
+            self.settingsWindow = SettingsWindow()
         self.settingsWindow.show()
-
-    def updateConfig(self, config):
-        self.config = config
 
     def changeIconMaximized(self):
         """ overload function """
-        self.ui.PbMaximizeRestore.setIcon(self.resource["maximize_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
 
     def changeIconNormalized(self):
         """ overload function """
-        self.ui.PbMaximizeRestore.setIcon(self.resource["restore_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["restore_icon"])
 
     def deleteTask(self):
         pass
@@ -218,7 +153,7 @@ class MainWindow(WindowsFramelessWindow):
     def insertRowInTable(self, manga_task):
         manga_id = manga_task['info']['id']
         cover_url = manga_task['info']['horizontal_cover']
-        self.loadThread[manga_id] = FetchThread(cover_url, None)
+        self.loadThread[manga_id] = FetchThread(cover_url)
         self.loadThread[manga_id].resoponse_signal.connect(
             lambda content: self.loadImage(content, manga_id))
         self.loadThread[manga_id].start()
@@ -257,7 +192,7 @@ class MainWindow(WindowsFramelessWindow):
     def loadImage(self, content, manga_id):
         cover = QPixmap()
         cover.loadFromData(content)
-        self.resource['cover'][manga_id] = cover
+        core.RESOURCE['cover'][manga_id] = cover
         for i in range(self.ui.LwTaskList.count()):
             item = self.ui.LwTaskList.item(i)
             widget = self.ui.LwTaskList.itemWidget(item)
@@ -276,7 +211,6 @@ class MainWindow(WindowsFramelessWindow):
         if self.settingsWindow is not None:
             self.settingsWindow.close()
         self.parseWindowManager.closeAll()
-        save_config_file(self.config)
         sys.exit(0)
 
 

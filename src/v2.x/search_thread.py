@@ -9,10 +9,9 @@ class SearchThread(QThread):
     single_result_signal = Signal(dict)
     keyword_result_signal = Signal(dict)
 
-    def __init__(self, search_content, config) -> None:
+    def __init__(self, search_content) -> None:
         super(SearchThread, self).__init__()
         self.search_content = search_content
-        self.config = config
 
     def run(self):
         # parse search content
@@ -26,14 +25,14 @@ class SearchThread(QThread):
             r'manga.bilibili.com/detail/mc[0-9]*', self.search_content)
         if len(manga_id) != 0:
             manga_id = int(manga_id[0].split('/')[2][2:])
-            manga_detail = fetch_manga_detail(manga_id, self.config['cookie'])
+            manga_detail = fetch_manga_detail(manga_id)
             if manga_detail['code'] != 0:
                 self.message_signal.emit('搜索失败,{}'.format(manga_detail['msg']))
                 manga_detail['data'] = {}
                 return
 
             # issue #2 parse tokuten
-            tokuten = fetch_tokuten(manga_id, self.config['cookie'])
+            tokuten = fetch_tokuten(manga_id)
             if tokuten['code'] != 0:
                 self.message_signal.emit('特典获取失败,{}'.format(tokuten['msg']))
                 tokuten['data'] = {'list': []}
@@ -47,7 +46,7 @@ class SearchThread(QThread):
         if len(manga_episode_id) != 0:
             manga_id = int(manga_episode_id[0].split('/')[1][2:])
             episode_id = int(manga_episode_id[0].split('/')[2])
-            manga_detail = fetch_manga_detail(manga_id, self.config['cookie'])
+            manga_detail = fetch_manga_detail(manga_id)
             if manga_detail['code'] != 0:
                 self.message_signal.emit('搜索失败,{}'.format(manga_detail['msg']))
             # find episode
@@ -69,7 +68,7 @@ class SearchThread(QThread):
         # case 3: 迦希大人不气馁！
         # search keyword
         keyword = self.search_content
-        keyword_result = fetch_search_list(keyword, self.config['cookie'])
+        keyword_result = fetch_search_list(keyword)
         if keyword_result['code'] != 0:
             self.message_signal.emit('搜索失败,{}'.format(keyword_result['msg']))
         else:

@@ -5,15 +5,14 @@ from service import fetch_image
 class FetchThread(QThread):
     resoponse_signal = Signal(bytes)
 
-    def __init__(self, url, cookie) -> None:
+    def __init__(self, url) -> None:
         super(FetchThread, self).__init__()
-        self.cookie = cookie
         self.url = url
 
     def run(self):
         # safe fetch
 
-        response = fetch_image(self.url, cookie=self.cookie)
+        response = fetch_image(self.url)
         if response is None:
             self.resoponse_signal.emit(b"")
             return

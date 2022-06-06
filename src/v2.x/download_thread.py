@@ -2,15 +2,14 @@ import os
 from urllib import response
 from PySide6.QtCore import QThread, Signal
 from service import fetch_image_list, fetch_image_token, fetch_image, fetch_video
-
+import core
 
 class DownloadThread(QThread):
     update_signal = Signal(list, float)
     finished_signal = Signal(list)
 
-    def __init__(self, index, config, download_path, task) -> None:
+    def __init__(self, index, download_path, task) -> None:
         super(DownloadThread, self).__init__()
-        self.config = config
         self.index = index
         self.download_path = download_path
         self.task = task
@@ -21,11 +20,11 @@ class DownloadThread(QThread):
         """ Download images to file """
         # check if download path is exist
         curr_download_folder = os.path.join(
-            self.config['download_folder'], self.download_path)
+            core.CONFIG['download_folder'], self.download_path)
         if not os.path.exists(curr_download_folder):
             os.makedirs(curr_download_folder)
         if self.task['type'] == 'honpen':
-            img_list = fetch_image_list(self.index[1], self.config['cookie'])
+            img_list = fetch_image_list(self.index[1])
             if img_list['code'] != 0:
                 # handle error
                 print('获取图像列表时出错\nDetail:{}'.format(img_list['msg']))
@@ -52,7 +51,7 @@ class DownloadThread(QThread):
 
                 # save image to local file
                 content = fetch_image(
-                    "{}?token={}".format(url, token), range_start=data_count, cookie=self.config['cookie'])
+                    "{}?token={}".format(url, token), range_start=data_count)
                 if content is None:
                     self.err_log.append([self.index, i])
                     continue
@@ -77,7 +76,7 @@ class DownloadThread(QThread):
                         self.update_signal.emit(self.index,
                                                 ((len(data) /
                                                  content_size) if content_size > 0 else 0) / len(img_list['data']['images']))
-                QThread.msleep(self.config['sleep_time'])
+                QThread.msleep(core.CONFIG['sleep_time'])
         elif self.task['type'] == 'tokuten':
             # if tokuten is image set
             if len(self.task['item']['pic']) != 0:
@@ -93,7 +92,7 @@ class DownloadThread(QThread):
 
                     # save image to local file
                     content = fetch_image(
-                        image, range_start=data_count, cookie=self.config['cookie'])
+                        image, range_start=data_count)
                     if content is None:
                         self.err_log.append([self.index, i])
                         continue
@@ -118,7 +117,7 @@ class DownloadThread(QThread):
                             self.update_signal.emit(
                                 self.index, ((len(data) /
                                              content_size) if content_size > 0 else 0) / len(self.task['item']['pic']))
-                    QThread.msleep(self.config['sleep_time'])
+                    QThread.msleep(core.CONFIG['sleep_time'])
             else:
                 # currently it must be video type
                 # get suffix
@@ -131,7 +130,7 @@ class DownloadThread(QThread):
                 if os.path.exists(download_path):
                     data_count = os.path.getsize(download_path)
                 content = fetch_video(
-                    self.task['item']['video']['url'], self.config['cookie'], data_count)
+                    self.task['item']['video']['url'], data_count)
                 if content is None:
                     self.err_log.append([self.index, 0])
                     return

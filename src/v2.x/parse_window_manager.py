@@ -2,10 +2,8 @@ from downloader_parse_ui import ParseResultWindow
 
 
 class ParseWindowManager():
-    def __init__(self, resource, qss) -> None:
+    def __init__(self) -> None:
         self.record = {}
-        self.resource = resource
-        self.qss = qss
 
     def __isWindowExist(self, manga_id: str) -> bool:
         """
@@ -32,7 +30,7 @@ class ParseWindowManager():
         if self.__isWindowExist(parse_result['id']):
             return self.record[parse_result['id']]
         self.record[parse_result['id']] = ParseResultWindow(
-            parse_result, self.resource, self.qss)
+            parse_result)
         self.record[parse_result['id']].closedSignal.connect(
             self.destroyWindow)
         return self.record[parse_result['id']]

@@ -1,4 +1,5 @@
 import sys
+import core
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import QApplication, QWidget
 from downloader_task_item_base_ui import Ui_Form
@@ -7,13 +8,12 @@ from downloader_task_item_base_ui import Ui_Form
 class DownloadTaskItem(QWidget):
     double_click_signal = Signal(int)
 
-    def __init__(self, task_info, resource={}, qss="", total=True) -> None:
+    def __init__(self, task_info, total=True) -> None:
         super().__init__()
         self.ui = Ui_Form()
         self.ui.setupUi(self)
 
-        self.resource = resource
-        self.setStyleSheet(qss)
+        self.setStyleSheet(core.QSS)
         self.total = total
         if total:
             self.manga_id = task_info['info']['id']
@@ -73,12 +73,4 @@ if __name__ == '__main__':
     """
     create and show window
     """
-    app = QApplication(sys.argv)
-    styleFile = './style.qss'
-    # set style sheet
-    with open(styleFile, 'r') as f:
-        qss = f.read()
-    widget = DownloadTaskItem(qss=qss)
-    widget.show()
-
-    sys.exit(app.exec())
+    pass
