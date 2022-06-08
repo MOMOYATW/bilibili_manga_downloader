@@ -5,7 +5,6 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/total.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/releases)
 
 ## 2.0 版本大升级
-## 下载量突破300，继续更新。
 
 ### 软件界面
 
