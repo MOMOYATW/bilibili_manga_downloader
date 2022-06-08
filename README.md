@@ -1,5 +1,3 @@
-# 下载量突破300，继续更新。
-
 # 基于现代 GUI 的哔哩哔哩(bilibili)漫画下载器
 
 [![GitHub release](https://img.shields.io/github/release/MOMOYATW/bilibili_manga_downloader.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest)
@@ -7,6 +5,7 @@
 [![GitHub downloads](https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/total.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/releases)
 
 ## 2.0 版本大升级
+## 下载量突破300，继续更新。
 
 ### 软件界面
 
