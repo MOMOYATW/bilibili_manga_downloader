@@ -24,6 +24,8 @@ class DownloadThread(QThread):
         if img_list['code'] != 0:
             # handle error
             print('获取图像列表时出错\nDetail:{}'.format(img_list['msg']))
+            self.err_log.append(img_list['msg'])
+            self.finished_signal.emit(self.index)
             return
 
         # iterate over image list
@@ -33,6 +35,7 @@ class DownloadThread(QThread):
             if img_token['code'] != 0:
                 # handle error
                 print('获取图像token信息时出错\nDetail:{}'.format(img_token['msg']))
+                self.err_log.append(img_token['msg'])
                 continue
             token = img_token['data'][0]['token']
             url = img_token['data'][0]['url']

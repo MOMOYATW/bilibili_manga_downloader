@@ -12,6 +12,8 @@ from frameless_window import WindowsFramelessWindow
 from downloader_main_base_ui import Ui_MainWindow
 from downloader_settings_ui import SettingsWindow
 from downloader_task_item_ui import DownloadTaskItem
+from dark_listener_thread import DarkListenerThread
+import darkdetect
 
 
 class MainWindow(WindowsFramelessWindow):
@@ -21,6 +23,12 @@ class MainWindow(WindowsFramelessWindow):
         self.ui.setupUi(self)
 
         # set style sheet
+        # check if auto set
+        if core.CONFIG['style_change_with_system']:
+            if darkdetect.theme() == "Dark":
+                core.set_config({'style': 'dark.qss'})
+            else:
+                core.set_config({'style': 'light.qss'})
         self.setStyleSheet(core.QSS)
 
         # set ui text
@@ -58,6 +66,12 @@ class MainWindow(WindowsFramelessWindow):
         # threads
         self.loadThread = {}        # can load multiple image at same time
         self.searchThread = None    # can only search once a time
+        self.darkListenerThread = None
+        self.darkListenerThread = DarkListenerThread()
+        self.darkListenerThread.start()
+        if core.CONFIG['style_change_with_system']:
+            self.darkListenerThread.themeChangedSignal.connect(
+                self.themeChangedHandler)
 
         # windows
         self.parseWindowManager = ParseWindowManager()
@@ -114,6 +128,13 @@ class MainWindow(WindowsFramelessWindow):
         self.searchThread.finished.connect(self.__toggleSearchBar)
         self.searchThread.start()
 
+    def themeChangedHandler(self, theme):
+        if theme == "Dark":
+            core.set_config({'style': 'dark.qss'})
+        else:
+            core.set_config({'style': 'light.qss'})
+        self.updateSettings()
+
     def __toggleSearchBar(self):
         """ Enable or disable the search bar """
         if self.ui.LeSearchBar.isEnabled():
@@ -137,7 +158,22 @@ class MainWindow(WindowsFramelessWindow):
         """ Open settings window """
         if self.settingsWindow is None or not self.settingsWindow.isVisible():
             self.settingsWindow = SettingsWindow()
+            self.settingsWindow.updateSettingsSignal.connect(
+                self.updateSettings)
         self.settingsWindow.show()
+
+    def updateSettings(self):
+        self.setStyleSheet(core.QSS)
+        self.parseWindowManager.updateSettings()
+        self.detailWindowManager.updateSettings()
+        self.downloadManagerThread.dispatch()
+        if self.settingsWindow is not None:
+            self.settingsWindow.updateSettings()
+        if not core.CONFIG['style_change_with_system']:
+            self.darkListenerThread.themeChangedSignal.connect(None)
+        else:
+            self.darkListenerThread.themeChangedSignal.connect(
+                self.themeChangedHandler)
 
     def changeIconMaximized(self):
         """ overload function """
@@ -222,6 +258,7 @@ class MainWindow(WindowsFramelessWindow):
         if self.searchThread is not None and self.searchThread.isRunning():
             self.searchThread.terminate()
         self.downloadManagerThread.terminate()
+        self.darkListenerThread.terminate()
 
         # close all window
         if self.settingsWindow is not None:

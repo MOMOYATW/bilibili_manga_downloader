@@ -1,6 +1,7 @@
 import sys
 import os
 import json
+from PySide6.QtCore import Signal
 from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 from frameless_window import WindowsFramelessWindow
 from downloader_settings_base_ui import Ui_MainWindow
@@ -11,6 +12,7 @@ import service
 
 
 class SettingsWindow(WindowsFramelessWindow):
+    updateSettingsSignal = Signal()
 
     def __init__(self) -> None:
         super().__init__()
@@ -45,7 +47,7 @@ class SettingsWindow(WindowsFramelessWindow):
         self.ui.LProxy.setText('设置HTTPS代理')
         self.ui.LAppName.setText('哔哩哔哩漫画下载器')
         self.ui.LVersion.setText(core.VERSION_TAG)
-        self.ui.LStyle.setText('主题(重启生效)')
+        self.ui.LStyle.setText('颜色主题')
         self.ui.LPathFormat.setText('下载路径格式')
         self.ui.LTokutenPathFormat.setText('特典路径格式')
         self.ui.LGithub.setText(
@@ -156,12 +158,13 @@ class SettingsWindow(WindowsFramelessWindow):
         config['sleep_time'] = self.ui.SbSleepTime.value()
         config['style'] = list(core.STYLE_CHOICE.keys())[list(
             core.STYLE_CHOICE.values()).index(self.ui.CbStyle.currentText())]
-        config['proxy'] = {"https:": self.ui.LeProxy.text(
+        config['proxy'] = {"https": self.ui.LeProxy.text(
         )} if self.ui.LeProxy.text() != "" else {}
         config['path_format'] = self.ui.LePathFormat.text()
         config['tokuten_path_format'] = self.ui.LeTokutenPathFormat.text()
         core.set_config(config)
         service.update_session()
+        self.updateSettingsSignal.emit()
         self.close()
 
     def closeEvent(self, event) -> None:
@@ -190,6 +193,9 @@ class SettingsWindow(WindowsFramelessWindow):
         # if SESSDATA in cookie then success
         if 'SESSDATA' in cookie:
             self.ui.LeCookie.setText(json.dumps(cookie))
+
+    def updateSettings(self):
+        self.setStyleSheet(core.QSS)
 
 
 if __name__ == '__main__':

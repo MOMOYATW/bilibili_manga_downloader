@@ -37,7 +37,7 @@ class DownloadTaskItem(QWidget):
             elif task_info['status'] == 'finished':
                 self.ui.LItemStatus.setText('已完成')
             else:
-                self.ui.LItemStatus.setText('部分失败')
+                self.ui.LItemStatus.setText('失败')
             self.ui.LItemCount.setText('')
             self.ui.PbProgress.setValue(task_info['progress'] * 100)
 

@@ -102,3 +102,7 @@ class DetailWindowManager():
         Signal to override
         """
         pass
+
+    def updateSettings(self):
+        for window in self.record.values():
+            window.updateSettings()

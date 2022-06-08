@@ -98,6 +98,8 @@ class TaskDetailWindow(WindowsFramelessWindow):
         widget = self.ui.LwChapterList.itemWidget(item)
         widget.updateTaskStatus(status)
 
+    def updateSettings(self):
+        self.setStyleSheet(core.QSS)
 
 if __name__ == '__main__':
     """

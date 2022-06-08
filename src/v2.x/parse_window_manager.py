@@ -91,3 +91,7 @@ class ParseWindowManager():
 
     def requestTaskInListSignal(self, manga_id):
         pass
+
+    def updateSettings(self):
+        for window in self.record.values():
+            window.updateSettings()

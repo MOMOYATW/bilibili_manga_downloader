@@ -177,6 +177,8 @@ class ParseResultWindow(WindowsFramelessWindow):
         self.closedSignal.emit(self.manga_info['id'])
         event.accept()
 
+    def updateSettings(self):
+        self.setStyleSheet(core.QSS)
 
 if __name__ == '__main__':
     """

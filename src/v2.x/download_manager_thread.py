@@ -185,8 +185,9 @@ class DownloadManagerThread(QThread):
         self.task_dict[index[0]]['info']['cnt']['running'] -= 1
 
         if len(thread.err_log) != 0:
+            self.task_dict[index[0]][index[1]]['status'] = 'error'
             self.task_dict[index[0]]['info']['cnt']['error'] += 1
-            self.update_detail_status_signal.emit(index, '部分失败')
+            self.update_detail_status_signal.emit(index, '失败')
         else:
             self.update_detail_status_signal.emit(index, '已完成')
             self.update_detail_progress_signal.emit(index, 1)

@@ -11,8 +11,6 @@ if __name__ == '__main__':
     """
     app = QApplication(sys.argv)
     core.read_config_file()
-    core.load_qss()
-    core.load_resource()
     service.update_session()
     widget = MainWindow()
     widget.show()

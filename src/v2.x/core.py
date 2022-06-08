@@ -5,6 +5,7 @@ import re
 import sources_rc
 from PySide6.QtGui import QPixmap, QIcon, QFontDatabase
 from PySide6.QtCore import QSize
+from dot_dict import DotDict
 
 VERSION_TAG = 'v2.1.2'
 STYLE_CHOICE = {'light.qss': '亮色主题', 'dark.qss': '暗色主题'}
@@ -15,8 +16,9 @@ DEFAULT_CONFIG = {"cookie": {},
                   "sleep_time": 1000,
                   "style": "dark.qss",
                   "proxy": {},
-                  "path_format": '{manga["title"]}/{episode["short_title"]} - {episode["title"]}',
-                  "tokuten_path_format": '{manga["title"]}/{tokuten["title"]} - {tokuten["detail"]}'}
+                  "path_format": '{manga.title}/{episode.short_title} - {episode.title}',
+                  "tokuten_path_format": '{manga.title}/{tokuten.title} - {tokuten.detail}',
+                  "style_change_with_system": True}
 
 
 def read_config_file() -> None:
@@ -24,17 +26,14 @@ def read_config_file() -> None:
     Read configurations in file 'settings.json', if file do not exist then use default settings.
     """
     global CONFIG
-    value_dict = {}
+    CONFIG = {}
     file = os.path.exists('./settings.json')
     if file:
         with open('./settings.json', 'r', encoding='utf-8') as f:
             json_data = json.load(f)
-        for attribute in DEFAULT_CONFIG.keys():
-            if attribute in json_data:
-                value_dict[attribute] = json_data[attribute]
-            else:
-                value_dict[attribute] = DEFAULT_CONFIG[attribute]
-        CONFIG = value_dict
+        config = DEFAULT_CONFIG.copy()
+        config.update(json_data)
+        set_config(config)
         return
     CONFIG = DEFAULT_CONFIG
 
@@ -119,6 +118,8 @@ def generate_download_path(manga, episode):
     Generate download path according to config file
     """
     path_format = CONFIG['path_format']
+    manga = DotDict(manga)
+    episode = DotDict(episode)
     # catch exceptions
     try:
         download_path = eval("f'{}'".format(path_format))
@@ -138,6 +139,8 @@ def generate_tokuten_download_path(manga, tokuten):
     Generate tokuten download path according to config file
     """
     path_format = CONFIG['tokuten_path_format']
+    manga = DotDict(manga)
+    tokuten = DotDict(tokuten)
     # catch exceptions
     try:
         download_path = eval("f'{}'".format(path_format))
@@ -159,7 +162,7 @@ def set_config(settings: dict) -> None:
     """
     global CONFIG
     for setting in settings:
-        if setting in CONFIG:
+        if setting in DEFAULT_CONFIG:
             if setting == "download_folder" and not os.path.exists(settings[setting]):
                 settings[setting] = DEFAULT_CONFIG["download_folder"]
                 print('下载路径已重置')
@@ -167,7 +170,7 @@ def set_config(settings: dict) -> None:
                 exps = re.findall(r'{.*?}', settings[setting])
                 for exp in exps:
                     res = re.findall(
-                        r'^{episode\[.*?\]}$|^{manga\[.*?\]}$', exp)
+                        r'^{episode\..*?}$|^{manga\..*?}$', exp)
                     if len(res) == 0:
                         # use default config
                         settings[setting] = DEFAULT_CONFIG['path_format']
@@ -177,7 +180,7 @@ def set_config(settings: dict) -> None:
                 exps = re.findall(r'{.*?}', settings[setting])
                 for exp in exps:
                     res = re.findall(
-                        r'^{tokuten\[.*?\]}$|^{manga\[.*?\]}$', exp)
+                        r'^{tokuten\..*?}$|^{manga\..*?}$', exp)
                     if len(res) == 0:
                         # use default config
                         settings[setting] = DEFAULT_CONFIG['tokuten_path_format']
@@ -185,7 +188,9 @@ def set_config(settings: dict) -> None:
                         break
 
             CONFIG[setting] = settings[setting]
+    load_qss()
+    load_resource()
 
 
 if __name__ == '__main__':
-    print(re.findall(r'^episode\[.*?\]$|^manga\[.*?\]$', 'manga["hello"]'))
+    pass
