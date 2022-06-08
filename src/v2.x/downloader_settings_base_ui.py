@@ -15,21 +15,23 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QFrame, QHBoxLayout,
-    QLabel, QLineEdit, QMainWindow, QPushButton,
-    QSizePolicy, QSpinBox, QVBoxLayout, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
+    QHBoxLayout, QLabel, QLineEdit, QMainWindow,
+    QPushButton, QScrollArea, QSizePolicy, QSpinBox,
+    QStackedWidget, QVBoxLayout, QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(517, 609)
+        MainWindow.resize(500, 350)
         sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QSize(0, 600))
+        MainWindow.setMinimumSize(QSize(500, 350))
+        MainWindow.setMaximumSize(QSize(500, 350))
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.verticalLayout = QVBoxLayout(self.centralwidget)
@@ -117,55 +119,88 @@ class Ui_MainWindow(object):
         self.FContentBar.setMinimumSize(QSize(500, 0))
         self.FContentBar.setFrameShape(QFrame.StyledPanel)
         self.FContentBar.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_2 = QVBoxLayout(self.FContentBar)
+        self.verticalLayout_4 = QVBoxLayout(self.FContentBar)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.FTabMenu = QFrame(self.FContentBar)
+        self.FTabMenu.setObjectName(u"FTabMenu")
+        self.FTabMenu.setFrameShape(QFrame.StyledPanel)
+        self.FTabMenu.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_13 = QHBoxLayout(self.FTabMenu)
+        self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.FMenuBar = QFrame(self.FTabMenu)
+        self.FMenuBar.setObjectName(u"FMenuBar")
+        self.FMenuBar.setFrameShape(QFrame.StyledPanel)
+        self.FMenuBar.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_15 = QHBoxLayout(self.FMenuBar)
+        self.horizontalLayout_15.setSpacing(0)
+        self.horizontalLayout_15.setObjectName(u"horizontalLayout_15")
+        self.horizontalLayout_15.setContentsMargins(0, 0, 0, 0)
+        self.FMenuBtns = QFrame(self.FMenuBar)
+        self.FMenuBtns.setObjectName(u"FMenuBtns")
+        self.FMenuBtns.setFrameShape(QFrame.StyledPanel)
+        self.FMenuBtns.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_5 = QVBoxLayout(self.FMenuBtns)
+        self.verticalLayout_5.setSpacing(0)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.PbDownloadPage = QPushButton(self.FMenuBtns)
+        self.PbDownloadPage.setObjectName(u"PbDownloadPage")
+        self.PbDownloadPage.setMinimumSize(QSize(80, 40))
+
+        self.verticalLayout_5.addWidget(self.PbDownloadPage)
+
+        self.PbSpiderPage = QPushButton(self.FMenuBtns)
+        self.PbSpiderPage.setObjectName(u"PbSpiderPage")
+        self.PbSpiderPage.setMinimumSize(QSize(80, 40))
+
+        self.verticalLayout_5.addWidget(self.PbSpiderPage)
+
+        self.PbGeneralPage = QPushButton(self.FMenuBtns)
+        self.PbGeneralPage.setObjectName(u"PbGeneralPage")
+        self.PbGeneralPage.setMinimumSize(QSize(80, 40))
+
+        self.verticalLayout_5.addWidget(self.PbGeneralPage)
+
+        self.PbAboutPage = QPushButton(self.FMenuBtns)
+        self.PbAboutPage.setObjectName(u"PbAboutPage")
+        self.PbAboutPage.setMinimumSize(QSize(80, 40))
+
+        self.verticalLayout_5.addWidget(self.PbAboutPage)
+
+
+        self.horizontalLayout_15.addWidget(self.FMenuBtns, 0, Qt.AlignTop)
+
+
+        self.horizontalLayout_13.addWidget(self.FMenuBar)
+
+        self.SwSettings = QStackedWidget(self.FTabMenu)
+        self.SwSettings.setObjectName(u"SwSettings")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.SwSettings.sizePolicy().hasHeightForWidth())
+        self.SwSettings.setSizePolicy(sizePolicy2)
+        self.DownloadSettings = QWidget()
+        self.DownloadSettings.setObjectName(u"DownloadSettings")
+        self.verticalLayout_2 = QVBoxLayout(self.DownloadSettings)
         self.verticalLayout_2.setSpacing(0)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
-        self.FCookie = QFrame(self.FContentBar)
-        self.FCookie.setObjectName(u"FCookie")
-        self.FCookie.setMinimumSize(QSize(0, 40))
-        self.FCookie.setFrameShape(QFrame.StyledPanel)
-        self.FCookie.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_6 = QHBoxLayout(self.FCookie)
-        self.horizontalLayout_6.setSpacing(10)
-        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
-        self.horizontalLayout_6.setContentsMargins(0, 0, 0, 0)
-        self.LCookie = QLabel(self.FCookie)
-        self.LCookie.setObjectName(u"LCookie")
-        self.LCookie.setMinimumSize(QSize(100, 0))
-        self.LCookie.setMaximumSize(QSize(100, 16777215))
-        self.LCookie.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.horizontalLayout_6.addWidget(self.LCookie)
-
-        self.LeCookie = QLineEdit(self.FCookie)
-        self.LeCookie.setObjectName(u"LeCookie")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.LeCookie.sizePolicy().hasHeightForWidth())
-        self.LeCookie.setSizePolicy(sizePolicy2)
-        self.LeCookie.setMaximumSize(QSize(16777215, 40))
-
-        self.horizontalLayout_6.addWidget(self.LeCookie)
-
-        self.PbLogin = QPushButton(self.FCookie)
-        self.PbLogin.setObjectName(u"PbLogin")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.PbLogin.sizePolicy().hasHeightForWidth())
-        self.PbLogin.setSizePolicy(sizePolicy3)
-        self.PbLogin.setMinimumSize(QSize(80, 40))
-
-        self.horizontalLayout_6.addWidget(self.PbLogin)
-
-
-        self.verticalLayout_2.addWidget(self.FCookie)
-
-        self.FDownloadFolder = QFrame(self.FContentBar)
+        self.SaDownloadSettings = QScrollArea(self.DownloadSettings)
+        self.SaDownloadSettings.setObjectName(u"SaDownloadSettings")
+        self.SaDownloadSettings.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, -89, 369, 275))
+        self.verticalLayout_10 = QVBoxLayout(self.scrollAreaWidgetContents)
+        self.verticalLayout_10.setSpacing(15)
+        self.verticalLayout_10.setObjectName(u"verticalLayout_10")
+        self.verticalLayout_10.setContentsMargins(0, 15, 15, 0)
+        self.FDownloadFolder = QFrame(self.scrollAreaWidgetContents)
         self.FDownloadFolder.setObjectName(u"FDownloadFolder")
         self.FDownloadFolder.setMinimumSize(QSize(0, 40))
+        self.FDownloadFolder.setMaximumSize(QSize(16777215, 40))
         self.FDownloadFolder.setFrameShape(QFrame.StyledPanel)
         self.FDownloadFolder.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_8 = QHBoxLayout(self.FDownloadFolder)
@@ -182,8 +217,11 @@ class Ui_MainWindow(object):
 
         self.LeDownloadFolder = QLineEdit(self.FDownloadFolder)
         self.LeDownloadFolder.setObjectName(u"LeDownloadFolder")
-        sizePolicy2.setHeightForWidth(self.LeDownloadFolder.sizePolicy().hasHeightForWidth())
-        self.LeDownloadFolder.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.LeDownloadFolder.sizePolicy().hasHeightForWidth())
+        self.LeDownloadFolder.setSizePolicy(sizePolicy3)
         self.LeDownloadFolder.setMaximumSize(QSize(16777215, 40))
 
         self.horizontalLayout_8.addWidget(self.LeDownloadFolder)
@@ -196,11 +234,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.addWidget(self.PbSelect)
 
 
-        self.verticalLayout_2.addWidget(self.FDownloadFolder)
+        self.verticalLayout_10.addWidget(self.FDownloadFolder)
 
-        self.FMaxThread = QFrame(self.FContentBar)
+        self.FMaxThread = QFrame(self.scrollAreaWidgetContents)
         self.FMaxThread.setObjectName(u"FMaxThread")
         self.FMaxThread.setMinimumSize(QSize(0, 40))
+        self.FMaxThread.setMaximumSize(QSize(16777215, 40))
         self.FMaxThread.setFrameShape(QFrame.StyledPanel)
         self.FMaxThread.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_9 = QHBoxLayout(self.FMaxThread)
@@ -233,52 +272,12 @@ class Ui_MainWindow(object):
         self.horizontalLayout_9.addWidget(self.SbMaxThread)
 
 
-        self.verticalLayout_2.addWidget(self.FMaxThread)
+        self.verticalLayout_10.addWidget(self.FMaxThread)
 
-        self.FCheckUpdateStart = QFrame(self.FContentBar)
-        self.FCheckUpdateStart.setObjectName(u"FCheckUpdateStart")
-        self.FCheckUpdateStart.setMinimumSize(QSize(0, 40))
-        self.FCheckUpdateStart.setFrameShape(QFrame.StyledPanel)
-        self.FCheckUpdateStart.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_10 = QHBoxLayout(self.FCheckUpdateStart)
-        self.horizontalLayout_10.setSpacing(10)
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
-        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
-        self.LCheckUpdateStart = QLabel(self.FCheckUpdateStart)
-        self.LCheckUpdateStart.setObjectName(u"LCheckUpdateStart")
-        self.LCheckUpdateStart.setMinimumSize(QSize(100, 0))
-        self.LCheckUpdateStart.setMaximumSize(QSize(100, 16777215))
-        self.LCheckUpdateStart.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.horizontalLayout_10.addWidget(self.LCheckUpdateStart)
-
-        self.CbCheckUpdateStart = QCheckBox(self.FCheckUpdateStart)
-        self.CbCheckUpdateStart.setObjectName(u"CbCheckUpdateStart")
-        sizePolicy4.setHeightForWidth(self.CbCheckUpdateStart.sizePolicy().hasHeightForWidth())
-        self.CbCheckUpdateStart.setSizePolicy(sizePolicy4)
-        self.CbCheckUpdateStart.setMaximumSize(QSize(16777215, 40))
-        self.CbCheckUpdateStart.setChecked(True)
-
-        self.horizontalLayout_10.addWidget(self.CbCheckUpdateStart)
-
-        self.PbCheckUpdate = QPushButton(self.FCheckUpdateStart)
-        self.PbCheckUpdate.setObjectName(u"PbCheckUpdate")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
-        sizePolicy5.setHorizontalStretch(0)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.PbCheckUpdate.sizePolicy().hasHeightForWidth())
-        self.PbCheckUpdate.setSizePolicy(sizePolicy5)
-        self.PbCheckUpdate.setMinimumSize(QSize(0, 40))
-        self.PbCheckUpdate.setMaximumSize(QSize(80, 40))
-
-        self.horizontalLayout_10.addWidget(self.PbCheckUpdate)
-
-
-        self.verticalLayout_2.addWidget(self.FCheckUpdateStart)
-
-        self.FSleepTime = QFrame(self.FContentBar)
+        self.FSleepTime = QFrame(self.scrollAreaWidgetContents)
         self.FSleepTime.setObjectName(u"FSleepTime")
         self.FSleepTime.setMinimumSize(QSize(0, 40))
+        self.FSleepTime.setMaximumSize(QSize(16777215, 40))
         self.FSleepTime.setFrameShape(QFrame.StyledPanel)
         self.FSleepTime.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_11 = QHBoxLayout(self.FSleepTime)
@@ -308,11 +307,183 @@ class Ui_MainWindow(object):
         self.horizontalLayout_11.addWidget(self.SbSleepTime)
 
 
-        self.verticalLayout_2.addWidget(self.FSleepTime)
+        self.verticalLayout_10.addWidget(self.FSleepTime)
 
-        self.FProxy = QFrame(self.FContentBar)
+        self.FPathFormat = QFrame(self.scrollAreaWidgetContents)
+        self.FPathFormat.setObjectName(u"FPathFormat")
+        self.FPathFormat.setMinimumSize(QSize(0, 40))
+        self.FPathFormat.setMaximumSize(QSize(16777215, 40))
+        self.FPathFormat.setFrameShape(QFrame.StyledPanel)
+        self.FPathFormat.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_18 = QHBoxLayout(self.FPathFormat)
+        self.horizontalLayout_18.setSpacing(10)
+        self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
+        self.horizontalLayout_18.setContentsMargins(0, 0, 0, 0)
+        self.LPathFormat = QLabel(self.FPathFormat)
+        self.LPathFormat.setObjectName(u"LPathFormat")
+        self.LPathFormat.setMinimumSize(QSize(100, 0))
+        self.LPathFormat.setMaximumSize(QSize(100, 16777215))
+        self.LPathFormat.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_18.addWidget(self.LPathFormat)
+
+        self.LePathFormat = QLineEdit(self.FPathFormat)
+        self.LePathFormat.setObjectName(u"LePathFormat")
+        self.LePathFormat.setMinimumSize(QSize(0, 40))
+        self.LePathFormat.setMaximumSize(QSize(16777215, 40))
+
+        self.horizontalLayout_18.addWidget(self.LePathFormat)
+
+
+        self.verticalLayout_10.addWidget(self.FPathFormat)
+
+        self.FTokutenPathFormat = QFrame(self.scrollAreaWidgetContents)
+        self.FTokutenPathFormat.setObjectName(u"FTokutenPathFormat")
+        self.FTokutenPathFormat.setMinimumSize(QSize(0, 40))
+        self.FTokutenPathFormat.setMaximumSize(QSize(16777215, 40))
+        self.FTokutenPathFormat.setFrameShape(QFrame.StyledPanel)
+        self.FTokutenPathFormat.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_17 = QHBoxLayout(self.FTokutenPathFormat)
+        self.horizontalLayout_17.setSpacing(10)
+        self.horizontalLayout_17.setObjectName(u"horizontalLayout_17")
+        self.horizontalLayout_17.setContentsMargins(0, 0, 0, 0)
+        self.LTokutenPathFormat = QLabel(self.FTokutenPathFormat)
+        self.LTokutenPathFormat.setObjectName(u"LTokutenPathFormat")
+        self.LTokutenPathFormat.setMinimumSize(QSize(100, 0))
+        self.LTokutenPathFormat.setMaximumSize(QSize(100, 16777215))
+        self.LTokutenPathFormat.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_17.addWidget(self.LTokutenPathFormat)
+
+        self.LeTokutenPathFormat = QLineEdit(self.FTokutenPathFormat)
+        self.LeTokutenPathFormat.setObjectName(u"LeTokutenPathFormat")
+        self.LeTokutenPathFormat.setMinimumSize(QSize(0, 40))
+        self.LeTokutenPathFormat.setMaximumSize(QSize(16777215, 40))
+
+        self.horizontalLayout_17.addWidget(self.LeTokutenPathFormat)
+
+
+        self.verticalLayout_10.addWidget(self.FTokutenPathFormat)
+
+        self.SaDownloadSettings.setWidget(self.scrollAreaWidgetContents)
+
+        self.verticalLayout_2.addWidget(self.SaDownloadSettings)
+
+        self.SwSettings.addWidget(self.DownloadSettings)
+        self.About = QWidget()
+        self.About.setObjectName(u"About")
+        self.horizontalLayout_12 = QHBoxLayout(self.About)
+        self.horizontalLayout_12.setSpacing(15)
+        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
+        self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
+        self.FAbout = QFrame(self.About)
+        self.FAbout.setObjectName(u"FAbout")
+        self.FAbout.setFrameShape(QFrame.StyledPanel)
+        self.FAbout.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_7 = QVBoxLayout(self.FAbout)
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.FAppLogo = QFrame(self.FAbout)
+        self.FAppLogo.setObjectName(u"FAppLogo")
+        self.FAppLogo.setFrameShape(QFrame.StyledPanel)
+        self.FAppLogo.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_9 = QVBoxLayout(self.FAppLogo)
+        self.verticalLayout_9.setObjectName(u"verticalLayout_9")
+        self.LIconAbout = QLabel(self.FAppLogo)
+        self.LIconAbout.setObjectName(u"LIconAbout")
+        self.LIconAbout.setMinimumSize(QSize(64, 64))
+        self.LIconAbout.setMaximumSize(QSize(64, 64))
+        self.LIconAbout.setScaledContents(True)
+
+        self.verticalLayout_9.addWidget(self.LIconAbout)
+
+
+        self.verticalLayout_7.addWidget(self.FAppLogo, 0, Qt.AlignHCenter)
+
+        self.FAppInfo = QFrame(self.FAbout)
+        self.FAppInfo.setObjectName(u"FAppInfo")
+        self.FAppInfo.setFrameShape(QFrame.StyledPanel)
+        self.FAppInfo.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_8 = QVBoxLayout(self.FAppInfo)
+        self.verticalLayout_8.setSpacing(15)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
+        self.verticalLayout_8.setContentsMargins(0, 0, 0, 0)
+        self.LAppName = QLabel(self.FAppInfo)
+        self.LAppName.setObjectName(u"LAppName")
+        self.LAppName.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_8.addWidget(self.LAppName)
+
+        self.LVersion = QLabel(self.FAppInfo)
+        self.LVersion.setObjectName(u"LVersion")
+        self.LVersion.setAlignment(Qt.AlignCenter)
+
+        self.verticalLayout_8.addWidget(self.LVersion)
+
+        self.LGithub = QLabel(self.FAppInfo)
+        self.LGithub.setObjectName(u"LGithub")
+        self.LGithub.setTextFormat(Qt.RichText)
+        self.LGithub.setAlignment(Qt.AlignCenter)
+        self.LGithub.setOpenExternalLinks(True)
+
+        self.verticalLayout_8.addWidget(self.LGithub)
+
+
+        self.verticalLayout_7.addWidget(self.FAppInfo)
+
+
+        self.horizontalLayout_12.addWidget(self.FAbout)
+
+        self.SwSettings.addWidget(self.About)
+        self.SpiderSettings = QWidget()
+        self.SpiderSettings.setObjectName(u"SpiderSettings")
+        self.verticalLayout_3 = QVBoxLayout(self.SpiderSettings)
+        self.verticalLayout_3.setSpacing(15)
+        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.FCookie = QFrame(self.SpiderSettings)
+        self.FCookie.setObjectName(u"FCookie")
+        self.FCookie.setMinimumSize(QSize(0, 40))
+        self.FCookie.setMaximumSize(QSize(16777215, 40))
+        self.FCookie.setFrameShape(QFrame.StyledPanel)
+        self.FCookie.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_6 = QHBoxLayout(self.FCookie)
+        self.horizontalLayout_6.setSpacing(10)
+        self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
+        self.horizontalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.LCookie = QLabel(self.FCookie)
+        self.LCookie.setObjectName(u"LCookie")
+        self.LCookie.setMinimumSize(QSize(100, 0))
+        self.LCookie.setMaximumSize(QSize(100, 16777215))
+        self.LCookie.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_6.addWidget(self.LCookie)
+
+        self.LeCookie = QLineEdit(self.FCookie)
+        self.LeCookie.setObjectName(u"LeCookie")
+        sizePolicy3.setHeightForWidth(self.LeCookie.sizePolicy().hasHeightForWidth())
+        self.LeCookie.setSizePolicy(sizePolicy3)
+        self.LeCookie.setMaximumSize(QSize(16777215, 40))
+
+        self.horizontalLayout_6.addWidget(self.LeCookie)
+
+        self.PbLogin = QPushButton(self.FCookie)
+        self.PbLogin.setObjectName(u"PbLogin")
+        sizePolicy5 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.PbLogin.sizePolicy().hasHeightForWidth())
+        self.PbLogin.setSizePolicy(sizePolicy5)
+        self.PbLogin.setMinimumSize(QSize(80, 40))
+
+        self.horizontalLayout_6.addWidget(self.PbLogin)
+
+
+        self.verticalLayout_3.addWidget(self.FCookie)
+
+        self.FProxy = QFrame(self.SpiderSettings)
         self.FProxy.setObjectName(u"FProxy")
         self.FProxy.setMinimumSize(QSize(0, 40))
+        self.FProxy.setMaximumSize(QSize(16777215, 40))
         self.FProxy.setFrameShape(QFrame.StyledPanel)
         self.FProxy.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_7 = QHBoxLayout(self.FProxy)
@@ -328,35 +499,120 @@ class Ui_MainWindow(object):
 
         self.LeProxy = QLineEdit(self.FProxy)
         self.LeProxy.setObjectName(u"LeProxy")
-        sizePolicy2.setHeightForWidth(self.LeProxy.sizePolicy().hasHeightForWidth())
-        self.LeProxy.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.LeProxy.sizePolicy().hasHeightForWidth())
+        self.LeProxy.setSizePolicy(sizePolicy3)
         self.LeProxy.setMaximumSize(QSize(16777215, 40))
 
         self.horizontalLayout_7.addWidget(self.LeProxy)
 
 
-        self.verticalLayout_2.addWidget(self.FProxy)
+        self.verticalLayout_3.addWidget(self.FProxy)
 
-        self.FOperate = QFrame(self.FContentBar)
-        self.FOperate.setObjectName(u"FOperate")
-        self.FOperate.setMinimumSize(QSize(0, 40))
-        self.FOperate.setFrameShape(QFrame.StyledPanel)
-        self.FOperate.setFrameShadow(QFrame.Raised)
-        self.horizontalLayout_12 = QHBoxLayout(self.FOperate)
-        self.horizontalLayout_12.setSpacing(0)
-        self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.horizontalLayout_12.setContentsMargins(0, 0, 0, 0)
-        self.PbSubmit = QPushButton(self.FOperate)
+        self.SwSettings.addWidget(self.SpiderSettings)
+        self.GeneralSettings = QWidget()
+        self.GeneralSettings.setObjectName(u"GeneralSettings")
+        self.verticalLayout_6 = QVBoxLayout(self.GeneralSettings)
+        self.verticalLayout_6.setSpacing(15)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(0, 0, 0, 0)
+        self.FCheckUpdateStart = QFrame(self.GeneralSettings)
+        self.FCheckUpdateStart.setObjectName(u"FCheckUpdateStart")
+        self.FCheckUpdateStart.setMinimumSize(QSize(0, 40))
+        self.FCheckUpdateStart.setMaximumSize(QSize(16777215, 40))
+        self.FCheckUpdateStart.setFrameShape(QFrame.StyledPanel)
+        self.FCheckUpdateStart.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_10 = QHBoxLayout(self.FCheckUpdateStart)
+        self.horizontalLayout_10.setSpacing(10)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.LCheckUpdateStart = QLabel(self.FCheckUpdateStart)
+        self.LCheckUpdateStart.setObjectName(u"LCheckUpdateStart")
+        self.LCheckUpdateStart.setMinimumSize(QSize(100, 0))
+        self.LCheckUpdateStart.setMaximumSize(QSize(100, 16777215))
+        self.LCheckUpdateStart.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_10.addWidget(self.LCheckUpdateStart)
+
+        self.CbCheckUpdateStart = QCheckBox(self.FCheckUpdateStart)
+        self.CbCheckUpdateStart.setObjectName(u"CbCheckUpdateStart")
+        sizePolicy4.setHeightForWidth(self.CbCheckUpdateStart.sizePolicy().hasHeightForWidth())
+        self.CbCheckUpdateStart.setSizePolicy(sizePolicy4)
+        self.CbCheckUpdateStart.setMaximumSize(QSize(16777215, 40))
+        self.CbCheckUpdateStart.setChecked(True)
+
+        self.horizontalLayout_10.addWidget(self.CbCheckUpdateStart)
+
+        self.PbCheckUpdate = QPushButton(self.FCheckUpdateStart)
+        self.PbCheckUpdate.setObjectName(u"PbCheckUpdate")
+        sizePolicy6 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Preferred)
+        sizePolicy6.setHorizontalStretch(0)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.PbCheckUpdate.sizePolicy().hasHeightForWidth())
+        self.PbCheckUpdate.setSizePolicy(sizePolicy6)
+        self.PbCheckUpdate.setMinimumSize(QSize(0, 40))
+        self.PbCheckUpdate.setMaximumSize(QSize(80, 40))
+
+        self.horizontalLayout_10.addWidget(self.PbCheckUpdate)
+
+
+        self.verticalLayout_6.addWidget(self.FCheckUpdateStart)
+
+        self.FStyle = QFrame(self.GeneralSettings)
+        self.FStyle.setObjectName(u"FStyle")
+        self.FStyle.setMinimumSize(QSize(0, 40))
+        self.FStyle.setMaximumSize(QSize(16777215, 40))
+        self.FStyle.setFrameShape(QFrame.StyledPanel)
+        self.FStyle.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_16 = QHBoxLayout(self.FStyle)
+        self.horizontalLayout_16.setSpacing(10)
+        self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
+        self.horizontalLayout_16.setContentsMargins(0, 0, 0, 0)
+        self.LStyle = QLabel(self.FStyle)
+        self.LStyle.setObjectName(u"LStyle")
+        self.LStyle.setMinimumSize(QSize(100, 0))
+        self.LStyle.setMaximumSize(QSize(100, 16777215))
+        self.LStyle.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
+
+        self.horizontalLayout_16.addWidget(self.LStyle)
+
+        self.CbStyle = QComboBox(self.FStyle)
+        self.CbStyle.setObjectName(u"CbStyle")
+        self.CbStyle.setMinimumSize(QSize(0, 40))
+        self.CbStyle.setMaximumSize(QSize(16777215, 40))
+
+        self.horizontalLayout_16.addWidget(self.CbStyle)
+
+
+        self.verticalLayout_6.addWidget(self.FStyle)
+
+        self.SwSettings.addWidget(self.GeneralSettings)
+
+        self.horizontalLayout_13.addWidget(self.SwSettings, 0, Qt.AlignTop)
+
+
+        self.verticalLayout_4.addWidget(self.FTabMenu)
+
+        self.FSubmit = QFrame(self.FContentBar)
+        self.FSubmit.setObjectName(u"FSubmit")
+        self.FSubmit.setMinimumSize(QSize(0, 50))
+        self.FSubmit.setMaximumSize(QSize(16777215, 50))
+        self.FSubmit.setFrameShape(QFrame.StyledPanel)
+        self.FSubmit.setFrameShadow(QFrame.Raised)
+        self.horizontalLayout_14 = QHBoxLayout(self.FSubmit)
+        self.horizontalLayout_14.setSpacing(0)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalLayout_14.setContentsMargins(0, 0, 0, 0)
+        self.PbSubmit = QPushButton(self.FSubmit)
         self.PbSubmit.setObjectName(u"PbSubmit")
-        sizePolicy2.setHeightForWidth(self.PbSubmit.sizePolicy().hasHeightForWidth())
-        self.PbSubmit.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.PbSubmit.sizePolicy().hasHeightForWidth())
+        self.PbSubmit.setSizePolicy(sizePolicy3)
         self.PbSubmit.setMinimumSize(QSize(0, 30))
         self.PbSubmit.setMaximumSize(QSize(300, 50))
 
-        self.horizontalLayout_12.addWidget(self.PbSubmit)
+        self.horizontalLayout_14.addWidget(self.PbSubmit)
 
 
-        self.verticalLayout_2.addWidget(self.FOperate)
+        self.verticalLayout_4.addWidget(self.FSubmit)
 
 
         self.verticalLayout.addWidget(self.FContentBar, 0, Qt.AlignHCenter)
@@ -382,6 +638,9 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
+        self.SwSettings.setCurrentIndex(3)
+
+
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
 
@@ -391,20 +650,31 @@ class Ui_MainWindow(object):
         self.LTitle.setText("")
         self.PbMinimize.setText("")
         self.PbClose.setText("")
-        self.LCookie.setText("")
-        self.PbLogin.setText("")
+        self.PbDownloadPage.setText("")
+        self.PbSpiderPage.setText("")
+        self.PbGeneralPage.setText("")
+        self.PbAboutPage.setText("")
         self.LDownloadFolder.setText("")
         self.PbSelect.setText("")
         self.LMaxThread.setText("")
         self.SbMaxThread.setSuffix("")
         self.SbMaxThread.setPrefix("")
-        self.LCheckUpdateStart.setText("")
-        self.CbCheckUpdateStart.setText("")
-        self.PbCheckUpdate.setText("")
         self.LSleepTime.setText("")
         self.SbSleepTime.setSuffix(QCoreApplication.translate("MainWindow", u"\u6beb\u79d2", None))
         self.SbSleepTime.setPrefix("")
+        self.LPathFormat.setText("")
+        self.LTokutenPathFormat.setText("")
+        self.LIconAbout.setText("")
+        self.LAppName.setText("")
+        self.LVersion.setText("")
+        self.LGithub.setText("")
+        self.LCookie.setText("")
+        self.PbLogin.setText("")
         self.LProxy.setText("")
+        self.LCheckUpdateStart.setText("")
+        self.CbCheckUpdateStart.setText("")
+        self.PbCheckUpdate.setText("")
+        self.LStyle.setText("")
         self.PbSubmit.setText("")
         self.LStatus.setText("")
     # retranslateUi

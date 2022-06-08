@@ -1,5 +1,6 @@
 .vscode/
 .qt_for_python/
+.VSCodeCounter/
 __pycache__/
 ui/
 build/

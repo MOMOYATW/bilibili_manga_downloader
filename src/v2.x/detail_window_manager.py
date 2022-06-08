@@ -1,5 +1,4 @@
 from downloader_task_detail_ui import TaskDetailWindow
-from PySide6.QtCore import Signal
 
 
 class DetailWindowManager():
@@ -12,21 +11,19 @@ class DetailWindowManager():
         Check if window is alread exist
 
         Parameters:
-            manga_id - comic id
+            manga_id    -   comic id
 
         Returns:
             True if it exist, else return False
         """
         return manga_id in self.record
 
-    def createWindow(self, manga_id):
+    def createWindow(self, manga_id: str) -> None:
         """
         Use parse result to create window and add to manager
 
         Parameters:
-
-        Returns:
-
+            manga_id    -   comic_id
         """
         if self.__isWindowExist(manga_id):
             return self.record[manga_id]
@@ -46,57 +43,62 @@ class DetailWindowManager():
 
         Paramters:
             manga_id - comic id
-
-        Returns:
-            None
         """
-        del self.record[manga_id]
-
-    def getParseWindow(self, manga_id: str) -> TaskDetailWindow or None:
-        """
-        Get window from manager by manga_id
-
-        Paramters:
-            manga_id - comic id
-
-        Returns:
-            A parse result window if exist, else return None
-        """
-        if self.__isWindowExist(manga_id):
-            return None
-        else:
-            return self.record[manga_id]
+        self.record.pop(manga_id)
 
     def closeAll(self) -> None:
         """
         Close all the window in manager
-
-        Parameters:
-
-        Returns:
-
         """
         for window in self.record.values():
             window.closedSignal.disconnect()
             window.close()
         self.record.clear()
 
-    def passToDetailWindow(self, dict):
-        if dict == {}:
+    def passToDetailWindow(self, tasks_dict: dict):
+        """
+        Pass items in download list to detail window
+
+        Parameters:
+            tasks_dict  -   a dict with task informations about certain manga
+        """
+        if tasks_dict == {}:
             return
-        if dict['info']['id'] in self.record:
-            self.record[dict['info']['id']].applyTaskInList(dict)
 
-    def updateDetailProgress(self, dict, value):
-        if dict[0] in self.record:
-            self.record[dict[0]].updateProgress(dict[1], value)
+        # pass accroding to id
+        if tasks_dict['info']['id'] in self.record:
+            self.record[tasks_dict['info']['id']].applyTaskInList(tasks_dict)
 
-    def updateDetailStatus(self, dict, value):
-        if dict[0] in self.record:
-            self.record[dict[0]].updateTaskStatus(dict[1], value)
+    def updateDetailProgress(self, task_index: list, value: float):
+        """
+        Update progress bar in detail window
+
+        Parameters:
+            task_index  -   [manga_id, episode_id]
+            value       -   task process value
+        """
+        if task_index[0] in self.record:
+            self.record[task_index[0]].updateProgress(task_index[1], value)
+
+    def updateDetailStatus(self, task_index: list, value: str):
+        """
+        Update status in detail window
+
+        Parameters:
+            task_index  -   [manga_id, episode_id]
+            value       -   task status value
+        """
+        if task_index[0] in self.record:
+            self.record[task_index[0]].updateTaskStatus(task_index[1], value)
 
     def createParseSignal(self, parse_result):
+        """
+        Signal to override
+        """
         pass
 
     def requestTaskInListSignal(self):
+        """
+        Signal to override
+        """
         pass

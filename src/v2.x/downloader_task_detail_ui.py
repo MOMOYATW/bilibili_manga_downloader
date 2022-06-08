@@ -17,27 +17,39 @@ class TaskDetailWindow(WindowsFramelessWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
+        # set style sheet
         self.setStyleSheet(core.QSS)
+
+        # init properties
         self.manga_id = manga_id
         self.list = {}
+
+        # set text
         self.setWindowTitle('任务详情')
         self.ui.LTitle.setText('任务详情')
+        self.ui.LChapterTitle.setText('下载列表')
+        self.ui.PbStartResumeAll.setText('全部暂停')
+        self.ui.PbParsePage.setText('前往漫画')
+
+        # set icons
         self.setWindowIcon(core.RESOURCE["logo_icon"])
         self.ui.LIcon.setPixmap(core.RESOURCE["logo_pixmap"])
         self.ui.PbMinimize.setIcon(core.RESOURCE["minimize_icon"])
         self.ui.PbClose.setIcon(core.RESOURCE["close_icon"])
+        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
+
+        # connect signals
         self.ui.PbMinimize.clicked.connect(self.window().showMinimized)
         self.ui.PbClose.clicked.connect(self.close)
-        self.ui.PbMaximizeRestore.setIcon(core.RESOURCE["maximize_icon"])
         self.ui.PbMaximizeRestore.clicked.connect(self.toggleMaxState)
         self.ui.PbParsePage.clicked.connect(self.startSearch)
 
-        self.ui.LChapterTitle.setText('下载列表')
-        self.ui.PbStartResumeAll.setText('全部暂停')
         self.ui.PbStartResumeAll.setDisabled(True)
-        self.ui.PbParsePage.setText('前往漫画')
 
     def startSearch(self):
+        """
+        Search manga and show parse window
+        """
         self.searchThread = SearchThread(
             'manga.bilibili.com/detail/mc{}'.format(self.manga_id))
         self.searchThread.msgSignal.connect(lambda msg: print(msg))

@@ -1,4 +1,3 @@
-import os
 import sys
 import core
 from PySide6.QtGui import QPixmap
@@ -25,8 +24,8 @@ class MainWindow(WindowsFramelessWindow):
         self.setStyleSheet(core.QSS)
 
         # set ui text
-        self.ui.LTitle.setText('哔哩哔哩漫画下载器 {}'.format(core.VERSION_TAG))
-        self.setWindowTitle('哔哩哔哩漫画下载器 {}'.format(core.VERSION_TAG))
+        self.ui.LTitle.setText('哔哩哔哩漫画下载器')
+        self.setWindowTitle('哔哩哔哩漫画下载器')
         self.ui.LeSearchBar.setPlaceholderText("输入关键词搜索或者输入网址进行解析")
 
         # set ui icons
