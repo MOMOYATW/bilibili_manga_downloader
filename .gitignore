@@ -12,5 +12,5 @@ old_version/
 *.json
 *.spec
 *.qrc
-*.qss
 *.mp4
+v3.0/

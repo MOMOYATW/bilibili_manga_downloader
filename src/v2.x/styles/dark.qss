@@ -1,0 +1,224 @@
+* {
+    background-color: #292d3e;
+    color: #a6accd;
+    font-size: 10pt;
+    font-family: "Montserrat", "微软雅黑"
+}
+
+QPushButton {
+    border: none;
+}
+
+QPushButton:hover#PbMinimize {
+    background-color:#3f4252;
+    border-radius: 0;
+}
+
+QPushButton:hover#PbMaximizeRestore {
+    background-color:#3f4252;
+    border-radius: 0;
+}
+
+QPushButton:hover#PbClose {
+    background-color:#d51326;
+    border-radius: 0;
+}
+
+QPushButton:hover {
+    background-color:#383c48;
+    border-radius: 5px;
+}
+
+QLineEdit {
+    color: #a6accd;
+    border: 1px solid #3f4352;
+    background-color: #333747;
+    font-size: 14px;
+}
+
+QLineEdit[text=""] {
+    color:#5f637a;
+}
+
+QLabel#LMangaTitle {
+    font-size:28px;
+}
+
+QLabel#LAuthor {
+    font-size:16px;
+}
+
+QLabel#LDescription {
+    font-size:14px;
+}
+
+QPushButton#PbDownload {
+    font-size:16px;
+    color:#ffffff;
+    background-color:#3f4563;
+}
+
+QPushButton:hover#PbDownload {
+    border-radius: 0;
+    background-color:#4b5169;
+}
+
+QLabel#LChapterTitle {
+    font-size: 24px;
+}
+
+QListWidget {
+    border: none;
+    font-size: 14px;
+    outline: 0px;
+}
+
+QListWidget::item {
+    height: 20px;
+    outline: 0px;
+    border: none;
+}
+
+QListWidget::item:hover {
+    background-color: #292d3e;
+    color: #ffffff;
+}
+
+
+QListWidget::item:selected {
+    background-color: #292d3e;
+    color: #80cbc4;
+}
+
+QListWidget::item:disabled {
+    background-color: #292d3e;
+    color: #4c526f;
+}
+
+QTableWidget {
+    border: none;
+}
+
+QHeaderView::section {
+    background-color: #292d3e;
+    border: none;
+    border-bottom: 1px solid #80cbc4;
+}
+
+
+QScrollBar:vertical{width:15px}
+QScrollBar::handle:vertical{background-color:#393d51;}
+QScrollBar::handle:vertical::hover{background-color:#313446; }
+QScrollBar::add-page:vertical{background-color:#292d3e;}
+QScrollBar::sub-page:vertical{background-color:#292d3e;}
+QScrollBar::up-arrow:vertical{height:0px}
+QScrollBar::down-arrow:vertical{height:0px}
+QScrollBar::add-line:vertical{height:0px}
+QScrollBar::sub-line:vertical{height:0px}
+
+QFrame#FItem QFrame {
+    background-color: transparent;
+}
+
+QFrame#FItem[status="hover"] {
+    background-color: #212532;
+}
+
+QProgressBar {
+    border: none;
+    background-color: #333747;
+}
+
+QProgressBar::chunk {
+    background-color: #80cbc4;
+}
+
+QFrame#FCover {
+    background-color:#212532;
+}
+
+QFrame#FCover * {
+    background-color:transparent;
+}
+
+QFrame#FItemCover {
+    background-color:#212532;
+}
+
+QFrame#FItemCover * {
+    background-color:transparent;
+}
+
+QLabel#LItemTitle {
+    font-size: 18px;
+}
+
+QSpinBox {
+    background-color:#333747;
+    border: 1px solid #3f4352;
+}
+
+QSpinBox::down-button{
+    border-style:outset;
+    width: 0px;
+}
+QSpinBox::up-button{
+    border-style:outset;
+    width: 0px;
+}
+QCheckBox::indicator  {
+    width: 15px;
+    height: 15px;
+}
+
+QPushButton#PbSubmit {
+    font-size:16px;
+    color:#ffffff;
+    background-color:#3f4563;
+}
+
+QPushButton:hover#PbSubmit {
+    border-radius: 0;
+    background-color:#4b5169;
+}
+
+QFrame#FMenuBtns QPushButton {
+    color: #5b6077;
+}
+
+QFrame#FMenuBtns QPushButton:checked {
+    color: white;
+    border-right: 1px solid #80cbc4;
+}
+
+QFrame#FMenuBtns QPushButton:hover {
+    border-radius: 0;
+    color: white;
+    background-color: transparent;
+}
+
+QLabel#LAppName {
+    font-size: 20px;
+}
+
+QComboBox {
+    border: 1px solid #3f4352;
+    background-color: #333747;
+}
+
+QComboBox::drop-down {
+    background-color: transparent;
+    width: 0;
+}
+
+QScrollArea {
+    border: none;
+}
+
+/* QFrame#FInformation  QFrame {
+    background-color:#1c1f2b;
+}
+
+QFrame#FInformation {
+    background-color:#1c1f2b;
+} */
