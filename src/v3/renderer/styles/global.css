@@ -1,0 +1,13 @@
+* {
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+img {
+  -webkit-user-drag: none;
+}
+
+.enable-scroll * {
+  overflow: unset;
+}

@@ -9,8 +9,7 @@ imgs/
 mp3/
 style/
 old_version/
-*.json
+config.json
 *.spec
 *.qrc
 *.mp4
-v3.0/

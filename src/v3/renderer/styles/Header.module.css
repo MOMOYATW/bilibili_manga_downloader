@@ -1,0 +1,16 @@
+.drag_region {
+  width: 100%;
+  height: 36px;
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.window_controls {
+  -webkit-app-region: no-drag;
+}
+
+#closeBtn:hover {
+  background: #e81123 !important;
+  color: #fff;
+}

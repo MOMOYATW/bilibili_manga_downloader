@@ -1,0 +1,11 @@
+node_modules
+*.log
+.next
+app
+dist
+config.json
+complete.json
+downloading.json
+mapping.json
+pending.json
+register.json

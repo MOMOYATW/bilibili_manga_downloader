@@ -1,0 +1,12 @@
+appId: me.davytao.bilibili_manga_downloader
+productName: Bilibili Manga Downloader
+copyright: Copyright © 2023 Davy Tao
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - from: .
+    filter:
+      - package.json
+      - app
+publish: null

@@ -1,0 +1,42 @@
+{
+  "private": true,
+  "name": "bilibili-manga-downloader",
+  "description": "Bilibili Manga Downloader",
+  "version": "1.0.0",
+  "author": "Davy Tao <wzhddtygg@gmail.com>",
+  "main": "app/background.js",
+  "scripts": {
+    "dev": "nextron",
+    "build": "nextron build",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "dependencies": {
+    "@mui/icons-material": "^5.11.0",
+    "@types/archiver": "^5.3.1",
+    "@types/async-lock": "^1.3.0",
+    "@types/file-saver": "^2.0.5",
+    "archiver": "^5.3.1",
+    "async-lock": "^1.4.0",
+    "axios": "^1.2.2",
+    "electron-serve": "^1.1.0",
+    "electron-store": "^8.1.0",
+    "file-saver": "^2.0.5",
+    "got": "^12.5.3"
+  },
+  "devDependencies": {
+    "@emotion/cache": "^11.10.3",
+    "@emotion/react": "^11.10.4",
+    "@emotion/server": "^11.10.0",
+    "@emotion/styled": "^11.10.4",
+    "@mui/material": "^5.10.8",
+    "@types/node": "^18.11.18",
+    "@types/react": "^18.0.26",
+    "electron": "^21.3.3",
+    "electron-builder": "^23.6.0",
+    "next": "^12.3.4",
+    "nextron": "^8.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "typescript": "^4.9.4"
+  }
+}
