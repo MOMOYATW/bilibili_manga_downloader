@@ -64,6 +64,7 @@ Token：用户登录后的`SESSDATA`项 Cookie 值，具体方法见下文。
 
 - `{title}` 表示漫画标题
 - `{id}`表示漫画 ID
+- `{authors}`表示作者
 
 每话文件夹名称格式：
 
