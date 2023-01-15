@@ -32,7 +32,9 @@
 
 <img src="README.assets/image-20230112221949394.png" width="700px">
 
-<img src="README.assets/image-20230112222042402.png" width="700px">
+<img src="README.assets/image-20230115125351648.png" width="700px">
+
+<img src="README.assets/image-20230115125316936.png" width="700px">
 
 对于有**特典**的漫画，其特典信息将被追加到列表的末尾，请留意。
 
@@ -44,9 +46,13 @@
 >
 > 我推测动图就是没有声音的视频，因此理论上当前版本也可以下载。不过如果有人遇到了问题欢迎在 issue 中提出。
 
-下载过程中可以双击任务，从而打开详情窗口。
+下载过程中可以单击任务，从而打开详情窗口。
 
-<img src="README.assets/image-20230112222318829.png" width="700px">
+<img src="README.assets/image-20230115125512120.png" width="700px">
+
+
+
+
 
 由于 B 站下载图片不支持断点续传，因此没有设计暂停功能，可以在下载过程中取消下载。
 
@@ -54,9 +60,11 @@
 
 有关设置，新版本设置项变为以下几项
 
-<img src="README.assets/image-20230113175151277.png" width="700px">
+<img src="README.assets/image-20230115125750982.png" width="700px">
 
-Token：用户登录后的`SESSDATA`项 Cookie 值，具体方法见下文。
+<img src="README.assets/image-20230115125818344.png" width="700px">
+
+Token：用户登录后的`SESSDATA`项 Cookie 值，现支持直接自动获取。点击获取 Token 按钮，在打开的窗口中登录 b 站账号，完成后关闭即可。需要注意的是，在程序内登录后Cookie会更新，这会导致网页端的账号被登出。该值亦可手动设置，详细步骤见下文。
 
 下载路径：选择图片存储位置。
 
@@ -111,13 +119,15 @@ Token：用户登录后的`SESSDATA`项 Cookie 值，具体方法见下文。
 
 ### 更新
 
-#### V3.0.1
+#### V3.0.2
 
-1. 添加菜单到下载完成界面
-2. 修复了队列页面更新不及时的问题
-3. 修复了命名问题
-4. 修复了安装新版本覆盖记录问题
+1. 添加对剪切板的监听
+2. 支持在 app 内完成登录
+3. 支持自动更新
 
 ### 开发计划
 
-1. 制作成电子书
+1. 制作成电子书 epub
+2. 更加灵活的压缩策略
+3. 托盘运行
+4. 订阅漫画更新
