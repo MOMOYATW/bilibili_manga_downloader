@@ -4,7 +4,6 @@
 <img src="README.assets/icon.png" width=100px>
 </div>
 <div align="center" padding="1">
-
 [![GitHub release](https://img.shields.io/github/release/MOMOYATW/bilibili_manga_downloader.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest) [![GitHub downloads](https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/latest/total.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest) [![GitHub downloads](https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/total.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/releases) [![Github stars](https://img.shields.io/github/stars/MOMOYATW/bilibili_manga_downloader.svg?logo=github)](https://github.com/MOMOYATW/bilibili_manga_downloader/stargazers)
 
 </div>
@@ -29,11 +28,15 @@
 
 ### 使用说明
 
-在栏中填入漫画网址进行搜索，即可获取漫画信息
+在栏中填入漫画网址进行搜索，即可获取漫画信息，也支持直接搜索关键词
 
 目前支持漫画详细页面网址，形如`https://manga.bilibili.com/detail/mc28528?from=manga_person`
 
 漫画单话网址，形如 `https://manga.bilibili.com/mc26731/329893?from=manga_detail`
+
+关键词，形如`关于前辈很烦人`
+
+<img src="README.assets/image-20230118171740926.png" width="700px">
 
 <img src="README.assets/image-20230112221828757.png" width="700px">
 
