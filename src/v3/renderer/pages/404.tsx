@@ -10,16 +10,14 @@ const Error404 = () => {
       flexDirection={"column"}
       sx={{ height: "100%" }}
     >
-      <Box display="flex" width={"50%"}>
-        <Image src={"/images/404.png"} height={1000} width={1000} />
-      </Box>
+      <Image src={"/images/404.svg"} height={400} width={400} />
       <Typography
-        variant="h3"
+        variant="h5"
         component="div"
         fontWeight={"bold"}
         sx={{ mt: 2 }}
       >
-        你是怎么办到的！？
+        未知的页面
       </Typography>
     </Box>
   );

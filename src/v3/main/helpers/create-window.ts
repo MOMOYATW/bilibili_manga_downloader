@@ -4,6 +4,7 @@ import {
   BrowserWindowConstructorOptions,
 } from "electron";
 import Store from "electron-store";
+import path from "path";
 
 export default (
   windowName: string,
@@ -70,12 +71,16 @@ export default (
 
   state = ensureVisibleOnSomeDisplay(restore());
 
+  const isProd: boolean = process.env.NODE_ENV === "production";
+
   const browserOptions: BrowserWindowConstructorOptions = {
     ...state,
     ...options,
     minWidth: 850,
-    titleBarStyle: "hidden",
-    icon: "resources/icon.ico",
+    frame: false,
+    icon: isProd
+      ? path.join(process.resourcesPath, "static", "icon-64.png")
+      : path.join("static", "icon-64.png"),
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,

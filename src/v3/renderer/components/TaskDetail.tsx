@@ -1,14 +1,14 @@
-import { Box, Typography } from "@mui/material";
-import { ipcRenderer } from "electron";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import { ipcRenderer } from "electron";
+import { Box, Typography } from "@mui/material";
+import DownloadList from "./DownloadList";
 import {
+  ComicListItem,
+  TaskItem,
   ComicEpisodeObject,
   ComicPlusItemObject,
-} from "../../main/bilibili-manga-client";
-import { TaskItem } from "../../main/types";
-import { ComicListItem } from "../types";
-import DownloadList from "./DownloadList";
+} from "../types";
 
 const TaskDetail = ({
   taskType,

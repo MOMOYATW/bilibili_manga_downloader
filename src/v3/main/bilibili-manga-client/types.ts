@@ -237,3 +237,47 @@ export interface ImageTokenData {
   url: string;
   token: string;
 }
+
+export interface SearchResultData {
+  list: SearchResultObject[];
+  total_page: number;
+  total_num: number;
+  recommends: any[];
+  similar: string;
+  jump: null;
+  se_id: string;
+  banner: {
+    icon: string;
+    title: string;
+    url: string;
+  };
+}
+
+export interface SearchResultObject {
+  id: number;
+  title: string;
+  org_title: string;
+  alia_title: string[];
+  horizontal_cover: string;
+  square_cover: string;
+  vertical_cover: string;
+  author_name: string[];
+  styles: string[];
+  is_finish: number;
+  allow_wait_free: boolean;
+  discount_type: number;
+  type: number;
+  wiki: WikiObject;
+  numbers: number;
+}
+
+export interface WikiObject {
+  id: string;
+  title: string;
+  origin_title: string;
+  vertical_cover: string;
+  producer: string;
+  author_name: string[];
+  publish_time: string;
+  frequency: string;
+}

@@ -8,7 +8,11 @@ export interface Config {
   tokuten_folder_format: string;
   image_file_format: string;
   max_download_num: number;
-  zip_after_download: boolean;
+  hide_in_tray: boolean;
+  seperate_folder: boolean;
+  meta_data_options: "tachiyomi";
+  save_meta_data: false;
+  zip_options: "no_zip" | "zip_comic" | "zip_episode";
 }
 
 export interface TaskItem<T> {

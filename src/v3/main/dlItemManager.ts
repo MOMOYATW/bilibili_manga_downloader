@@ -1,9 +1,11 @@
 import AsyncLock from "async-lock";
+import path from "path";
 import {
   ComicEpisodeObject,
   ComicPlusItemObject,
 } from "./bilibili-manga-client";
 import { DownloadItemsRegiter, TaskItem } from "./types";
+import { zipDirectory } from "./utils";
 
 export class ItemManager {
   register: DownloadItemsRegiter;
@@ -14,13 +16,15 @@ export class ItemManager {
   ipcMain: Electron.IpcMain;
   mainWindow: Electron.CrossProcessExports.BrowserWindow;
   asyncLock: AsyncLock;
+  zip_options: "no_zip" | "zip_comic" | "zip_episode";
 
   constructor(
     pending: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[],
     complete: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[],
     max_downloading_num: number,
     ipcMain: Electron.IpcMain,
-    mainWindow: Electron.CrossProcessExports.BrowserWindow
+    mainWindow: Electron.CrossProcessExports.BrowserWindow,
+    zip_options: "no_zip" | "zip_comic" | "zip_episode"
   ) {
     this.pending = pending;
     this.downloading = [];
@@ -28,6 +32,7 @@ export class ItemManager {
     this.register = {};
     this.max_downloading_num = max_downloading_num;
     this.mainWindow = mainWindow;
+    this.zip_options = zip_options;
 
     this.asyncLock = new AsyncLock();
 
@@ -38,7 +43,6 @@ export class ItemManager {
     complete.map((completeItem) => {
       this.registerTask(completeItem);
     });
-    console.log("execute");
     // bind signal
     // querys
     ipcMain.on("getPendingList", () => {
@@ -131,6 +135,10 @@ export class ItemManager {
   }
 
   public getComplete() {
+    this.complete = this.complete.map((completeItem) => {
+      completeItem.imageUrls = [];
+      return completeItem;
+    });
     return this.complete;
   }
 
@@ -178,11 +186,41 @@ export class ItemManager {
       return;
     }
     task.item = [];
-    this.downloading.splice(index, 1);
-    this.complete.push(task);
-    this.DownloadLoader();
-    this.sendComplete();
-    this.sendDownloading();
+    task.imageUrls = [];
+    // zip this comic if this the last episode
+    if (
+      this.zip_options === "zip_comic" &&
+      this.downloading.filter(
+        (downloadItem) => downloadItem.comic.id === task.comic.id
+      ).length === 1
+    ) {
+      const comic_folder = path.dirname(task.savePath);
+      // if user add a new episode of this comic during zip
+      // it is highly possible fail
+      // the good news is we catch it, the program will not crash
+      zipDirectory(comic_folder, comic_folder + ".7z", () => {
+        this.downloading.splice(index, 1);
+        this.complete.push(task);
+        this.DownloadLoader();
+        this.sendComplete();
+        this.sendDownloading();
+      });
+    } else if (this.zip_options === "zip_episode") {
+      // zip this episode
+      zipDirectory(task.savePath, task.savePath + ".7z", () => {
+        this.downloading.splice(index, 1);
+        this.complete.push(task);
+        this.DownloadLoader();
+        this.sendComplete();
+        this.sendDownloading();
+      });
+    } else {
+      this.downloading.splice(index, 1);
+      this.complete.push(task);
+      this.DownloadLoader();
+      this.sendComplete();
+      this.sendDownloading();
+    }
   }
 
   public registerTask(
@@ -222,5 +260,11 @@ export class ItemManager {
   public updateMaxDownloadingNum(updateNumber: number) {
     this.max_downloading_num = updateNumber;
     this.DownloadLoader();
+  }
+
+  public updateZipAfterDownload(
+    updateOption: "no_zip" | "zip_comic" | "zip_episode"
+  ) {
+    this.zip_options = updateOption;
   }
 }

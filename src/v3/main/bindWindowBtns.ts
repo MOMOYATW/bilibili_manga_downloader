@@ -1,7 +1,6 @@
 export function bindWindowBtns(
   ipcMain: Electron.IpcMain,
-  mainWindow: Electron.CrossProcessExports.BrowserWindow,
-  closeWindowCallbackFunction: Function
+  mainWindow: Electron.CrossProcessExports.BrowserWindow
 ) {
   //Minimise the app
   ipcMain.on("minimiseApp", () => {
@@ -26,11 +25,5 @@ export function bindWindowBtns(
   // Check if is restored
   mainWindow.on("unmaximize", () => {
     mainWindow.webContents.send("isRestored");
-  });
-
-  //Close the app
-  ipcMain.on("closeApp", () => {
-    closeWindowCallbackFunction();
-    mainWindow.close();
   });
 }

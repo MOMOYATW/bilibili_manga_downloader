@@ -9,4 +9,17 @@ files:
     filter:
       - package.json
       - app
-publish: null
+publish:
+  provider: github
+  owner: MOMOYATW
+  repo: bilibili_manga_downloader
+win:
+  target:
+    - nsis
+  icon: resources/icon.ico
+linux:
+  target:
+    - deb
+  icon: resources/icon.png
+extraResources:
+  - ./static/**

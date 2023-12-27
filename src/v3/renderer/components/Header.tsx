@@ -1,5 +1,6 @@
+import { useState, useEffect } from "react";
+import { ipcRenderer } from "electron";
 import {
-  Box,
   AppBar,
   Toolbar,
   IconButton,
@@ -13,20 +14,17 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import CloseIcon from "@mui/icons-material/Close";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
-import React, { useState, useEffect } from "react";
 import styles from "../styles/Header.module.css";
-
-import { ipcRenderer } from "electron";
 
 const Header = ({ toggleTheme, theme }) => {
   const [maximum, setMaximum] = useState(false);
   useEffect(() => {
-    ipcRenderer.on("isMaximized", (event, args) => {
-      setMaximum(true);
-    });
-    ipcRenderer.on("isRestored", (event, args) => {
-      setMaximum(false);
-    });
+    ipcRenderer.on("isMaximized", () => setMaximum(true));
+    ipcRenderer.on("isRestored", () => setMaximum(false));
+    return () => {
+      ipcRenderer.removeAllListeners("isMaximized");
+      ipcRenderer.removeAllListeners("isRestored");
+    };
   }, []);
 
   return (

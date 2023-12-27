@@ -5,6 +5,7 @@ import {
   ComicPlusData,
   ImageIndexData,
   ImageTokenData,
+  SearchResultData,
 } from "./types";
 
 export class BilibiliMangaAPI {
@@ -32,6 +33,19 @@ export class BilibiliMangaAPI {
     this._apiBaseUrl = apiBaseUrl !== undefined ? apiBaseUrl : this._apiBaseUrl;
     this._authToken = authToken !== undefined ? authToken : this._authToken;
     console.log(this._authToken);
+  }
+
+  public async getSearch(keyword: string) {
+    const endpoint = "Search";
+    const body = {
+      key_word: keyword,
+      page_num: 1,
+      page_size: 100,
+    };
+    return this.fetch<BilibiliResponse<SearchResultData>>({
+      endpoint,
+      body,
+    });
   }
 
   public async getComicDetail(comicId: number) {
@@ -65,7 +79,7 @@ export class BilibiliMangaAPI {
     const body = {
       ep_id: episodeId,
     };
-    const params = { device: "pc" };
+    const params = { device: "pc", platform: "ios", version: 41 };
     return this.fetch<BilibiliResponse<ImageIndexData>>({
       endpoint,
       body,

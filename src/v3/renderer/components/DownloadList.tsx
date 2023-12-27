@@ -1,3 +1,8 @@
+import path from "path";
+import { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/router";
+import { ipcRenderer } from "electron";
 import {
   IconButton,
   List,
@@ -10,17 +15,14 @@ import {
   MenuItem,
   ListItemIcon,
   Menu,
+  Typography,
 } from "@mui/material";
-import React, { useState } from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { useRouter } from "next/router";
-import { ComicListItem } from "../types";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderZipIcon from "@mui/icons-material/FolderZip";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
-import path from "path";
-import { ipcRenderer } from "electron";
+import { ComicListItem } from "../types";
 
 const DownloadList = ({
   downloadList,
@@ -34,7 +36,7 @@ const DownloadList = ({
   detail?: boolean;
 }) => {
   const router = useRouter();
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [index, setIndex] = useState<number>(0);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -58,13 +60,7 @@ const DownloadList = ({
       name: "转到漫画页面",
       icon: <ShortcutIcon fontSize="small" />,
       function: () => {
-        router.push(
-          {
-            pathname: `/comics/${downloadList[index].comic.id}`,
-          },
-          undefined,
-          { shallow: true }
-        );
+        router.push(`/comics/${downloadList[index].comic.id}`);
       },
     },
     {
@@ -74,14 +70,14 @@ const DownloadList = ({
         if (detail) {
           require("electron").shell.openPath(downloadList[index].savePath);
         } else {
-          const comicFolder = path.join(
-            ...downloadList[index].savePath
-              .split(path.sep)
-              .splice(
-                0,
-                downloadList[index].savePath.split(path.sep).length - 1
-              )
-          );
+          let comicFolder = path.dirname(downloadList[index].savePath);
+          if (
+            comicFolder.slice(comicFolder.length - 2) === "特典" ||
+            comicFolder.slice(comicFolder.length - 2) === "正篇"
+          ) {
+            // get parent folder of comicFolder
+            comicFolder = path.dirname(comicFolder);
+          }
           require("electron").shell.openPath(comicFolder);
         }
 
@@ -92,13 +88,8 @@ const DownloadList = ({
       name: "压缩",
       icon: <FolderZipIcon fontSize="small" />,
       function: () => {
-        const comicFolder = path.join(
-          ...downloadList[index].savePath
-            .split(path.sep)
-            .splice(0, downloadList[index].savePath.split(path.sep).length - 1)
-        );
+        const comicFolder = path.dirname(downloadList[index].savePath);
         ipcRenderer.send("zipFolder", comicFolder);
-        console.log(comicFolder);
         handleClose();
       },
     },
@@ -205,7 +196,18 @@ const DownloadList = ({
           );
         })
       ) : (
-        <Box>还没有内容哟~快去下载吧！</Box>
+        <Box
+          display="flex"
+          flexDirection={"column"}
+          justifyContent="center"
+          alignItems="center"
+          sx={{ height: "100%" }}
+        >
+          <Image src={"/images/no-data.svg"} height={200} width={200} />
+          <Typography variant="body1" component="div" sx={{ mt: 2 }}>
+            还没有内容，快去下载吧~
+          </Typography>
+        </Box>
       )}
     </List>
   );

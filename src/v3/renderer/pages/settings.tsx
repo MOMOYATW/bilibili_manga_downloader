@@ -1,27 +1,28 @@
+import { useEffect, useState } from "react";
+import { ipcRenderer } from "electron";
 import {
-  Alert,
   Box,
   Button,
-  IconButton,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
+  InputLabel,
+  MenuItem,
+  Radio,
+  RadioGroup,
   Select,
-  Snackbar,
-  Switch,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
-import { ipcRenderer } from "electron";
-import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
+import PopoutAlert from "../components/PopoutAlert";
 
 const Settings = () => {
   const [config, setConfig] = useState(null);
   const [open, setOpen] = useState(false);
   useEffect(() => {
-    ipcRenderer.on("CurrentConfig", (event, args) => {
-      setConfig(args);
-    });
+    ipcRenderer.on("CurrentConfig", (_event, args) => setConfig(args));
     ipcRenderer.send("getCurrentConfig");
     return () => {
       ipcRenderer.removeAllListeners("CurrentConfig");
@@ -30,7 +31,7 @@ const Settings = () => {
   return (
     <>
       {!config ? (
-        <Loading failed={false} />
+        <Loading />
       ) : (
         <Box
           display="flex"
@@ -39,31 +40,13 @@ const Settings = () => {
           flexDirection={"column"}
           sx={{ p: 3 }}
         >
-          <Snackbar
+          <PopoutAlert
+            severity={"success"}
             open={open}
-            autoHideDuration={3000}
-            onClose={() => setOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            handleClose={() => setOpen(false)}
           >
-            <Alert
-              severity="success"
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-              sx={{ mb: 2 }}
-            >
-              设置已更新
-            </Alert>
-          </Snackbar>
+            设置已更新
+          </PopoutAlert>
           <Typography
             variant="h5"
             component="div"
@@ -74,7 +57,6 @@ const Settings = () => {
           </Typography>
           <Box display={"flex"}>
             <TextField
-              id="standard-basic"
               label="Token"
               variant="standard"
               value={config.token}
@@ -86,19 +68,14 @@ const Settings = () => {
             />
             <Button
               sx={{ ml: 1 }}
-              onClick={() => {
-                require("electron").shell.openExternal(
-                  "https://github.com/MOMOYATW/bilibili_manga_downloader#%E6%9C%89%E5%85%B3%E4%BA%8E%E7%99%BB%E5%BD%95-cookie-%E7%9A%84%E8%8E%B7%E5%8F%96"
-                );
-              }}
+              onClick={() => ipcRenderer.send("openBilibiliManga")}
               color={"info"}
             >
-              如何获取Token?
+              点此登录获取Token
             </Button>
           </Box>
           <Box display={"flex"} sx={{ mt: 3 }}>
             <TextField
-              id="standard-basic"
               label="下载路径"
               variant="standard"
               value={config.download_path}
@@ -117,7 +94,6 @@ const Settings = () => {
             </Button>
           </Box>
           <TextField
-            id="standard-basic"
             label="漫画文件夹名称格式"
             variant="standard"
             value={config.comic_folder_format}
@@ -128,7 +104,6 @@ const Settings = () => {
             sx={{ mt: 3 }}
           />
           <TextField
-            id="standard-basic"
             label="每话文件夹名称格式"
             variant="standard"
             value={config.episode_folder_format}
@@ -139,7 +114,6 @@ const Settings = () => {
             sx={{ mt: 3 }}
           />
           <TextField
-            id="standard-basic"
             label="特典文件夹名称格式"
             variant="standard"
             value={config.tokuten_folder_format}
@@ -150,7 +124,6 @@ const Settings = () => {
             sx={{ mt: 3 }}
           />
           <TextField
-            id="standard-basic"
             label="图片名称格式"
             variant="standard"
             value={config.image_file_format}
@@ -160,8 +133,25 @@ const Settings = () => {
             }}
             sx={{ mt: 3 }}
           />
+          <Box sx={{ mt: 3 }}>
+            <FormControl>
+              <FormLabel id="seperate-checkbox-label">文件夹路径</FormLabel>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={config.seperate_folder}
+                    onChange={(event) => {
+                      config.seperate_folder = event.target.checked;
+                      setConfig({ ...config });
+                    }}
+                  />
+                }
+                label="分离特典文件夹与正篇文件夹"
+                aria-labelledby="seperate-checkbox-label"
+              />
+            </FormControl>
+          </Box>
           <TextField
-            id="standard-basic"
             label="同时下载集数"
             variant="standard"
             type={"number"}
@@ -173,16 +163,77 @@ const Settings = () => {
             sx={{ mt: 3 }}
           />
           <Box sx={{ mt: 3 }}>
-            下载完成后压缩
-            <Tooltip title="开启后会影响下载速度" arrow>
-              <Switch
-                checked={config.zip_after_download}
+            <FormControl>
+              <FormLabel id="zip-radio-buttons-group-label">压缩策略</FormLabel>
+              <RadioGroup
+                aria-labelledby="zip-radio-buttons-group-label"
+                value={config.zip_options}
                 onChange={(event) => {
-                  config.zip_after_download = event.target.checked;
+                  config.zip_options = event.target.value;
                   setConfig({ ...config });
                 }}
+              >
+                <FormControlLabel
+                  value={"no_zip"}
+                  control={<Radio />}
+                  label="不压缩"
+                />
+                <FormControlLabel
+                  value={"zip_comic"}
+                  control={<Radio />}
+                  label="整部漫画下载完成后压缩漫画文件夹"
+                />
+                <FormControlLabel
+                  value={"zip_episode"}
+                  control={<Radio />}
+                  label="每话漫画下载完成后压缩单话文件夹"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Box>
+          <Box sx={{ mt: 3 }}>
+            <FormControl>
+              <FormLabel id="metadata-select-label">元数据</FormLabel>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={config.save_meta_data}
+                    onChange={(event) => {
+                      config.save_meta_data = event.target.checked;
+                      setConfig({ ...config });
+                    }}
+                  />
+                }
+                label="自动保存tachiyomi元数据"
+                aria-labelledby="metadata-radio-buttons-group-label"
               />
-            </Tooltip>
+            </FormControl>
+          </Box>
+          <Box sx={{ mt: 3 }}>
+            <FormControl>
+              <FormLabel id="close-radio-buttons-group-label">
+                关闭主界面
+              </FormLabel>
+              <RadioGroup
+                aria-labelledby="close-radio-buttons-group-label"
+                value={config.hide_in_tray}
+                onChange={(event) => {
+                  config.hide_in_tray = JSON.parse(event.target.value);
+                  setConfig({ ...config });
+                }}
+              >
+                <FormControlLabel
+                  value={true}
+                  control={<Radio />}
+                  label="最小化到系统托盘"
+                />
+                <FormControlLabel
+                  value={false}
+                  control={<Radio />}
+                  label="退出程序"
+                />
+              </RadioGroup>
+            </FormControl>
           </Box>
           <Button
             onClick={() => {

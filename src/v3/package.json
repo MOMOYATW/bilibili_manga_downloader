@@ -2,12 +2,17 @@
   "private": true,
   "name": "bilibili-manga-downloader",
   "description": "Bilibili Manga Downloader",
-  "version": "1.0.0",
+  "version": "3.2.2",
   "author": "Davy Tao <wzhddtygg@gmail.com>",
   "main": "app/background.js",
+  "repository": {
+    "url": "https://github.com/MOMOYATW/bilibili_manga_downloader.git",
+    "type": "git"
+  },
   "scripts": {
     "dev": "nextron",
     "build": "nextron build",
+    "release": "nextron build",
     "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
@@ -18,10 +23,11 @@
     "archiver": "^5.3.1",
     "async-lock": "^1.4.0",
     "axios": "^1.2.2",
+    "clipboard-event": "^1.6.0",
     "electron-serve": "^1.1.0",
     "electron-store": "^8.1.0",
-    "file-saver": "^2.0.5",
-    "got": "^12.5.3"
+    "electron-updater": "^5.3.0",
+    "file-saver": "^2.0.5"
   },
   "devDependencies": {
     "@emotion/cache": "^11.10.3",

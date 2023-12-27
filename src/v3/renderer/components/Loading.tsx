@@ -1,9 +1,6 @@
-import { Alert, Box, Button, CircularProgress } from "@mui/material";
-import { useRouter } from "next/router";
-import React from "react";
+import { Box, CircularProgress } from "@mui/material";
 
-const Loading = ({ failed }) => {
-  const router = useRouter();
+const Loading = () => {
   return (
     <Box
       display="flex"
@@ -15,34 +12,8 @@ const Loading = ({ failed }) => {
         alignItems: "center",
       }}
     >
-      {!failed ? (
-        <>
-          <CircularProgress color="inherit" sx={{ mb: 1 }} />
-          加载中...
-        </>
-      ) : (
-        <Alert
-          severity="error"
-          action={
-            <Button
-              size={"small"}
-              onClick={() =>
-                router.push(
-                  {
-                    pathname: `/home`,
-                  },
-                  undefined,
-                  { shallow: true }
-                )
-              }
-            >
-              返回主页
-            </Button>
-          }
-        >
-          解析失败
-        </Alert>
-      )}
+      <CircularProgress color="inherit" sx={{ mb: 1 }} />
+      加载中...
     </Box>
   );
 };

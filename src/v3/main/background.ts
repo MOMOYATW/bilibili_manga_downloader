@@ -1,15 +1,16 @@
 import os from "os";
 import path from "path";
+import fs from "fs";
+import { app, BrowserWindow, dialog, ipcMain, session } from "electron";
 import serve from "electron-serve";
-import { app, dialog, ipcMain, session } from "electron";
 import { createWindow } from "./helpers";
+import { autoUpdater } from "electron-updater";
 import {
   BilibiliMangaAPI,
   ComicDetailData,
   ComicEpisodeObject,
   ComicPlusItemObject,
 } from "./bilibili-manga-client";
-import { Config, DownloadPlusInfo, TaskItem } from "./types";
 import {
   readJSONasObjectUpdate,
   readJSONasObject,
@@ -20,12 +21,19 @@ import {
   generateEpisodePath,
   generateImageName,
   generateTokutenPath,
+  generateMetadata,
 } from "./utils";
 import { bindWindowBtns } from "./bindWindowBtns";
 import { MappingManager } from "./dlItemsMappingManager";
 import { ItemManager } from "./dlItemManager";
+import { Config, DownloadPlusInfo, TaskItem } from "./types";
+import { createTray } from "./createTray";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+}
 
 if (isProd) {
   serve({ directory: "app" });
@@ -41,7 +49,11 @@ let config: Config = {
   tokuten_folder_format: "{title}",
   image_file_format: "{index}",
   max_download_num: 1,
-  zip_after_download: false,
+  hide_in_tray: true,
+  seperate_folder: false,
+  meta_data_options: "tachiyomi",
+  save_meta_data: false,
+  zip_options: "no_zip",
 };
 
 const app_folder = ".bilibili_manga_downloader";
@@ -70,6 +82,34 @@ const mappingManager = new MappingManager();
     height: 600,
   });
 
+  app.on("second-instance", () => {
+    mainWindow.show();
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  });
+
+  // set up a tray
+  createTray(mainWindow, () => {
+    writeObjectasJSON(
+      path.join(os.homedir(), app_folder, "config.json"),
+      config
+    );
+    writeObjectasJSON(
+      path.join(os.homedir(), app_folder, "complete.json"),
+      itemManager.getComplete()
+    );
+  });
+
+  ipcMain.on("getVersion", () => {
+    mainWindow.webContents.send("Version", app.getVersion());
+  });
+
+  if (process.platform === "win32") {
+    app.setAppUserModelId(app.name);
+  }
+
+  autoUpdater.checkForUpdatesAndNotify();
+
   if (isProd) {
     await mainWindow.loadURL("app://./home.html");
   } else {
@@ -83,7 +123,8 @@ const mappingManager = new MappingManager();
     readJSONasObject(path.join(os.homedir(), app_folder, "complete.json"), []),
     config.max_download_num,
     ipcMain,
-    mainWindow
+    mainWindow,
+    config.zip_options
   );
 
   mainWindow.webContents.session.on(
@@ -128,6 +169,18 @@ const mappingManager = new MappingManager();
       }
 
       // set download path
+      // if already exist then cancel
+      if (
+        fs.existsSync(path.join(config.download_path, mappingInfo.filename))
+      ) {
+        item.cancel();
+        downloadItem.finished_num += 1;
+        if (downloadItem.finished_num === downloadItem.task_num) {
+          itemManager.downloadComplete(downloadItem);
+        }
+        console.log("Already downloaded. Download canceled.");
+        return;
+      }
       item.setSavePath(path.join(config.download_path, mappingInfo.filename));
       downloadItem.item.push(item);
 
@@ -138,6 +191,7 @@ const mappingManager = new MappingManager();
       item.on("updated", (event, state) => {
         if (state == "interrupted") {
           console.log("Download is interrupted but can be resume");
+          console.log(downloadItem.savePath);
         } else if (state == "progressing") {
           if (item.isPaused()) {
             console.log("Download is paused");
@@ -158,20 +212,6 @@ const mappingManager = new MappingManager();
         if (state === "completed") {
           downloadItem.finished_num += 1;
           if (downloadItem.finished_num === downloadItem.task_num) {
-            // archive to file
-            const episode_folder = path.join(
-              ...item.savePath
-                .split(path.sep)
-                .splice(0, item.savePath.split(path.sep).length - 1)
-            );
-            const comic_folder = path.join(
-              ...episode_folder
-                .split(path.sep)
-                .splice(0, episode_folder.split(path.sep).length - 1)
-            );
-            if (config.zip_after_download) {
-              zipDirectory(comic_folder, comic_folder + ".zip", () => {});
-            }
             itemManager.downloadComplete(downloadItem);
           }
           console.log("Download successfully");
@@ -181,6 +221,16 @@ const mappingManager = new MappingManager();
       });
     }
   );
+
+  ipcMain.on("getSearch", async (event, args: string) => {
+    try {
+      const result = await api.getSearch(args);
+      mainWindow.webContents.send("Search", result.data.data.list);
+    } catch (error) {
+      console.log(error);
+      mainWindow.webContents.send("Search", []);
+    }
+  });
 
   ipcMain.on("getComicDetail", async (event, args: number) => {
     try {
@@ -203,7 +253,7 @@ const mappingManager = new MappingManager();
   });
 
   ipcMain.on("zipFolder", (event, args) => {
-    zipDirectory(args, args + ".zip", () => {});
+    zipDirectory(args, args + ".7z", () => {});
   });
 
   ipcMain.on("getCurrentConfig", () => {
@@ -214,6 +264,7 @@ const mappingManager = new MappingManager();
     config = args;
     api.updateConfig({ authToken: config.token });
     itemManager.updateMaxDownloadingNum(config.max_download_num);
+    itemManager.updateZipAfterDownload(config.zip_options);
   });
 
   ipcMain.on("openDialog", async () => {
@@ -248,15 +299,38 @@ const mappingManager = new MappingManager();
       filename: clientSideName,
     });
     mainWindow.webContents.downloadURL(comicInfo.vertical_cover);
+    // save metadata
+    if (config.save_meta_data) {
+      generateMetadata(
+        config.meta_data_options,
+        comicInfo,
+        config.download_path,
+        config.comic_folder_format
+      );
+    }
+
     // handle selected list
+    // currently type can only be video or images
+
     Promise.allSettled(
       comicInfo.ep_list.map(async (episode) => {
+        let video_task = false;
         const imageIndexs = await api.getImageIndex(episode.id);
         const imageHost = imageIndexs.data.data.host;
         const imageUrls = imageIndexs.data.data.images.map(
           (image, imageIndex) => {
-            const serverSideName =
-              image.path.split("/")[image.path.split("/").length - 1];
+            let serverSideName = "";
+            // judge if image or video
+            if (image.video_path) {
+              // use video_path
+              video_task = true;
+              serverSideName = image.video_path
+                .split("/")
+                [image.video_path.split("/").length - 1].split("?")[0];
+            } else {
+              serverSideName =
+                image.path.split("/")[image.path.split("/").length - 1];
+            }
             const comicFolderName = generateComicPath(
               config.comic_folder_format,
               comicInfo
@@ -271,6 +345,7 @@ const mappingManager = new MappingManager();
             );
             const clientSideName = path.join(
               slugify(comicFolderName),
+              config.seperate_folder ? "正篇" : "",
               slugify(episodeFolderName),
               slugify(imageName) +
                 "." +
@@ -280,13 +355,23 @@ const mappingManager = new MappingManager();
               episodeId: episode.id,
               filename: clientSideName,
             });
-            return imageHost + image.path;
+            if (video_task) {
+              // if video
+              return image.video_path;
+            } else {
+              return imageHost + image.path;
+            }
           }
         );
-        const imageTokens = await api.getImageToken(imageUrls);
-        const imageUrlswithToken = imageTokens.data.data.map((imageToken) => {
-          return imageToken.url + "?token=" + imageToken.token;
-        });
+        let imageUrlswithToken = [];
+        if (video_task) {
+          imageUrlswithToken = imageUrls;
+        } else {
+          const imageTokens = await api.getImageToken(imageUrls);
+          imageUrlswithToken = imageTokens.data.data.map((imageToken) => {
+            return imageToken.url + "?token=" + imageToken.token;
+          });
+        }
         const comicFolderName = generateComicPath(
           config.comic_folder_format,
           comicInfo
@@ -312,8 +397,9 @@ const mappingManager = new MappingManager();
           type: "episode",
           savePath: path.join(
             config.download_path,
-            comicFolderName,
-            episodeFolderName
+            slugify(comicFolderName),
+            config.seperate_folder ? "正篇" : "",
+            slugify(episodeFolderName)
           ),
         };
         itemManager.addPending(episodeWithUrls);
@@ -354,6 +440,7 @@ const mappingManager = new MappingManager();
             );
             const clientSideName = path.join(
               slugify(comicFolderName),
+              config.seperate_folder ? "特典" : "",
               slugify(episodeFolderName),
               slugify(imageName) +
                 "." +
@@ -365,6 +452,17 @@ const mappingManager = new MappingManager();
             });
             return image;
           });
+          // # issue 27 add token check
+          let imageUrlswithToken = [];
+          if (!episode.item.pic_num) {
+            imageUrlswithToken = imageUrls;
+          } else {
+            const imageTokens = await api.getImageToken(imageUrls);
+            imageUrlswithToken = imageTokens.data.data.map((imageToken) => {
+              return imageToken.url + "?token=" + imageToken.token;
+            });
+          }
+
           const comicFolderName = generateComicPath(
             config.comic_folder_format,
             comicInfo.comic
@@ -377,7 +475,7 @@ const mappingManager = new MappingManager();
             ComicEpisodeObject | ComicPlusItemObject
           > = {
             episode: episode.item,
-            imageUrls,
+            imageUrls : imageUrlswithToken,
             comic: {
               id: comicInfo.comic.id,
               title: comicInfo.comic.title,
@@ -385,13 +483,14 @@ const mappingManager = new MappingManager();
             },
             progress: 0,
             finished_num: 0,
-            task_num: imageUrls.length,
+            task_num: imageUrlswithToken.length,
             item: [],
             type: !episode.item.pic_num ? "tokuten-video" : "tokuten-image",
             savePath: path.join(
               config.download_path,
-              comicFolderName,
-              episodeFolderName
+              slugify(comicFolderName),
+              config.seperate_folder ? "特典" : "",
+              slugify(episodeFolderName)
             ),
           };
           itemManager.addPending(episodeWithUrls);
@@ -400,25 +499,60 @@ const mappingManager = new MappingManager();
     }
   );
 
-  bindWindowBtns(ipcMain, mainWindow, () => {
-    writeObjectasJSON(
-      path.join(os.homedir(), app_folder, "config.json"),
-      config,
-      path.join(os.homedir(), app_folder)
+  bindWindowBtns(ipcMain, mainWindow);
+
+  //Close the app
+  ipcMain.on("closeApp", () => {
+    if (config.hide_in_tray) mainWindow.hide();
+    else {
+      writeObjectasJSON(
+        path.join(os.homedir(), app_folder, "config.json"),
+        config
+      );
+      writeObjectasJSON(
+        path.join(os.homedir(), app_folder, "complete.json"),
+        itemManager.getComplete()
+      );
+      mainWindow.close();
+    }
+  });
+
+  ipcMain.on("saveMetadata", (event, comicInfo: ComicDetailData) => {
+    generateMetadata(
+      config.meta_data_options,
+      comicInfo,
+      config.download_path,
+      config.comic_folder_format
     );
-    writeObjectasJSON(
-      path.join(os.homedir(), app_folder, "complete.json"),
-      itemManager.getComplete(),
-      path.join(os.homedir(), app_folder)
-    );
+  });
+
+  ipcMain.on("openBilibiliManga", () => {
+    const win = new BrowserWindow({
+      width: 800,
+      height: 600,
+    });
+    win.loadURL("https://manga.bilibili.com");
+    win.setMenu(null);
+    win.webContents.on("did-frame-finish-load", () => {
+      win.setTitle("登陆完成后关闭窗口即可");
+    });
+    const ses = win.webContents.session.cookies;
+    win.on("close", () => {
+      ses
+        .get({ url: "https://manga.bilibili.com/" })
+        .then((cookies) => {
+          const sessdata = cookies.filter((map) => map.name === "SESSDATA")[0];
+          if (sessdata === undefined) return;
+          config.token = sessdata.value;
+          mainWindow.webContents.send("CurrentConfig");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
   });
 })();
 
 app.on("window-all-closed", () => {
   app.quit();
-});
-
-ipcMain.on("ping-pong", (event, arg) => {
-  // event.sender.send("ping-pong", `[ipcMain] "${arg}" received asynchronously.`);
-  console.log(arg);
 });

@@ -11,22 +11,22 @@ import {
   Chip,
   Typography,
   Divider,
-  Snackbar,
-  Alert,
-  IconButton,
+  Fab,
 } from "@mui/material";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import EpisodeList from "../../components/EpisodeList";
 import Loading from "../../components/Loading";
-import CloseIcon from "@mui/icons-material/Close";
+import ScrollTop from "../../components/ScrollTop";
+import PopoutAlert from "../../components/PopoutAlert";
 import {
+  TaskItem,
   ComicDetailData,
-  ComicEpisodeObject,
   ComicPlusData,
+  ComicEpisodeObject,
   ComicPlusItemObject,
-} from "../../../main/bilibili-manga-client";
-import { TaskItem } from "../../../main/types";
+} from "../../types";
 
-const ComicDetail = () => {
+const ComicDetail = ({ scrollTarget }) => {
   const router = useRouter();
   const [comicInfo, setComicInfo] = useState<ComicDetailData | null>(null);
   const [selectedEpisodeIndex, setSelectedEpisodeIndex] = useState<number[]>(
@@ -39,7 +39,6 @@ const ComicDetail = () => {
   const [downloadList, setDownloadList] = useState<
     TaskItem<ComicEpisodeObject | ComicPlusItemObject>[]
   >([]);
-  const [failed, setFailed] = useState(false);
   const [open, setOpen] = useState(false);
   const loadData = () => {
     ipcRenderer.send("getComicDetail", router.query["id"]);
@@ -47,21 +46,20 @@ const ComicDetail = () => {
     ipcRenderer.send("getDownloadList", router.query["id"]);
   };
   useEffect(() => {
-    ipcRenderer.on("ComicDetail", (_event, args: ComicDetailData) => {
+    ipcRenderer.on("ComicDetail", (_event, args: ComicDetailData | null) => {
       if (args === null) {
-        setFailed(true);
-        return;
+        router.push(`/error`);
       }
-      args.ep_list.reverse();
       setComicInfo(args);
     });
-    ipcRenderer.on("ComicAlbumPlus", (_event, args) => {
-      setComicPlusInfo(args);
-    });
-    ipcRenderer.on("DownloadList", (_event, args) => {
-      setDownloadList(args);
-      console.log(args);
-    });
+    ipcRenderer.on("ComicAlbumPlus", (_event, args: ComicPlusData | null) =>
+      setComicPlusInfo(args)
+    );
+    ipcRenderer.on(
+      "DownloadList",
+      (_event, args: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[]) =>
+        setDownloadList(args)
+    );
     loadData();
     return () => {
       ipcRenderer.removeAllListeners("ComicDetail");
@@ -73,47 +71,21 @@ const ComicDetail = () => {
   return (
     <>
       {!comicInfo ? (
-        <Loading failed={failed} />
+        <Loading />
       ) : (
         <Box display="flex" flexDirection={"column"} sx={{ p: 3 }}>
-          <Snackbar
+          <PopoutAlert
+            severity={"success"}
             open={open}
-            autoHideDuration={3000}
-            onClose={() => setOpen(false)}
-            anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            handleClose={() => setOpen(false)}
           >
-            <Alert
-              severity="success"
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setOpen(false);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-              sx={{ mb: 2 }}
-            >
-              任务已添加
-            </Alert>
-          </Snackbar>
-          <Card
-            sx={{
-              display: "flex",
-              p: 2,
-            }}
-          >
+            任务已添加
+          </PopoutAlert>
+          <Card sx={{ display: "flex", p: 2 }} id="back-to-top-anchor">
             <Box sx={{ display: "flex", alignItems: "center" }}>
               <CardMedia
                 component="img"
-                sx={{
-                  width: "300px",
-                  p: 1,
-                }}
+                sx={{ width: "300px", p: 1 }}
                 image={comicInfo.vertical_cover}
                 alt="Vertical Cover of the Comic"
               />
@@ -186,6 +158,24 @@ const ComicDetail = () => {
                   下载选中
                 </Button>
                 <Box sx={{ flexGrow: 1 }}></Box>
+                <Button
+                  size="large"
+                  onClick={() => ipcRenderer.send("saveMetadata", comicInfo)}
+                  color={"info"}
+                >
+                  保存元数据
+                </Button>
+                <Button
+                  size="large"
+                  onClick={() => {
+                    comicInfo.ep_list.reverse();
+                    setSelectedEpisodeIndex([]);
+                    setComicInfo({ ...comicInfo });
+                  }}
+                  color={"info"}
+                >
+                  正序 / 倒序
+                </Button>
                 <Button size="large" onClick={loadData} color={"info"}>
                   重新加载
                 </Button>
@@ -206,6 +196,11 @@ const ComicDetail = () => {
               downloadList={downloadList}
             />
           )}
+          <ScrollTop scrollTarget={scrollTarget}>
+            <Fab size="small" aria-label="scroll back to top">
+              <KeyboardArrowUpIcon />
+            </Fab>
+          </ScrollTop>
         </Box>
       )}
     </>

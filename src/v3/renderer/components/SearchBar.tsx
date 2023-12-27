@@ -1,7 +1,6 @@
 import { Paper, InputBase, IconButton } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import React, { useEffect } from "react";
 
 const SearchBar = ({ value, handleChange, handleSearch, handleClear }) => {
   return (

@@ -115,6 +115,27 @@ Token：用户登录后的`SESSDATA`项 Cookie 值，现支持直接自动获取
 
 <img src="README.assets/image-20230112223958612.png" width="700px">
 
+### 自行编译与运行
+
+配置依赖
+```
+$ cd src/v3
+
+# using yarn or npm
+$ yarn (or `npm install`)
+```
+
+调试模式运行
+```
+$ yarn dev (or `npm run dev`)
+```
+
+编译
+```
+$ yarn build (or `npm run build`)
+```
+
+注意：MacOS用户请查询electron-builder配置`electron-builder.yml`文件
 
 ### 项目基于
 

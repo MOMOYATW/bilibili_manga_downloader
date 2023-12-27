@@ -2,7 +2,13 @@ import "../styles/global.css";
 import React from "react";
 import Head from "next/head";
 import type { AppProps } from "next/app";
-import { Box, CssBaseline, styled, ThemeProvider } from "@mui/material";
+import {
+  Box,
+  CssBaseline,
+  styled,
+  ThemeProvider,
+  useScrollTrigger,
+} from "@mui/material";
 import { lightTheme, darkTheme } from "../lib/theme";
 import type { EmotionCache } from "@emotion/cache";
 import createEmotionCache from "../lib/create-emotion-cache";
@@ -36,8 +42,9 @@ export default function MyApp(props: MyAppProps) {
   const [activeTheme, setActiveTheme] = useState(lightTheme);
   const [selectedTheme, setSelectedTheme] = useState<"light" | "dark">("light");
   const [activeMenuIndex, setActiveMenuIndex] = useState(0);
-  const [downloadList, setDownloadList] = useState({});
+
   const router = useRouter();
+  const trigger = useScrollTrigger();
   const MenuList = [
     {
       title: "主页",
@@ -86,6 +93,7 @@ export default function MyApp(props: MyAppProps) {
   }, [router.pathname]);
 
   const { Component, pageProps, emotionCache = clientSideEmotionCache } = props;
+  const [scrollTarget, setScrollTarget] = useState<Node | undefined>(undefined);
 
   return (
     <CacheProvider value={emotionCache}>
@@ -104,12 +112,16 @@ export default function MyApp(props: MyAppProps) {
             onClickMenuBtn={setActiveMenuIndex}
             menuItems={MenuList}
           />
-          <ScrollBox component={"main"} className="enable-scroll">
-            <Component
-              {...pageProps}
-              downloadList={downloadList}
-              setDownloadList={setDownloadList}
-            />
+          <ScrollBox
+            component={"main"}
+            className="enable-scroll"
+            ref={(node: Node) => {
+              if (node) {
+                setScrollTarget(node);
+              }
+            }}
+          >
+            <Component {...pageProps} scrollTarget={scrollTarget} selectedTheme={selectedTheme} />
           </ScrollBox>
         </Box>
       </ThemeProvider>

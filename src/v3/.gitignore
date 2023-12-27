@@ -3,9 +3,4 @@ node_modules
 .next
 app
 dist
-config.json
-complete.json
-downloading.json
-mapping.json
-pending.json
-register.json
+.VSCodeCounter/
