@@ -4,7 +4,7 @@
 <img src="README.assets/icon.png" width=100px>
 </div>
 <div align="center" padding="1">
-<a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/release/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="GitHub release"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/latest/total.svg?logo=github" alt="GitHub downloads"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/total.svg?logo=github" alt="GitHub downloads"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/stargazers"><img src="https://img.shields.io/github/stars/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="Github stars"></a>
+<a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/release/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="GitHub release"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/badge/platform-Windows_|_Linux-blue" alt="Support platform"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/latest/total.svg?logo=github" alt="GitHub downloads"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/total.svg?logo=github" alt="GitHub downloads"></a> <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/stargazers"><img src="https://img.shields.io/github/stars/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="Github stars"></a>
 
 </div>
 
@@ -115,6 +115,7 @@ Token：用户登录后的`SESSDATA`项 Cookie 值，现支持直接自动获取
 
 <img src="README.assets/image-20230112223958612.png" width="700px">
 
+
 ### 项目基于
 
 - Electron
@@ -125,10 +126,12 @@ Token：用户登录后的`SESSDATA`项 Cookie 值，现支持直接自动获取
 
 ### 更新
 
-V3.2.1
+V3.2.2
 
-1. 修复了特典下载问题（issue #27 ）
-2. 修复了压缩问题（issue #26）
+1. 增加对Linux平台的支持，修复了在Linux下的一些适配性问题（issue #25）
+2. 发布Linux二进制版本，在ubuntu 20.04上通过测试
+3. 明确了各发行版本所支持架构，其他架构请对照README自行编译
+4. 修复了上个版本中关于界面图标不显示的问题
    
 
 ### 开发计划
