@@ -87,7 +87,7 @@ const Settings = () => {
               component="label"
               sx={{ ml: 1 }}
               onClick={() => {
-                ipcRenderer.send("openDialog");
+                ipcRenderer.send("openConfigDialog");
               }}
             >
               选择路径

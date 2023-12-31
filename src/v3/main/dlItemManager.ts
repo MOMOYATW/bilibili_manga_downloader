@@ -248,6 +248,7 @@ export class ItemManager extends EventEmitter {
    */
   public sendRegister(comicId: number) {
     this.emit("DownloadList", this.register[comicId] ? this.register[comicId] : {});
+    console.log(this.register[comicId] ? this.register[comicId] : {})
   }
 
   /**
