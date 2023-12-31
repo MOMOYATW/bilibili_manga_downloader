@@ -6,10 +6,13 @@
 <div align="center" padding="1">
 <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/release/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="GitHub release"></a> 
 <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/badge/platform-Windows_|_Linux-blue?logo=github" alt="Support platform"></a> 
+<a href="https://github.com/MOMOYATW/bilibili_manga_downloader/stargazers"><img src="https://img.shields.io/github/stars/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="Github stars"></a>
+</div>
+<div align="center" padding="1">
 <a href="https://github.com/MOMOYATW/bilibili_manga_downloader?tab=MIT-1-ov-file"><img src="https://img.shields.io/github/license/MOMOYATW/bilibili_manga_downloader?logo=github" alt="License"></a> 
 <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/latest/total.svg?logo=github" alt="GitHub downloads"></a>
 <a href="https://github.com/MOMOYATW/bilibili_manga_downloader/releases/latest"><img src="https://img.shields.io/github/downloads/MOMOYATW/bilibili_manga_downloader/total.svg?logo=github" alt="GitHub downloads"></a> 
-<a href="https://github.com/MOMOYATW/bilibili_manga_downloader/stargazers"><img src="https://img.shields.io/github/stars/MOMOYATW/bilibili_manga_downloader.svg?logo=github" alt="Github stars"></a>
+
 
 </div>
 
