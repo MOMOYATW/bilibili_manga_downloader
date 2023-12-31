@@ -6,134 +6,55 @@ import {
 } from "./bilibili-manga-client";
 import { DownloadItemsRegiter, TaskItem } from "./types";
 import { zipDirectory } from "./utils";
+import EventEmitter from "events";
 
-export class ItemManager {
-  register: DownloadItemsRegiter;
-  pending: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[];
-  downloading: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[];
-  complete: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[];
-  max_downloading_num: number;
-  ipcMain: Electron.IpcMain;
-  mainWindow: Electron.CrossProcessExports.BrowserWindow;
-  asyncLock: AsyncLock;
-  zip_options: "no_zip" | "zip_comic" | "zip_episode";
+/**
+ * Manages the download items for the manga downloader.
+ */
+export class ItemManager extends EventEmitter {
+  private register: DownloadItemsRegiter;
+  private pending: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[];
+  private downloading: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[];
+  private complete: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[];
+  private asyncLock: AsyncLock;
+  private config: {max_downloading_num: number, zip_options: "no_zip" | "zip_comic" | "zip_episode"};
 
+  /**
+   * Constructs a new instance of the ItemManager class.
+   * @param complete The list of complete download items.
+   * @param max_downloading_num The maximum number of items that can be downloaded simultaneously.
+   * @param zip_options The options for zipping the downloaded items.
+   */
   constructor(
-    pending: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[],
     complete: TaskItem<ComicEpisodeObject | ComicPlusItemObject>[],
     max_downloading_num: number,
-    ipcMain: Electron.IpcMain,
-    mainWindow: Electron.CrossProcessExports.BrowserWindow,
     zip_options: "no_zip" | "zip_comic" | "zip_episode"
   ) {
-    this.pending = pending;
+    super();
+    this.pending = [];
     this.downloading = [];
     this.complete = complete;
     this.register = {};
-    this.max_downloading_num = max_downloading_num;
-    this.mainWindow = mainWindow;
-    this.zip_options = zip_options;
-
+    this.config = { max_downloading_num, zip_options };
     this.asyncLock = new AsyncLock();
 
     // register for everyone
-    pending.map((pendingItem) => {
-      this.registerTask(pendingItem);
-    });
-    complete.map((completeItem) => {
-      this.registerTask(completeItem);
-    });
-    // bind signal
-    // querys
-    ipcMain.on("getPendingList", () => {
-      this.sendPending();
-    });
-    ipcMain.on("getDownloadingList", () => {
-      this.sendDownloading();
-    });
-    ipcMain.on("getCompleteList", () => {
-      this.sendComplete();
-    });
-    ipcMain.on("getDownloadList", (_event, comicId: number) => {
-      this.sendRegister(comicId);
-    });
-    // operations
-    ipcMain.on("deleteComicPending", (_event, comicId: number) => {
-      this.pending = this.pending.filter((pendingItem) => {
-        if (pendingItem.comic.id === comicId) {
-          delete this.register[pendingItem.comic.id][pendingItem.episode.id];
-          return false;
-        }
-        return true;
-      });
-      this.sendPending();
-    });
-    ipcMain.on("deleteEpisodePending", (_event, episodeId: number) => {
-      this.pending = this.pending.filter((pendingItem) => {
-        if (pendingItem.episode.id === episodeId) {
-          delete this.register[pendingItem.comic.id][pendingItem.episode.id];
-          return false;
-        }
-        return true;
-      });
-      this.sendPending();
-    });
-    ipcMain.on("cancelComicDownloading", (_event, comicId: number) => {
-      this.downloading = this.downloading.filter((downloadingItem) => {
-        if (downloadingItem.comic.id === comicId) {
-          downloadingItem.item.forEach((item) => item.cancel());
-          delete this.register[downloadingItem.comic.id][
-            downloadingItem.episode.id
-          ];
-          return false;
-        }
-        return true;
-      });
-      this.sendDownloading();
-      this.DownloadLoader();
-    });
-    ipcMain.on("cancelEpisodeDownloading", (_event, episodeId: number) => {
-      this.downloading = this.downloading.filter((downloadingItem) => {
-        if (downloadingItem.episode.id === episodeId) {
-          downloadingItem.item.forEach((item) => item.cancel());
-          delete this.register[downloadingItem.comic.id][
-            downloadingItem.episode.id
-          ];
-          return false;
-        }
-        return true;
-      });
-      this.sendDownloading();
-      this.DownloadLoader();
-    });
-    ipcMain.on("deleteComicComplete", (_event, comicId: number) => {
-      this.complete = this.complete.filter((completeItem, index) => {
-        if (completeItem.comic.id === comicId) {
-          delete this.register[completeItem.comic.id][completeItem.episode.id];
-          return false;
-        }
-        return true;
-      });
-      this.sendComplete();
-    });
-    ipcMain.on("deleteEpisodeComplete", (_event, episodeId: number) => {
-      this.complete = this.complete.filter((completeItem, index) => {
-        if (completeItem.episode.id === episodeId) {
-          delete this.register[completeItem.comic.id][completeItem.episode.id];
-          return false;
-        }
-        return true;
-      });
-      this.sendComplete();
-    });
-
+    complete.forEach(item => this.registerTask(item));
     this.DownloadLoader();
   }
 
+  /**
+   * Gets the list of currently downloading items.
+   * @returns The list of currently downloading items.
+   */
   public getDownloading() {
     return this.downloading;
   }
 
+  /**
+   * Gets the list of complete download items.
+   * @returns The list of complete download items.
+   */
   public getComplete() {
     this.complete = this.complete.map((completeItem) => {
       completeItem.imageUrls = [];
@@ -142,6 +63,10 @@ export class ItemManager {
     return this.complete;
   }
 
+  /**
+   * Adds a pending download task.
+   * @param task The download task to add.
+   */
   public addPending(task: TaskItem<ComicEpisodeObject | ComicPlusItemObject>) {
     this.registerTask(task);
     this.sendRegister(task.comic.id);
@@ -150,18 +75,71 @@ export class ItemManager {
     this.DownloadLoader();
   }
 
-  public DownloadLoader() {
+  public removePendingByComicId(comicId: number) {
+    // remove from pending and register
+    this.pending = this.pending.filter((item) => item.comic.id !== comicId);
+    delete this.register[comicId];
+    this.sendPending();
+  }
+
+  public removePendingByEpisodeId(episodeId: number) {
+    // remove from pending and register
+    this.pending = this.pending.filter((item) => item.episode.id !== episodeId);
+    Object.keys(this.register).forEach((comicId) => {
+      delete this.register[comicId][episodeId];
+    });
+    this.sendPending();
+  }
+
+  public removeDownloadingByComicId(comicId: number) {
+    // remove from downloading and register
+    this.downloading = this.downloading.filter((item) => item.comic.id !== comicId);
+    delete this.register[comicId];
+    this.sendDownloading();
+    this.DownloadLoader();
+  }
+
+  public removeDownloadingByEpisodeId(episodeId: number) {
+    // remove from downloading and register
+    this.downloading = this.downloading.filter((item) => item.episode.id !== episodeId);
+    Object.keys(this.register).forEach((comicId) => {
+      delete this.register[comicId][episodeId];
+    });
+    this.sendDownloading();
+    this.DownloadLoader();
+  }
+
+  public removeCompleteByComicId(comicId: number) {
+    // remove from complete and register
+    this.complete = this.complete.filter((item) => item.comic.id !== comicId);
+    delete this.register[comicId];
+    this.sendComplete();
+  }
+
+  public removeCompleteByEpisodeId(episodeId: number) {
+    // remove from complete and register
+    this.complete = this.complete.filter((item) => item.episode.id !== episodeId);
+    Object.keys(this.register).forEach((comicId) => {
+      delete this.register[comicId][episodeId];
+    });
+    this.sendComplete();
+  }
+
+  /**
+   * Loads and starts downloading the pending items.
+   */
+  private DownloadLoader() {
     // judge if load
     this.asyncLock.acquire("mutex", () => {
       if (
-        this.max_downloading_num &&
-        this.downloading.length >= this.max_downloading_num
+        this.config.max_downloading_num &&
+        this.downloading.length >= this.config.max_downloading_num
       )
         return;
       // load
       const loadItems = this.pending.splice(
         0,
-        this.max_downloading_num - this.downloading.length
+        this.config.max_downloading_num - this.downloading.length
       );
       this.sendPending();
       // add to download list
@@ -169,12 +147,16 @@ export class ItemManager {
       this.sendDownloading();
       loadItems.map((item) => {
         item.imageUrls.map((url) =>
-          this.mainWindow.webContents.downloadURL(url)
+          this.emit("downloadItem", url)
         );
       });
     });
   }
 
+  /**
+   * Handles the completion of a download task.
+   * @param task The completed download task.
+   */
   public downloadComplete(
     task: TaskItem<ComicEpisodeObject | ComicPlusItemObject>
   ) {
@@ -189,7 +171,7 @@ export class ItemManager {
     task.imageUrls = [];
     // zip this comic if this the last episode
     if (
-      this.zip_options === "zip_comic" &&
+      this.config.zip_options === "zip_comic" &&
       this.downloading.filter(
         (downloadItem) => downloadItem.comic.id === task.comic.id
       ).length === 1
@@ -205,7 +187,7 @@ export class ItemManager {
         this.sendComplete();
         this.sendDownloading();
       });
-    } else if (this.zip_options === "zip_episode") {
+    } else if (this.config.zip_options === "zip_episode") {
       // zip this episode
       zipDirectory(task.savePath, task.savePath + ".7z", () => {
         this.downloading.splice(index, 1);
@@ -223,6 +205,10 @@ export class ItemManager {
     }
   }
 
+  /**
+   * Registers a download task.
+   * @param task The download task to register.
+   */
   public registerTask(
     task: TaskItem<ComicEpisodeObject | ComicPlusItemObject>
   ) {
@@ -232,39 +218,46 @@ export class ItemManager {
     this.register[task.comic.id][task.episode.id] = true;
   }
 
+  /**
+   * Sends the list of pending download items.
+   */
   public sendPending() {
-    this.mainWindow.webContents.send("PendingList", this.pending);
+    this.emit("PendingList", this.pending);
   }
 
+  /**
+   * Sends the list of currently downloading items.
+   */
   public sendDownloading() {
-    this.mainWindow.webContents.send(
-      "DownloadingList",
-      this.downloading.map((downloadItem) => ({
-        ...downloadItem,
-        item: [],
-      }))
-    );
+    this.emit("DownloadingList", this.downloading.map((downloadItem) => ({
+      ...downloadItem,
+      item: [],
+      })));
   }
 
+  /**
+   * Sends the list of complete download items.
+   */
   public sendComplete() {
-    this.mainWindow.webContents.send("CompleteList", this.complete);
+    this.emit("CompleteList", this.complete);
   }
 
+  /**
+   * Sends the download list for a specific comic.
+   * @param comicId The ID of the comic.
+   */
   public sendRegister(comicId: number) {
-    this.mainWindow.webContents.send(
-      "DownloadList",
-      this.register[comicId] ? this.register[comicId] : {}
-    );
+    this.emit("DownloadList", this.register[comicId] ? this.register[comicId] : {});
   }
 
-  public updateMaxDownloadingNum(updateNumber: number) {
-    this.max_downloading_num = updateNumber;
+  /**
+   * Updates the configuration options.
+   * @param newConfig The new configuration options.
+   */
+  public updateConfig(newConfig: Partial<typeof this.config>) {
+    for (const key in newConfig) {
+      this.config[key] = newConfig[key];
+    }
     this.DownloadLoader();
-  }
-
-  public updateZipAfterDownload(
-    updateOption: "no_zip" | "zip_comic" | "zip_episode"
-  ) {
-    this.zip_options = updateOption;
   }
 }

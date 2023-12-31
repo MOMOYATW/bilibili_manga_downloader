@@ -119,13 +119,62 @@ const mappingManager = new MappingManager();
   }
 
   const itemManager = new ItemManager(
-    [],
     readJSONasObject(path.join(os.homedir(), app_folder, "complete.json"), []),
     config.max_download_num,
-    ipcMain,
-    mainWindow,
     config.zip_options
   );
+
+  itemManager.on("PendingList", (pendingList) => {
+    mainWindow.webContents.send("PendingList", pendingList);
+  });
+
+  itemManager.on("DownloadingList", (downloadingList) => {
+    mainWindow.webContents.send("DownloadingList", downloadingList);
+  });
+
+  itemManager.on("CompleteList", (completeList) => {
+    mainWindow.webContents.send("CompleteList", completeList);
+  });
+
+  itemManager.on("Register", (comicId) => {
+    mainWindow.webContents.send("Register", comicId);
+  });
+
+  itemManager.on("downloadItem", (url) => {
+    mainWindow.webContents.downloadURL(url);
+  });
+
+  ipcMain.on("getPendingList", () => {
+    itemManager.sendPending();
+  });
+  ipcMain.on("getDownloadingList", () => {
+    itemManager.sendDownloading();
+  });
+  ipcMain.on("getCompleteList", () => {
+    itemManager.sendComplete();
+  });
+  ipcMain.on("getDownloadList", (_event, comicId: number) => {
+    itemManager.sendRegister(comicId);
+  });
+  // operations
+  ipcMain.on("deleteComicPending", (_event, comicId: number) => {
+    itemManager.removePendingByComicId(comicId);
+  });
+  ipcMain.on("deleteEpisodePending", (_event, episodeId: number) => {
+    itemManager.removePendingByEpisodeId(episodeId);
+  });
+  ipcMain.on("cancelComicDownloading", (_event, comicId: number) => {
+    itemManager.removeDownloadingByComicId(comicId);
+  });
+  ipcMain.on("cancelEpisodeDownloading", (_event, episodeId: number) => {
+    itemManager.removeDownloadingByEpisodeId(episodeId);
+  });
+  ipcMain.on("deleteComicComplete", (_event, comicId: number) => {
+    itemManager.removeCompleteByComicId(comicId);
+  });
+  ipcMain.on("deleteEpisodeComplete", (_event, episodeId: number) => {
+    itemManager.removeCompleteByEpisodeId(episodeId);
+  });
 
   mainWindow.webContents.session.on(
     "will-download",
@@ -263,8 +312,7 @@ const mappingManager = new MappingManager();
   ipcMain.on("updateConfig", (event, args) => {
     config = args;
     api.updateConfig({ authToken: config.token });
-    itemManager.updateMaxDownloadingNum(config.max_download_num);
-    itemManager.updateZipAfterDownload(config.zip_options);
+    itemManager.updateConfig({max_downloading_num: config.max_download_num, zip_options: config.zip_options});
   });
 
   ipcMain.on("openDialog", async () => {
