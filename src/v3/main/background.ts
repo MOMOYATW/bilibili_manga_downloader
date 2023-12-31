@@ -1,6 +1,5 @@
 import os from "os";
 import path from "path";
-import fs from "fs";
 import { app, BrowserWindow, dialog, ipcMain, session } from "electron";
 import serve from "electron-serve";
 import { createWindow } from "./helpers";
@@ -12,8 +11,6 @@ import {
   ComicPlusItemObject,
 } from "./bilibili-manga-client";
 import {
-  readJSONasObjectUpdate,
-  readJSONasObject,
   slugify,
   writeObjectasJSON,
   zipDirectory,
@@ -24,10 +21,11 @@ import {
   generateMetadata,
 } from "./utils";
 import { bindWindowBtns } from "./bindWindowBtns";
-import { MappingManager } from "./dlItemsMappingManager";
-import { ItemManager } from "./dlItemManager";
-import { Config, DownloadPlusInfo, TaskItem } from "./types";
+import { DownloadPlusInfo, TaskItem } from "./types";
 import { createTray } from "./createTray";
+import { config, app_folder } from "./helpers/configHandler";
+import { handleWillDownload } from "./helpers/downloadHandler";
+import { itemManager, mappingManager } from "./helpers/downloadHandler";
 
 const isProd: boolean = process.env.NODE_ENV === "production";
 
@@ -41,30 +39,7 @@ if (isProd) {
   app.setPath("userData", `${app.getPath("userData")} (development)`);
 }
 
-let config: Config = {
-  token: "",
-  download_path: path.join(os.homedir(), "download_comics"),
-  comic_folder_format: "{title}",
-  episode_folder_format: "{index}-{title}",
-  tokuten_folder_format: "{title}",
-  image_file_format: "{index}",
-  max_download_num: 1,
-  hide_in_tray: true,
-  seperate_folder: false,
-  meta_data_options: "tachiyomi",
-  save_meta_data: false,
-  zip_options: "no_zip",
-};
-
-const app_folder = ".bilibili_manga_downloader";
-config = readJSONasObjectUpdate<Config>(
-  path.join(os.homedir(), app_folder, "config.json"),
-  config
-);
-
-const api = new BilibiliMangaAPI({ authToken: config.token });
-
-const mappingManager = new MappingManager();
+const api = new BilibiliMangaAPI({ authToken: config.get('token') });
 
 (async () => {
   await app.whenReady();
@@ -92,7 +67,7 @@ const mappingManager = new MappingManager();
   createTray(mainWindow, () => {
     writeObjectasJSON(
       path.join(os.homedir(), app_folder, "config.json"),
-      config
+      config.getConfig()
     );
     writeObjectasJSON(
       path.join(os.homedir(), app_folder, "complete.json"),
@@ -118,158 +93,25 @@ const mappingManager = new MappingManager();
     mainWindow.webContents.openDevTools();
   }
 
-  const itemManager = new ItemManager(
-    readJSONasObject(path.join(os.homedir(), app_folder, "complete.json"), []),
-    config.max_download_num,
-    config.zip_options
-  );
 
-  itemManager.on("PendingList", (pendingList) => {
-    mainWindow.webContents.send("PendingList", pendingList);
-  });
+  itemManager.on("PendingList", (pendingList) => mainWindow.webContents.send("PendingList", pendingList));
+  itemManager.on("DownloadingList", (downloadingList) => mainWindow.webContents.send("DownloadingList", downloadingList));
+  itemManager.on("CompleteList", (completeList) => mainWindow.webContents.send("CompleteList", completeList));
+  itemManager.on("Register", (comicId) => mainWindow.webContents.send("Register", comicId));
+  itemManager.on("downloadItem", (url) => mainWindow.webContents.downloadURL(url));
 
-  itemManager.on("DownloadingList", (downloadingList) => {
-    mainWindow.webContents.send("DownloadingList", downloadingList);
-  });
+  ipcMain.on("getPendingList", () => itemManager.sendPending());
+  ipcMain.on("getDownloadingList", () => itemManager.sendDownloading());
+  ipcMain.on("getCompleteList", () => itemManager.sendComplete());
+  ipcMain.on("getDownloadList", (_event, comicId: number) => itemManager.sendRegister(comicId));
+  ipcMain.on("deleteComicPending", (_event, comicId: number) => itemManager.removePendingByComicId(comicId));
+  ipcMain.on("deleteEpisodePending", (_event, episodeId: number) => itemManager.removePendingByEpisodeId(episodeId));
+  ipcMain.on("cancelComicDownloading", (_event, comicId: number) => itemManager.removeDownloadingByComicId(comicId));
+  ipcMain.on("cancelEpisodeDownloading", (_event, episodeId: number) => itemManager.removeDownloadingByEpisodeId(episodeId));
+  ipcMain.on("deleteComicComplete", (_event, comicId: number) => itemManager.removeCompleteByComicId(comicId));
+  ipcMain.on("deleteEpisodeComplete", (_event, episodeId: number) => itemManager.removeCompleteByEpisodeId(episodeId));
 
-  itemManager.on("CompleteList", (completeList) => {
-    mainWindow.webContents.send("CompleteList", completeList);
-  });
-
-  itemManager.on("Register", (comicId) => {
-    mainWindow.webContents.send("Register", comicId);
-  });
-
-  itemManager.on("downloadItem", (url) => {
-    mainWindow.webContents.downloadURL(url);
-  });
-
-  ipcMain.on("getPendingList", () => {
-    itemManager.sendPending();
-  });
-  ipcMain.on("getDownloadingList", () => {
-    itemManager.sendDownloading();
-  });
-  ipcMain.on("getCompleteList", () => {
-    itemManager.sendComplete();
-  });
-  ipcMain.on("getDownloadList", (_event, comicId: number) => {
-    itemManager.sendRegister(comicId);
-  });
-  // operations
-  ipcMain.on("deleteComicPending", (_event, comicId: number) => {
-    itemManager.removePendingByComicId(comicId);
-  });
-  ipcMain.on("deleteEpisodePending", (_event, episodeId: number) => {
-    itemManager.removePendingByEpisodeId(episodeId);
-  });
-  ipcMain.on("cancelComicDownloading", (_event, comicId: number) => {
-    itemManager.removeDownloadingByComicId(comicId);
-  });
-  ipcMain.on("cancelEpisodeDownloading", (_event, episodeId: number) => {
-    itemManager.removeDownloadingByEpisodeId(episodeId);
-  });
-  ipcMain.on("deleteComicComplete", (_event, comicId: number) => {
-    itemManager.removeCompleteByComicId(comicId);
-  });
-  ipcMain.on("deleteEpisodeComplete", (_event, episodeId: number) => {
-    itemManager.removeCompleteByEpisodeId(episodeId);
-  });
-
-  mainWindow.webContents.session.on(
-    "will-download",
-    (event, item, webContents) => {
-      const serverSideName = item.getFilename();
-
-      if (!mappingManager.recordExist(serverSideName)) {
-        // cannot find record, handle it nicely.
-        console.error(
-          `Item canceled due to lack of task information. serverSideName: ${serverSideName}`
-        );
-        item.cancel();
-        return;
-      }
-
-      const mappingInfo = mappingManager.getMappingInfo(
-        serverSideName,
-        itemManager.getDownloading()
-      );
-
-      // check if is cover
-      if (mappingInfo.episodeId === null) {
-        item.setSavePath(path.join(config.download_path, mappingInfo.filename));
-        return;
-      }
-
-      // get downloading item info
-      const downloadItem = itemManager
-        .getDownloading()
-        .filter((downloadingItem) => {
-          return downloadingItem.episode.id === mappingInfo.episodeId;
-        })[0];
-
-      if (!downloadItem) {
-        // cannot fimd downloading item info, handle it nicely
-        console.error(
-          `item cannot find its download info. episodeId: ${mappingInfo.episodeId} filename: ${mappingInfo.filename}`
-        );
-        item.cancel();
-        return;
-      }
-
-      // set download path
-      // if already exist then cancel
-      if (
-        fs.existsSync(path.join(config.download_path, mappingInfo.filename))
-      ) {
-        item.cancel();
-        downloadItem.finished_num += 1;
-        if (downloadItem.finished_num === downloadItem.task_num) {
-          itemManager.downloadComplete(downloadItem);
-        }
-        console.log("Already downloaded. Download canceled.");
-        return;
-      }
-      item.setSavePath(path.join(config.download_path, mappingInfo.filename));
-      downloadItem.item.push(item);
-
-      // global variable
-      let lastReceivedBytes = 0;
-
-      // update
-      item.on("updated", (event, state) => {
-        if (state == "interrupted") {
-          console.log("Download is interrupted but can be resume");
-          console.log(downloadItem.savePath);
-        } else if (state == "progressing") {
-          if (item.isPaused()) {
-            console.log("Download is paused");
-          } else {
-            const deltaItemProgress =
-              (item.getReceivedBytes() - lastReceivedBytes) /
-              item.getTotalBytes();
-            downloadItem.progress +=
-              (deltaItemProgress / downloadItem.task_num) * 100;
-            lastReceivedBytes = item.getReceivedBytes();
-            itemManager.sendDownloading();
-          }
-        }
-      });
-
-      // done
-      item.once("done", (event, state) => {
-        if (state === "completed") {
-          downloadItem.finished_num += 1;
-          if (downloadItem.finished_num === downloadItem.task_num) {
-            itemManager.downloadComplete(downloadItem);
-          }
-          console.log("Download successfully");
-        } else {
-          console.log(`Download failed: ${state}`);
-        }
-      });
-    }
-  );
+  mainWindow.webContents.session.on("will-download", handleWillDownload);
 
   ipcMain.on("getSearch", async (event, args: string) => {
     try {
@@ -302,17 +144,17 @@ const mappingManager = new MappingManager();
   });
 
   ipcMain.on("zipFolder", (event, args) => {
-    zipDirectory(args, args + ".7z", () => {});
+    zipDirectory(args, args + ".7z", () => { });
   });
 
   ipcMain.on("getCurrentConfig", () => {
-    mainWindow.webContents.send("CurrentConfig", config);
+    mainWindow.webContents.send("CurrentConfig", config.getConfig());
   });
 
   ipcMain.on("updateConfig", (event, args) => {
-    config = args;
-    api.updateConfig({ authToken: config.token });
-    itemManager.updateConfig({max_downloading_num: config.max_download_num, zip_options: config.zip_options});
+    config.update(args);
+    api.updateConfig({ authToken: config.get('token') });
+    itemManager.updateConfig({ max_downloading_num: config.get('max_download_num'), zip_options: config.get('zip_options') });
   });
 
   ipcMain.on("openDialog", async () => {
@@ -320,8 +162,8 @@ const mappingManager = new MappingManager();
       properties: ["openDirectory"],
     });
     if (canceled) return;
-    config.download_path = filePaths[0];
-    mainWindow.webContents.send("CurrentConfig", config);
+    config.update({ download_path: filePaths[0] })
+    mainWindow.webContents.send("CurrentConfig", config.getConfig());
   });
 
   ipcMain.on("DownloadEpisodes", async (event, comicInfo: ComicDetailData) => {
@@ -329,18 +171,18 @@ const mappingManager = new MappingManager();
     // download cover issue #7
     const serverSideName =
       comicInfo.vertical_cover.split("/")[
-        comicInfo.vertical_cover.split("/").length - 1
+      comicInfo.vertical_cover.split("/").length - 1
       ];
     const comicFolderName = generateComicPath(
-      config.comic_folder_format,
+      config.get('comic_folder_format'),
       comicInfo
     );
     const imageName = "cover";
     const clientSideName = path.join(
       slugify(comicFolderName),
       slugify(imageName) +
-        "." +
-        serverSideName.split(".")[serverSideName.split(".").length - 1]
+      "." +
+      serverSideName.split(".")[serverSideName.split(".").length - 1]
     );
     mappingManager.registerMappingInfo(serverSideName, {
       episodeId: null,
@@ -348,12 +190,12 @@ const mappingManager = new MappingManager();
     });
     mainWindow.webContents.downloadURL(comicInfo.vertical_cover);
     // save metadata
-    if (config.save_meta_data) {
+    if (config.get('save_meta_data')) {
       generateMetadata(
-        config.meta_data_options,
+        config.get('meta_data_options'),
         comicInfo,
-        config.download_path,
-        config.comic_folder_format
+        config.get('download_path'),
+        config.get('comic_folder_format')
       );
     }
 
@@ -374,30 +216,30 @@ const mappingManager = new MappingManager();
               video_task = true;
               serverSideName = image.video_path
                 .split("/")
-                [image.video_path.split("/").length - 1].split("?")[0];
+              [image.video_path.split("/").length - 1].split("?")[0];
             } else {
               serverSideName =
                 image.path.split("/")[image.path.split("/").length - 1];
             }
             const comicFolderName = generateComicPath(
-              config.comic_folder_format,
+              config.get('comic_folder_format'),
               comicInfo
             );
             const episodeFolderName = generateEpisodePath(
-              config.episode_folder_format,
+              config.get('episode_folder_format'),
               episode
             );
             const imageName = generateImageName(
-              config.image_file_format,
+              config.get('image_file_format'),
               imageIndex
             );
             const clientSideName = path.join(
               slugify(comicFolderName),
-              config.seperate_folder ? "正篇" : "",
+              config.get('seperate_folder') ? "正篇" : "",
               slugify(episodeFolderName),
               slugify(imageName) +
-                "." +
-                serverSideName.split(".")[serverSideName.split(".").length - 1]
+              "." +
+              serverSideName.split(".")[serverSideName.split(".").length - 1]
             );
             mappingManager.registerMappingInfo(serverSideName, {
               episodeId: episode.id,
@@ -421,11 +263,11 @@ const mappingManager = new MappingManager();
           });
         }
         const comicFolderName = generateComicPath(
-          config.comic_folder_format,
+          config.get('comic_folder_format'),
           comicInfo
         );
         const episodeFolderName = generateEpisodePath(
-          config.episode_folder_format,
+          config.get('episode_folder_format'),
           episode
         );
         const episodeWithUrls: TaskItem<
@@ -444,9 +286,9 @@ const mappingManager = new MappingManager();
           item: [],
           type: "episode",
           savePath: path.join(
-            config.download_path,
+            config.get('download_path'),
             slugify(comicFolderName),
-            config.seperate_folder ? "正篇" : "",
+            config.get('seperate_folder') ? "正篇" : "",
             slugify(episodeFolderName)
           ),
         };
@@ -475,24 +317,24 @@ const mappingManager = new MappingManager();
               image.split("/").length - 1
             ];
             const comicFolderName = generateComicPath(
-              config.comic_folder_format,
+              config.get('comic_folder_format'),
               comicInfo.comic
             );
             const episodeFolderName = generateTokutenPath(
-              config.tokuten_folder_format,
+              config.get('tokuten_folder_format'),
               episode.item
             );
             const imageName = generateImageName(
-              config.image_file_format,
+              config.get('image_file_format'),
               imageIndex
             );
             const clientSideName = path.join(
               slugify(comicFolderName),
-              config.seperate_folder ? "特典" : "",
+              config.get('seperate_folder') ? "特典" : "",
               slugify(episodeFolderName),
               slugify(imageName) +
-                "." +
-                serverSideName.split(".")[serverSideName.split(".").length - 1]
+              "." +
+              serverSideName.split(".")[serverSideName.split(".").length - 1]
             );
             mappingManager.registerMappingInfo(serverSideName, {
               episodeId: episode.item.id,
@@ -512,18 +354,18 @@ const mappingManager = new MappingManager();
           }
 
           const comicFolderName = generateComicPath(
-            config.comic_folder_format,
+            config.get('comic_folder_format'),
             comicInfo.comic
           );
           const episodeFolderName = generateTokutenPath(
-            config.tokuten_folder_format,
+            config.get('tokuten_folder_format'),
             episode.item
           );
           const episodeWithUrls: TaskItem<
             ComicEpisodeObject | ComicPlusItemObject
           > = {
             episode: episode.item,
-            imageUrls : imageUrlswithToken,
+            imageUrls: imageUrlswithToken,
             comic: {
               id: comicInfo.comic.id,
               title: comicInfo.comic.title,
@@ -535,9 +377,9 @@ const mappingManager = new MappingManager();
             item: [],
             type: !episode.item.pic_num ? "tokuten-video" : "tokuten-image",
             savePath: path.join(
-              config.download_path,
+              config.get('download_path'),
               slugify(comicFolderName),
-              config.seperate_folder ? "特典" : "",
+              config.get('seperate_folder') ? "特典" : "",
               slugify(episodeFolderName)
             ),
           };
@@ -551,11 +393,11 @@ const mappingManager = new MappingManager();
 
   //Close the app
   ipcMain.on("closeApp", () => {
-    if (config.hide_in_tray) mainWindow.hide();
+    if (config.get('hide_in_tray')) mainWindow.hide();
     else {
       writeObjectasJSON(
         path.join(os.homedir(), app_folder, "config.json"),
-        config
+        config.getConfig()
       );
       writeObjectasJSON(
         path.join(os.homedir(), app_folder, "complete.json"),
@@ -567,10 +409,10 @@ const mappingManager = new MappingManager();
 
   ipcMain.on("saveMetadata", (event, comicInfo: ComicDetailData) => {
     generateMetadata(
-      config.meta_data_options,
+      config.get('meta_data_options'),
       comicInfo,
-      config.download_path,
-      config.comic_folder_format
+      config.get('download_path'),
+      config.get('comic_folder_format')
     );
   });
 
@@ -591,7 +433,7 @@ const mappingManager = new MappingManager();
         .then((cookies) => {
           const sessdata = cookies.filter((map) => map.name === "SESSDATA")[0];
           if (sessdata === undefined) return;
-          config.token = sessdata.value;
+          config.update({ token: sessdata.value });
           mainWindow.webContents.send("CurrentConfig");
         })
         .catch((error) => {

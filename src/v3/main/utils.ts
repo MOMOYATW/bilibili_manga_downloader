@@ -7,21 +7,6 @@ import {
 import path from "path";
 import child_process from "child_process";
 
-export function readJSONasObjectUpdate<T>(
-  jsonFileName: string,
-  defaultObject: T
-): T {
-  if (fs.existsSync(jsonFileName)) {
-    const objectRead = JSON.parse(fs.readFileSync(jsonFileName, "utf-8"));
-    Object.keys(defaultObject).map((key) => {
-      if (key in objectRead) {
-        defaultObject[key] = objectRead[key];
-      }
-    });
-  }
-  return defaultObject;
-}
-
 export function readJSONasObject<T>(jsonFileName: string, defaultObject: T): T {
   if (fs.existsSync(jsonFileName)) {
     const objectRead = JSON.parse(fs.readFileSync(jsonFileName, "utf-8"));
